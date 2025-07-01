@@ -125,3 +125,33 @@ document.addEventListener("DOMContentLoaded", updateAll);
 
 window.addInventaireRow = addInventaireRow;
 window.addConvertRow = addConvertRow;
+
+
+// Vérification que les données sont bien chargées
+if (!monnaies || !monnaies.pieces || !monnaies.gemmes) {
+  alert("Erreur : les données de monnaies ne sont pas chargées.");
+}
+
+// Sécurité pour éviter d'ajouter des lignes si les données sont vides
+function addInventaireRow(type) {
+  const table = document.getElementById(type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes');
+  const objList = type === 'pieces' ? monnaies.pieces : monnaies.gemmes;
+
+  if (!objList || Object.keys(objList).length === 0) {
+    alert("Aucune donnée disponible pour ajouter une ligne.");
+    return;
+  }
+
+  const row = table.insertRow(-1);
+  const options = Object.entries(objList).map(([name]) => \`<option value="\${name}">\${name}</option>\`).join('');
+  row.innerHTML = `
+    <td><select onchange="updateInventaire(this)">${options}</select></td>
+    <td><input type='number' value='0' class='qte'></td>
+    <td><span class='valeur'>0</span></td>
+    <td><span class='total'>0</span></td>
+  `;
+  updateInventaire(row.querySelector("select"));
+}
+
+window.addInventaireRow = addInventaireRow;
+window.addConvertRow = addConvertRow;
