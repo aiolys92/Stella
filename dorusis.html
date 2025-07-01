@@ -66,6 +66,25 @@
       Pièces
      </h3>
      <table id="inventaireTablePieces">
+      <thead>
+       <tr>
+        <th>
+         Nom
+        </th>
+        <th>
+         Quantité
+        </th>
+        <th>
+         Valeur
+        </th>
+        <th>
+         Total
+        </th>
+        <th>
+         Supprimer
+        </th>
+       </tr>
+      </thead>
       <tbody>
        <tr>
         <th>
@@ -80,6 +99,11 @@
         <th>
          Total
         </th>
+        <td>
+         <button onclick="removeInventaireRow(this)" type="button">
+          🗑️
+         </button>
+        </td>
        </tr>
       </tbody>
      </table>
@@ -90,6 +114,25 @@
       Gemmes
      </h3>
      <table id="inventaireTableGemmes">
+      <thead>
+       <tr>
+        <th>
+         Nom
+        </th>
+        <th>
+         Quantité
+        </th>
+        <th>
+         Valeur
+        </th>
+        <th>
+         Total
+        </th>
+        <th>
+         Supprimer
+        </th>
+       </tr>
+      </thead>
       <tbody>
        <tr>
         <th>
@@ -104,6 +147,11 @@
         <th>
          Total
         </th>
+        <td>
+         <button onclick="removeInventaireRow(this)" type="button">
+          🗑️
+         </button>
+        </td>
        </tr>
       </tbody>
      </table>

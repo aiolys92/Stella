@@ -245,3 +245,14 @@ document.addEventListener('DOMContentLoaded', function() {
     saveGuildBtn.addEventListener('click', saveToFileGuild);
   }
 });
+
+// Remove row from inventory
+function removeInventaireRow(btn) {
+  const row = btn.closest('tr');
+  row.remove();
+  // update total
+  let sum = 0;
+  document.querySelectorAll('.total').forEach(c => sum += parseFloat(c.textContent) || 0);
+  const totalSpan = document.getElementById('totalInventaire');
+  if (totalSpan) totalSpan.textContent = sum.toFixed(2);
+}

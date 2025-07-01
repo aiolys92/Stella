@@ -35,38 +35,79 @@
      Sauvegarder Guild
     </button>
    </div>
-   <div  id="guildContent" style="min-height:200px; border:1px dashed #ccc; padding:1em;">
-    <div class="sidebar">
-     <h2>
-      Navigation
-     </h2>
-     <a href="index.html">
-      Accueil
-     </a>
-     <a href="dorusis.html">
-      Dorusis
-     </a>
-     <a href="guilde.html">
-      Guilde
-     </a>
-     <a href="liste.html">
-      Liste complète
-     </a>
-     <a href="convertisseur.html">
-      Convertisseur
-     </a>
+   <div class="sidebar">
+    <h2>
+     Navigation
+    </h2>
+    <a href="index.html">
+     Accueil
+    </a>
+    <a href="dorusis.html">
+     Dorusis
+    </a>
+    <a href="guilde.html">
+     Guilde
+    </a>
+    <a href="liste.html">
+     Liste complète
+    </a>
+    <a href="convertisseur.html">
+     Convertisseur
+    </a>
+   </div>
+   <div class="content fade-in">
+    <div id="header">
     </div>
-    <div class="content fade-in">
-     <div id="header">
-     </div>
-     <div class="section" id="inventaire">
-      <h2>
-       Inventaire Guilde
-      </h2>
-      <h3>
-       Pièces
-      </h3>
-      <table id="inventaireTablePieces">
+    <div class="section" id="inventaire">
+     <h2>
+      Inventaire Guilde
+     </h2>
+     <h3>
+      Pièces
+     </h3>
+     <table id="inventaireTablePieces">
+      <thead>
+       <tr>
+        <th>
+         Nom
+        </th>
+        <th>
+         Quantité
+        </th>
+        <th>
+         Valeur
+        </th>
+        <th>
+         Total
+        </th>
+        <th>
+         Supprimer
+        </th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <th>
+         Nom
+        </th>
+        <th>
+         Quantité
+        </th>
+        <th>
+         Valeur
+        </th>
+        <th>
+         Total
+        </th>
+        <th>
+         Supprimer
+        </th>
+        <td>
+         <button onclick="removeInventaireRow(this)" type="button">
+          🗑️
+         </button>
+        </td>
+       </tr>
        <tr>
         <th>
          Objet
@@ -80,15 +121,63 @@
         <th>
          Total
         </th>
+        <td>
+         <button onclick="removeInventaireRow(this)" type="button">
+          🗑️
+         </button>
+        </td>
        </tr>
-      </table>
-      <button onclick="addInventaireRow('pieces')">
-       ➕ Ajouter une pièce
-      </button>
-      <h3>
-       Gemmes
-      </h3>
-      <table id="inventaireTableGemmes">
+      </tbody>
+     </table>
+     <button onclick="addInventaireRow('pieces')">
+      ➕ Ajouter une pièce
+     </button>
+     <h3>
+      Gemmes
+     </h3>
+     <table id="inventaireTableGemmes">
+      <thead>
+       <tr>
+        <th>
+         Nom
+        </th>
+        <th>
+         Quantité
+        </th>
+        <th>
+         Valeur
+        </th>
+        <th>
+         Total
+        </th>
+        <th>
+         Supprimer
+        </th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <th>
+         Nom
+        </th>
+        <th>
+         Quantité
+        </th>
+        <th>
+         Valeur
+        </th>
+        <th>
+         Total
+        </th>
+        <th>
+         Supprimer
+        </th>
+        <td>
+         <button onclick="removeInventaireRow(this)" type="button">
+          🗑️
+         </button>
+        </td>
+       </tr>
        <tr>
         <th>
          Objet
@@ -102,21 +191,26 @@
         <th>
          Total
         </th>
+        <td>
+         <button onclick="removeInventaireRow(this)" type="button">
+          🗑️
+         </button>
+        </td>
        </tr>
-      </table>
-      <button onclick="addInventaireRow('gemmes')">
-       ➕ Ajouter une gemme
-      </button>
-      <p>
-       <strong>
-        Total :
-       </strong>
-       <span id="totalInventaire">
-        0
-       </span>
-       PM
-      </p>
-     </div>
+      </tbody>
+     </table>
+     <button onclick="addInventaireRow('gemmes')">
+      ➕ Ajouter une gemme
+     </button>
+     <p>
+      <strong>
+       Total :
+      </strong>
+      <span id="totalInventaire">
+       0
+      </span>
+      PM
+     </p>
     </div>
    </div>
   </div>
