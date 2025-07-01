@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
  <head>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <meta charset="utf-8"/>
   <title>
    Dorusis
@@ -9,12 +10,25 @@
  </head>
  <body>
   <div class="content">
-   <div class="file-controls" style="margin-bottom:1em;">
+   <div class="file-controls">
     <input accept=".json" id="fileInputInventory" type="file"/>
-    <button id="saveInventoryBtn" type="button">
-     Sauvegarder
+    <button id="saveInventoryBtn">
+     Sauvegarder Inventaire
+    </button>
+    <button onclick="addInventaireRow('pieces')" type="button">
+     ➕ Ajouter une pièce
+    </button>
+    <button onclick="addInventaireRow('gemmes')" type="button">
+     ➕ Ajouter une gemme
     </button>
    </div>
+   <p>
+    Total pièces (PM):
+    <span id="totalPieces">
+     0
+    </span>
+    PM
+   </p>
    <h2>
     Inventaire Dorusis
    </h2>
@@ -44,15 +58,6 @@
     <tbody>
     </tbody>
    </table>
-   <p id="totalPiecesP">
-    <strong>
-     Total pièces (PM):
-    </strong>
-    <span id="totalPieces">
-     0
-    </span>
-    PM
-   </p>
    <h3>
     Gemmes
    </h3>

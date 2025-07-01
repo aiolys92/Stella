@@ -1,7 +1,6 @@
 /* nav.js — injects navigation sidebar and mobile nav */
-
 document.addEventListener('DOMContentLoaded', function() {
-  const sidebarHtml = `
+  const sidebar = `
   <div class="sidebar">
     <h2>Navigation</h2>
     <a href="index.html">Accueil</a>
@@ -10,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <a href="liste.html">Liste complète</a>
     <a href="convertisseur.html">Convertisseur</a>
   </div>`;
-  const mobileHtml = `
+  const mobile = `
   <div class="mobile-nav">
     <a href="index.html">Accueil</a>
     <a href="dorusis.html">Dorusis</a>
@@ -18,9 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
     <a href="liste.html">Liste</a>
     <a href="convertisseur.html">Convertisseur</a>
   </div>`;
-
-  document.body.querySelectorAll('.sidebar, .mobile-nav').forEach(el => el.remove());
-  document.body.insertAdjacentHTML('afterbegin', mobileHtml);
+  document.querySelectorAll('.sidebar, .mobile-nav').forEach(e=>e.remove());
+  document.body.insertAdjacentHTML('afterbegin', mobile);
   const content = document.querySelector('.content');
-  if (content) content.insertAdjacentHTML('beforebegin', sidebarHtml);
+  if(content) content.insertAdjacentHTML('beforebegin', sidebar);
 });

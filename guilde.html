@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
  <head>
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <meta charset="utf-8"/>
   <title>
    Dorusis
@@ -14,13 +15,20 @@
     <button id="saveInventoryBtn">
      Sauvegarder Inventaire
     </button>
-   </div>
-   <div class="file-controls" style="margin-bottom:1em;">
-    <input accept=".json" id="fileInputGuild" type="file"/>
-    <button id="saveGuildBtn" type="button">
-     Sauvegarder
+    <button onclick="addInventaireRow('pieces')" type="button">
+     ➕ Ajouter une pièce
+    </button>
+    <button onclick="addInventaireRow('gemmes')" type="button">
+     ➕ Ajouter une gemme
     </button>
    </div>
+   <p>
+    Total pièces (PM):
+    <span id="totalPieces">
+     0
+    </span>
+    PM
+   </p>
    <h2>
     Inventaire Guilde
    </h2>
@@ -50,15 +58,6 @@
     <tbody>
     </tbody>
    </table>
-   <p id="totalPiecesP">
-    <strong>
-     Total pièces (PM):
-    </strong>
-    <span id="totalPieces">
-     0
-    </span>
-    PM
-   </p>
    <h3>
     Gemmes
    </h3>
