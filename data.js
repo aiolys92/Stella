@@ -1,5 +1,5 @@
-if (typeof monnaies === 'undefined') {
-  var monnaies = {
+if (!window.monnaies) {
+  window.monnaies = {
     pieces: {
       "Platine": 3, "Or": 1, "Argent": 1, "Électrum": 1, "Fer": 0.96,
       "Nickel": null, "Cuivre": null, "Titane": null, "Plomp": null
@@ -17,6 +17,4 @@ if (typeof monnaies === 'undefined') {
       "Jais": 5.76, "Nacre": 3.84, "Écaille": 1.92
     }
   };
-}
-};
 }
