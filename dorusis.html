@@ -2,19 +2,180 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Inventaire Dorusis</title>
+  <title>Dorusis</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="nav">
-    <a href="index.html">⬅️ Retour à l'accueil</a>
-  </div>
-  <!-- Content removed for brevity. Will insert the final HTML content here after kernel reset -->
-  <script>
-    const profil = 'dorusis';
-  </script>
-  <script src="data.js"></script>
-  <script src="site.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", () => {
+  const pageTitle = document.title;
+  const header = document.createElement("header");
+  header.innerHTML = `
+    <div class="nav">
+      <a href="index.html">🏠 Retour à l'accueil</a>
+    </div>
+    <h1>${pageTitle}</h1>
+  `;
+  document.body.insertBefore(header, document.body.firstChild);
+});</script>
+  
+<div class="section active" id="inventaire">
+  <h2>Inventaire</h2>
+  <h3>Pièces</h3>
+  <table id="inventaireTablePieces">
+    <tr><th>Objet</th><th>Quantité</th><th>Valeur unitaire (PM)</th><th>Total (PM)</th></tr>
+  </table>
+  <button class="add-row-btn" onclick="addInventaireRow('pieces')">➕ Ajouter une pièce</button>
+  <h3>Gemmes</h3>
+  <table id="inventaireTableGemmes">
+    <tr><th>Objet</th><th>Quantité</th><th>Valeur unitaire (PM)</th><th>Total (PM)</th></tr>
+  </table>
+  <button class="add-row-btn" onclick="addInventaireRow('gemmes')">➕ Ajouter une gemme</button>
+  <p><strong>Total inventaire :</strong> <span id="totalInventaire">0</span> PM</p>
+</div>
+
+  <script>const profil = 'dorusis'</script>
+  <script>const monnaies = {
+  pieces: {
+    "Platine": 3, "Or": 1, "Argent": 1, "Électrum": 1, "Fer": 0.96,
+    "Nickel": null, "Cuivre": null, "Titane": null, "Plomp": null
+  },
+  gemmes: {
+    "Rubis": 7680, "Émeraude": 6720, "Saphir": 5760, "Diamant": 960,
+    "Topaze": 4800, "Aigue-Marine": 3840, "Améthyste": 2880, "Grenat": 1920,
+    "Péridot": 1440, "Cyanite": 384.0, "Citrine": 307.2, "Pierre de Lune": 1152,
+    "Pierre de Soleil": 1152, "Tourmaline": 960, "Aventurine": 86.4, "Turquoise": 81.6,
+    "Œil de loup": 76.8, "Œil de taureau": 67.2, "Œil de tigre": 57.6, "Œil de faucon": 48.0,
+    "Morion": 38.4, "Rhodite": 28.8, "Cristal": 19.2, "Lapis Lazuli": 17.28, "Onyx": 16.32,
+    "Cornaline": 14.4, "Chrysoprase": 11.52, "Sardoine": 8.64, "Agate": 7.68,
+    "Opale": 6.72, "Obsidienne": 4.8, "Serpentine": 2.88, "Malachite": 1.92,
+    "Hématite": 0.96, "Perle": 9600, "Ambre": 10.56, "Corail": 9.6,
+    "Jais": 5.76, "Nacre": 3.84, "Écaille": 1.92
+  }
+};</script>
+  <script>const profils = {
+  dorusis: { pieces: [], gemmes: [] },
+  guilde: { pieces: [], gemmes: [] }
+};
+
+let currentProfil = null;
+
+function choisirProfil(nom) {
+  currentProfil = nom;
+  document.getElementById("accueil").style.display = "none";
+  document.getElementById("contenu").style.display = "block";
+  showSection('inventaire');
+  updateAll();
+}
+
+function retourAccueil() {
+  currentProfil = null;
+  document.getElementById("accueil").style.display = "block";
+  document.getElementById("contenu").style.display = "none";
+}
+
+function showSection(id) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+function addInventaireRow(type) {
+  const tableId = type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes';
+  const table = document.getElementById(tableId);
+  const objList = type === 'pieces' ? monnaies.pieces : monnaies.gemmes;
+  const row = table.insertRow(-1);
+  const options = Object.keys(objList)
+    .map(n => `<option value="${n}">${n}</option>`)
+    .join('');
+  row.innerHTML = \`
+    <td><select onchange="updateInventaire()">${options}</select></td>
+    <td><input type='number' value='0' class='qte' oninput='updateInventaire()'></td>
+    <td><span class='valeur'>0</span></td>
+    <td><span class='total'>0</span></td>
+  \`;
+}
+
+function updateInventaire() {
+  let total = 0;
+
+  ['pieces', 'gemmes'].forEach(type => {
+    const tableId = type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes';
+    const table = document.getElementById(tableId);
+    for (let i = 1; i < table.rows.length; i++) {
+      const row = table.rows[i];
+      const obj = row.cells[0].querySelector('select').value;
+      const qte = parseInt(row.cells[1].querySelector('input').value || '0');
+      const valeur = monnaies[type][obj] || 0;
+      const totalPM = valeur * qte;
+
+      row.cells[2].querySelector('span').textContent = valeur;
+      row.cells[3].querySelector('span').textContent = totalPM;
+
+      total += totalPM;
+    }
+  });
+
+  document.getElementById("totalInventaire").textContent = total.toFixed(2);
+}
+
+function addConvertRow() {
+  const table = document.getElementById("convertTable");
+  const row = table.insertRow(-1);
+  const allObj = { ...monnaies.pieces, ...monnaies.gemmes };
+  const options = Object.keys(allObj)
+    .map(n => `<option value="${n}">${n}</option>`)
+    .join('');
+  row.innerHTML = \`
+    <td><select onchange="updateConvert()">${options}</select></td>
+    <td><span class='valeur'>0</span></td>
+    <td><input type='number' value='0' class='qte' oninput='updateConvert()'></td>
+    <td><span class='result'>0</span></td>
+  \`;
+}
+
+function updateConvert() {
+  const table = document.getElementById("convertTable");
+  for (let i = 1; i < table.rows.length; i++) {
+    const row = table.rows[i];
+    const obj = row.cells[0].querySelector('select').value;
+    const qte = parseInt(row.cells[2].querySelector('input').value || '0');
+    const val = monnaies.pieces[obj] || monnaies.gemmes[obj] || 0;
+    row.cells[1].querySelector('span').textContent = val;
+    row.cells[3].querySelector('span').textContent = (val * qte).toFixed(2);
+  }
+}
+
+function updateTaux() {
+  const from = document.getElementById("fromSelect").value;
+  const to = document.getElementById("toSelect").value;
+  const vFrom = monnaies.pieces[from] || monnaies.gemmes[from] || 0;
+  const vTo = monnaies.pieces[to] || monnaies.gemmes[to] || 1;
+  const rate = vTo !== 0 ? vFrom / vTo : 0;
+  document.getElementById("conversionRate").textContent = rate.toFixed(4);
+  document.getElementById("conversionValue").textContent = vFrom.toFixed(2);
+}
+
+function updateAll() {
+  const from = document.getElementById("fromSelect");
+  const to = document.getElementById("toSelect");
+  const all = Object.keys({ ...monnaies.pieces, ...monnaies.gemmes });
+
+  from.innerHTML = all.map(o => \`<option value="\${o}">\${o}</option>\`).join('');
+  to.innerHTML = from.innerHTML;
+
+  const pieceList = document.getElementById("pieceList");
+  pieceList.innerHTML = Object.entries(monnaies.pieces)
+    .map(([k, v]) => \`<tr><td>\${k}</td><td>\${v !== null ? v : '-'}</td></tr>\`).join('');
+
+  const gemmeList = document.getElementById("gemmeList");
+  gemmeList.innerHTML = Object.entries(monnaies.gemmes)
+    .map(([k, v]) => \`<tr><td>\${k}</td><td>\${v}</td></tr>\`).join('');
+
+  updateTaux();
+  updateInventaire();
+  updateConvert();
+}
+
+document.addEventListener("DOMContentLoaded", updateAll);</script>
 </body>
 </html>
