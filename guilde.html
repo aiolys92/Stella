@@ -22,96 +22,100 @@
     Guilde
    </a>
    <a href="liste.html">
-    Liste compl&egrave;te
+    Liste complète
    </a>
    <a href="convertisseur.html">
     Convertisseur
    </a>
   </div>
   <div class="content fade-in">
-   <div class="sidebar">
-    <h2>
-     Navigation
-    </h2>
-    <a href="index.html">
-     Accueil
-    </a>
-    <a href="dorusis.html">
-     Dorusis
-    </a>
-    <a href="guilde.html">
-     Guilde
-    </a>
-    <a href="liste.html">
-     Liste compl&egrave;te
-    </a>
-    <a href="convertisseur.html">
-     Convertisseur
-    </a>
-   </div>
-   <div class="content fade-in">
-    <div id="header">
-    </div>
-    <div class="section" id="inventaire">
+   <div contenteditable="true" id="guildContent" style="min-height:200px; border:1px dashed #ccc; padding:1em;">
+    <div class="sidebar">
      <h2>
-      Inventaire Guilde
+      Navigation
      </h2>
-     <h3>
-      Pi&egrave;ces
-     </h3>
-     <table id="inventaireTablePieces">
-      <tr>
-       <th>
-        Objet
-       </th>
-       <th>
-        Quantit&eacute;
-       </th>
-       <th>
-        Valeur
-       </th>
-       <th>
-        Total
-       </th>
-      </tr>
-     </table>
-     <button onclick="addInventaireRow('pieces')">
-      ➕ Ajouter une pi&egrave;ce
-     </button>
-     <h3>
-      Gemmes
-     </h3>
-     <table id="inventaireTableGemmes">
-      <tr>
-       <th>
-        Objet
-       </th>
-       <th>
-        Quantit&eacute;
-       </th>
-       <th>
-        Valeur
-       </th>
-       <th>
-        Total
-       </th>
-      </tr>
-     </table>
-     <button onclick="addInventaireRow('gemmes')">
-      ➕ Ajouter une gemme
-     </button>
-     <p>
-      <strong>
-       Total :
-      </strong>
-      <span id="totalInventaire">
-       0
-      </span>
-      PM
-     </p>
+     <a href="index.html">
+      Accueil
+     </a>
+     <a href="dorusis.html">
+      Dorusis
+     </a>
+     <a href="guilde.html">
+      Guilde
+     </a>
+     <a href="liste.html">
+      Liste complète
+     </a>
+     <a href="convertisseur.html">
+      Convertisseur
+     </a>
+    </div>
+    <div class="content fade-in">
+     <div id="header">
+     </div>
+     <div class="section" id="inventaire">
+      <h2>
+       Inventaire Guilde
+      </h2>
+      <h3>
+       Pièces
+      </h3>
+      <table id="inventaireTablePieces">
+       <tr>
+        <th>
+         Objet
+        </th>
+        <th>
+         Quantité
+        </th>
+        <th>
+         Valeur
+        </th>
+        <th>
+         Total
+        </th>
+       </tr>
+      </table>
+      <button onclick="addInventaireRow('pieces')">
+       ➕ Ajouter une pièce
+      </button>
+      <h3>
+       Gemmes
+      </h3>
+      <table id="inventaireTableGemmes">
+       <tr>
+        <th>
+         Objet
+        </th>
+        <th>
+         Quantité
+        </th>
+        <th>
+         Valeur
+        </th>
+        <th>
+         Total
+        </th>
+       </tr>
+      </table>
+      <button onclick="addInventaireRow('gemmes')">
+       ➕ Ajouter une gemme
+      </button>
+      <p>
+       <strong>
+        Total :
+       </strong>
+       <span id="totalInventaire">
+        0
+       </span>
+       PM
+      </p>
+     </div>
     </div>
    </div>
   </div>
+  \n
+  \n
   <script src="data.js">
   </script>
   <script src="script.js">

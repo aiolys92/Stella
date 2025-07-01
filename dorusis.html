@@ -22,7 +22,7 @@
     Guilde
    </a>
    <a href="liste.html">
-    Liste compl&egrave;te
+    Liste complète
    </a>
    <a href="convertisseur.html">
     Convertisseur
@@ -43,7 +43,7 @@
      Guilde
     </a>
     <a href="liste.html">
-     Liste compl&egrave;te
+     Liste complète
     </a>
     <a href="convertisseur.html">
      Convertisseur
@@ -57,7 +57,7 @@
       Inventaire Dorusis
      </h2>
      <h3>
-      Pi&egrave;ces
+      Pièces
      </h3>
      <table id="inventaireTablePieces">
       <tr>
@@ -65,7 +65,7 @@
         Objet
        </th>
        <th>
-        Quantit&eacute;
+        Quantité
        </th>
        <th>
         Valeur
@@ -76,7 +76,7 @@
       </tr>
      </table>
      <button onclick="addInventaireRow('pieces')">
-      ➕ Ajouter une pi&egrave;ce
+      ➕ Ajouter une pièce
      </button>
      <h3>
       Gemmes
@@ -87,7 +87,7 @@
         Objet
        </th>
        <th>
-        Quantit&eacute;
+        Quantité
        </th>
        <th>
         Valeur
@@ -112,9 +112,19 @@
     </div>
    </div>
   </div>
+  \n
+  \n
   <script src="data.js">
   </script>
   <script src="script.js">
+  </script>
+  <script>
+   document.addEventListener('DOMContentLoaded', function() {
+  if(document.getElementById('inventaireTablePieces')) {
+    addInventaireRow('pieces');
+    addInventaireRow('gemmes');
+  }
+});
   </script>
  </body>
 </html>

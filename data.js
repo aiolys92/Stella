@@ -1,3 +1,5 @@
+const API_URL = 'https://script.google.com/macros/s/AKfycbwUt9FjE5EqnNm1nrDi1iJxLA5pecHAAowUp9Fev9ANG_DrUeiXf27a6EW6UckKD1Ix2w/exec';
+
 if (!window.monnaies) {
   window.monnaies = {
     pieces: {

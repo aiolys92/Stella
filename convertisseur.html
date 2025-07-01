@@ -10,7 +10,7 @@
  <body>
   <div class="sidebar">
    <h2>
-    Navigation
+    Convertisseur Monétaire
    </h2>
    <a href="index.html">
     Accueil
@@ -22,62 +22,42 @@
     Guilde
    </a>
    <a href="liste.html">
-    Liste compl&egrave;te
+    Liste complète
    </a>
    <a href="convertisseur.html">
     Convertisseur
    </a>
   </div>
   <div class="content fade-in">
-   <div class="sidebar">
-    <h2>
-     Navigation
-    </h2>
-    <a href="index.html">
-     Accueil
-    </a>
-    <a href="dorusis.html">
-     Dorusis
-    </a>
-    <a href="guilde.html">
-     Guilde
-    </a>
-    <a href="liste.html">
-     Liste compl&egrave;te
-    </a>
-    <a href="convertisseur.html">
-     Convertisseur
-    </a>
-   </div>
-   <div class="content fade-in">
-    <div id="header">
-    </div>
-    <div class="section" id="convertisseur">
-     <h2>
-      Convertisseur
-     </h2>
-     <table id="convertTable">
-      <tr>
-       <th>
-        Objet
-       </th>
-       <th class="valeur-pm">
-        Valeur (PM)
-       </th>
-       <th>
-        Quantit&eacute;
-       </th>
-       <th>
-        R&eacute;sultat
-       </th>
-      </tr>
-     </table>
-     <button onclick="addConvertRow()">
-      ➕ Ajouter une ligne
-     </button>
-    </div>
-   </div>
+   <h2>
+    Convertisseur Monétaire
+   </h2>
+   <label>
+    Devise:
+    <select id="convCurrency">
+    </select>
+   </label>
+   <label>
+    Quantité:
+    <input id="convQty" min="0" type="number" value="1"/>
+   </label>
+   <table>
+    <thead>
+     <tr>
+      <th>
+       Denomination
+      </th>
+      <th>
+       Equivalent en unité
+      </th>
+     </tr>
+    </thead>
+    <tbody id="convResults">
+    </tbody>
+   </table>
   </div>
+  \n
+  \n
   <script src="data.js">
   </script>
   <script src="script.js">
