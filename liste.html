@@ -179,5 +179,25 @@ document.addEventListener("DOMContentLoaded", updateAll);</script>
 <script src="data.js"></script>
 <script src="site.js"></script>
 <script src="header.js"></script>
+
+<script>
+  window.onload = () => {
+    const pieceTable = document.getElementById("pieceList");
+    const gemmeTable = document.getElementById("gemmeList");
+
+    Object.entries(monnaies.pieces).forEach(([nom, val]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${nom}</td><td>${val !== null ? val : '—'}</td>`;
+      pieceTable.appendChild(tr);
+    });
+
+    Object.entries(monnaies.gemmes).forEach(([nom, val]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${nom}</td><td>${val}</td>`;
+      gemmeTable.appendChild(tr);
+    });
+  };
+</script>
+
 </body>
 </html>
