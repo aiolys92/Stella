@@ -86,25 +86,6 @@
        </tr>
       </thead>
       <tbody>
-       <tr>
-        <th>
-         Objet
-        </th>
-        <th>
-         Quantité
-        </th>
-        <th>
-         Valeur
-        </th>
-        <th>
-         Total
-        </th>
-        <td>
-         <button onclick="removeInventaireRow(this)" type="button">
-          🗑️
-         </button>
-        </td>
-       </tr>
       </tbody>
      </table>
      <button onclick="addInventaireRow('pieces')">
@@ -134,25 +115,6 @@
        </tr>
       </thead>
       <tbody>
-       <tr>
-        <th>
-         Objet
-        </th>
-        <th>
-         Quantité
-        </th>
-        <th>
-         Valeur
-        </th>
-        <th>
-         Total
-        </th>
-        <td>
-         <button onclick="removeInventaireRow(this)" type="button">
-          🗑️
-         </button>
-        </td>
-       </tr>
       </tbody>
      </table>
      <button onclick="addInventaireRow('gemmes')">
@@ -172,10 +134,6 @@
   </div>
   \n
   \n
-  <script src="data.js">
-  </script>
-  <script src="script.js">
-  </script>
   <script>
    document.addEventListener('DOMContentLoaded', function() {
   if(document.getElementById('inventaireTablePieces')) {
@@ -183,6 +141,10 @@
     addInventaireRow('gemmes');
   }
 });
+  </script>
+  <script src="data.js">
+  </script>
+  <script src="script.js">
   </script>
  </body>
 </html>
