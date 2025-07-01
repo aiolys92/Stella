@@ -56,3 +56,28 @@ function updateInventaire() {
 }
 
 window.updateInventaire = updateInventaire;
+
+
+function addConvertRow() {
+  const table = document.getElementById("convertTable");
+  const row = table.insertRow(-1);
+  const options = Object.entries(objets).map(([name, value]) => 
+    `<option value="${name}">${name}</option>`).join('');
+  row.innerHTML = `
+    <td><select onchange="updateConvertRow(this)">${options}</select></td>
+    <td class='valeur'>0</td>
+    <td><input type='number' value='0' oninput='updateConvertRow(this)'></td>
+    <td class='total'>0</td>
+  `;
+}
+
+function updateConvertRow(elm) {
+  const row = elm.closest("tr");
+  const select = row.querySelector("select");
+  const qte = parseFloat(row.querySelector("input").value || 0);
+  const val = objets[select.value] || 0;
+  row.querySelector(".valeur").innerText = val;
+  row.querySelector(".total").innerText = (val * qte).toFixed(2);
+}
+window.addConvertRow = addConvertRow;
+window.updateConvertRow = updateConvertRow;
