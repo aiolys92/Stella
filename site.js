@@ -36,3 +36,23 @@ function addInventaireRow(type) {
 window.addInventaireRow = addInventaireRow;
 window.showSection = showSection;
 window.choisirProfil = choisirProfil;
+
+function updateInventaire() {
+  document.querySelectorAll('table').forEach(table => {
+    let totalInventaire = 0;
+    table.querySelectorAll('tr').forEach((row, i) => {
+      if (i === 0) return; // skip header
+      const select = row.querySelector("select");
+      const qte = parseFloat(row.querySelector(".qte")?.value || 0);
+      const valeur = monnaies.pieces[select.value] || monnaies.gemmes[select.value] || 0;
+      const total = valeur * qte;
+      row.querySelector(".valeur").innerText = valeur;
+      row.querySelector(".total").innerText = total;
+      totalInventaire += total;
+    });
+    const global = document.getElementById("totalInventaire");
+    if (global) global.innerText = totalInventaire.toFixed(2);
+  });
+}
+
+window.updateInventaire = updateInventaire;
