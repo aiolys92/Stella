@@ -18,3 +18,5 @@ if (typeof monnaies === 'undefined') {
     }
   };
 }
+};
+}
