@@ -136,3 +136,50 @@ document.addEventListener('DOMContentLoaded', function(){
   if(guildInput) guildInput.addEventListener('change', loadFromFileGuild);
   if(guildBtn)   guildBtn.addEventListener('click', saveToFileGuild);
 });
+
+
+// --- Robust File Persistence Overrides ---
+
+// Load inventory from JSON file
+async function loadFromFileInventory(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const data = JSON.parse(await file.text());
+  document.querySelectorAll('#inventaireTablePieces tbody, #inventaireTableGemmes tbody')
+    .forEach(tb => tb.innerHTML = '');
+  data.forEach(item => {
+    addInventaireRow(item.type);
+    const tbl = document.getElementById(item.type==='pieces'?'inventaireTablePieces':'inventaireTableGemmes');
+    const last = tbl.querySelector('tbody').lastElementChild;
+    last.querySelector('select').value = item.name;
+    last.querySelector('input.qte').value = item.qty;
+    updateInventaire({target:last.querySelector('input.qte')});
+  });
+}
+
+// Save inventory to file
+function saveToFileInventory() {
+  const rows = [];
+  document.querySelectorAll('#inventaireTablePieces tbody tr').forEach(tr => {
+    rows.push({type:'pieces', name:tr.querySelector('select').value, qty:tr.querySelector('input.qte').value});
+  });
+  document.querySelectorAll('#inventaireTableGemmes tbody tr').forEach(tr => {
+    rows.push({type:'gemmes', name:tr.querySelector('select').value, qty:tr.querySelector('input.qte').value});
+  });
+  const blob = new Blob([JSON.stringify(rows, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display='none'; a.href=url; a.download='inventaire.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Bind file controls
+document.addEventListener('DOMContentLoaded', function(){
+  const invInput = document.getElementById('fileInputInventory');
+  const invBtn = document.getElementById('saveInventoryBtn');
+  if(invInput) invInput.addEventListener('change', loadFromFileInventory);
+  if(invBtn)   invBtn.addEventListener('click', saveToFileInventory);
+});
