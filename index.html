@@ -1,52 +1,33 @@
 <!DOCTYPE html>
 <html lang="fr">
- <head>
-  <meta charset="utf-8"/>
-  <title>
-   Accueil
-  </title>
-  <link href="style.css" rel="stylesheet"/>
-  <link href="img/favicon.ico" rel="icon"/>
- </head>
- <body>
+<head>
+  <meta charset="UTF-8">
+  <title>Accueil</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="img/favicon.ico">
+</head>
+<body>
 
-<nav>
-    <ul style="list-style: none; display: flex; gap: 1em; justify-content: center; padding: 0;">
-        <li><a href="index.html">Accueil</a></li>
-        <li><a href="dorusis.html">Dorusis</a></li>
-        <li><a href="inventaire.html">Inventaire</a></li>
-        <li><a href="guilde.html">Guilde</a></li>
-    </ul>
-</nav>
+<div class="sidebar">
+    <h2>Navigation</h2>
+    <a href="index.html">Accueil</a>
+    <a href="dorusis.html">Dorusis</a>
+    <a href="guilde.html">Guilde</a>
+    <a href="liste.html">Liste PM/PF</a>
+    <a href="convertisseur.html">Convertisseur</a>
+</div>
 
-  <h1>
-   Bienvenue
-  </h1>
+<div class='content fade-in'>
+
+  <h1>Bienvenue</h1>
   <div class="nav">
-   <a href="dorusis.html">
-    <button>
-     Inventaire Dorusis
-    </button>
-   </a>
-   <a href="guilde.html">
-    <button>
-     Inventaire Guilde
-    </button>
-   </a>
-   <a href="convertisseur.html">
-    <button>
-     Convertisseur
-    </button>
-   </a>
-   <a href="liste.html">
-    <button>
-     Liste
-    </button>
-   </a>
+    <a href="dorusis.html"><button>Inventaire Dorusis</button></a>
+    <a href="guilde.html"><button>Inventaire Guilde</button></a>
+    <a href="convertisseur.html"><button>Convertisseur</button></a>
+    <a href="liste.html"><button>Liste</button></a>
   </div>
-  <script src="data.js">
-  </script>
-  <script src="script.js">
-  </script>
- </body>
+</div>
+<script src='data.js'></script>
+<script src='script.js'></script>
+</body>
 </html>

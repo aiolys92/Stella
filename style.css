@@ -1,72 +1,62 @@
 
-body {
-    background: url('https://www.transparenttextures.com/patterns/old-wall.png') repeat;
-    font-family: "Garamond", "Georgia", serif;
-    color: #2f1b0c;
-    margin: 0;
-    padding: 0;
+/* Base styles */
+
+body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+h1, h2 { text-align: center; }
+nav a { margin: 0 10px; text-decoration: none; font-weight: bold; }
+.section { background: white; padding: 20px; margin: 20px auto; max-width: 1000px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+button { padding: 8px 12px; margin: 10px 0; }
+
+
+/* Additional styles */
+
+.valeur-pm, .total-pm {
+  background-color: #f0f8ff;  /* Bleu pâle */
+  font-weight: bold;
+}
+.valeur-pf, .total-pf {
+  background-color: #fff8dc;  /* Jaune clair */
+  font-weight: bold;
 }
 
-h1, h2, h3 {
-    font-family: "Uncial Antiqua", "Garamond", serif;
-    color: #5e2e0e;
-    text-align: center;
-}
 
-.container {
-    max-width: 960px;
-    margin: 0 auto;
-    background-color: rgba(255, 248, 220, 0.9);
-    padding: 2em;
-    border: 3px solid #5e2e0e;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
-}
-
-button {
-    background-color: #a67c52;
-    color: #fff;
-    border: none;
-    padding: 0.7em 1.2em;
-    font-size: 1em;
+/* Sidebar navigation */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100%;
+    background-color: #2f1b0c;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+    color: white;
     font-family: "Garamond", serif;
-    border-radius: 5px;
-    cursor: pointer;
-    margin: 0.5em 0;
 }
 
-button:hover {
-    background-color: #8c6239;
+.sidebar a {
+    display: block;
+    margin: 10px 0;
+    color: white;
+    text-decoration: none;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1em 0;
-    font-size: 0.95em;
+.sidebar a:hover {
+    text-decoration: underline;
 }
 
-table, th, td {
-    border: 1px solid #5e2e0e;
+.content {
+    margin-left: 220px;
+    padding: 20px;
 }
 
-th, td {
-    padding: 0.5em;
-    text-align: left;
+.fade-in {
+    animation: fadeIn 0.8s ease-in-out both;
 }
 
-th {
-    background-color: #d2b48c;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
-
-input[type="text"], select {
-    padding: 0.5em;
-    width: 100%;
-    box-sizing: border-box;
-    font-family: "Garamond", serif;
-    border: 1px solid #a67c52;
-    border-radius: 4px;
-    margin-bottom: 1em;
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&display=swap');
