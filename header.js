@@ -2,10 +2,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const pageTitle = document.title;
   const header = document.createElement("header");
   header.innerHTML = `
-    <div class="nav">
-      <a href="index.html">🏠 Retour à l'accueil</a>
+    <div class="nav" style="background:#eee; padding:10px;">
+      <strong>${pageTitle}</strong>
+      <nav style="margin-top:10px;">
+        <a href="index.html">🏠 Accueil</a> |
+        <a href="dorusis.html">Dorusis</a> |
+        <a href="guilde.html">Guilde</a> |
+        <a href="convertisseur.html">Convertisseur</a> |
+        <a href="liste.html">Liste</a> |
+        <a href="taux.html">Taux</a>
+      </nav>
     </div>
-    <h1>${pageTitle}</h1>
   `;
   document.body.insertBefore(header, document.body.firstChild);
 });
