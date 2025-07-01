@@ -15,6 +15,8 @@ function updateInventaire(event) {
   document.querySelectorAll('td.total').forEach(td => sum += parseFloat(td.textContent)||0);
   const total = document.getElementById('totalInventaire');
   if (total) total.textContent = sum.toFixed(2);
+  const piecesSpan = document.getElementById('totalPieces');
+  if(piecesSpan) piecesSpan.textContent = sum.toFixed(2);
 }
 
 function addInventaireRow(type) {
@@ -71,26 +73,27 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-// --- File-based Persistence ---
-// Load inventory from file
+// --- File-based persistence ---
 async function loadFromFileInventory(event) {
   const file = event.target.files[0];
   if (!file) return;
-  const text = await file.text();
-  const data = JSON.parse(text);
-  // clear tables
-  document.querySelectorAll('#inventaireTablePieces tbody, #inventaireTableGemmes tbody').forEach(tb=>tb.innerHTML='');
-  data.forEach(item => {
+  const json = JSON.parse(await file.text());
+  // clear existing
+  const tbPieces = document.querySelector('#inventaireTablePieces tbody');
+  const tbGemmes = document.querySelector('#inventaireTableGemmes tbody');
+  if (tbPieces) tbPieces.innerHTML = '';
+  if (tbGemmes) tbGemmes.innerHTML = '';
+  // populate
+  json.forEach(item => {
     addInventaireRow(item.type);
     const tbl = document.getElementById(item.type==='pieces'?'inventaireTablePieces':'inventaireTableGemmes');
     const last = tbl.querySelector('tbody').lastElementChild;
     last.querySelector('select').value = item.name;
     last.querySelector('input.qte').value = item.qty;
-    updateInventaire({target:last.querySelector('input.qte')});
+    updateInventaire({target: last.querySelector('input.qte')});
   });
 }
 
-// Save inventory to file
 function saveToFileInventory() {
   const rows = [];
   document.querySelectorAll('#inventaireTablePieces tbody tr').forEach(tr => {
@@ -106,16 +109,13 @@ function saveToFileInventory() {
   a.click();
 }
 
-// Load guild content from file
 async function loadFromFileGuild(event) {
   const file = event.target.files[0];
   if (!file) return;
   const text = await file.text();
-  const div = document.getElementById('guildContent');
-  div.innerHTML = text;
+  document.getElementById('guildContent').innerHTML = text;
 }
 
-// Save guild content to file
 function saveToFileGuild() {
   const content = document.getElementById('guildContent').innerHTML;
   const blob = new Blob([content], {type:'text/html'});
@@ -125,18 +125,14 @@ function saveToFileGuild() {
   a.click();
 }
 
-// Attach file controls on load
-document.addEventListener('DOMContentLoaded', function() {
-  const fileInputInv = document.getElementById('fileInputInventory');
-  const saveInvBtn = document.getElementById('saveInventoryBtn');
-  if (fileInputInv && saveInvBtn) {
-    fileInputInv.addEventListener('change', loadFromFileInventory);
-    saveInvBtn.addEventListener('click', saveToFileInventory);
-  }
-  const fileInputGuild = document.getElementById('fileInputGuild');
-  const saveGuildBtn = document.getElementById('saveGuildBtn');
-  if (fileInputGuild && saveGuildBtn) {
-    fileInputGuild.addEventListener('change', loadFromFileGuild);
-    saveGuildBtn.addEventListener('click', saveToFileGuild);
-  }
+// Attach file control listeners
+document.addEventListener('DOMContentLoaded', function(){
+  const invInput = document.getElementById('fileInputInventory');
+  const invBtn   = document.getElementById('saveInventoryBtn');
+  if(invInput) invInput.addEventListener('change', loadFromFileInventory);
+  if(invBtn)   invBtn.addEventListener('click', saveToFileInventory);
+  const guildInput = document.getElementById('fileInputGuild');
+  const guildBtn   = document.getElementById('saveGuildBtn');
+  if(guildInput) guildInput.addEventListener('change', loadFromFileGuild);
+  if(guildBtn)   guildBtn.addEventListener('click', saveToFileGuild);
 });

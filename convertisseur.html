@@ -1,84 +1,12 @@
 <!DOCTYPE html>
-<html>
- <head>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <meta charset="utf-8"/>
-  <title>
-   Convertisseur
-  </title>
-  <link href="style.css" rel="stylesheet"/>
- </head>
- <body>
-  <div class="mobile-nav">
-   <a href="index.html">
-    Accueil
-   </a>
-   <a href="dorusis.html">
-    Dorusis
-   </a>
-   <a href="guilde.html">
-    Guilde
-   </a>
-   <a href="liste.html">
-    Liste
-   </a>
-   <a href="convertisseur.html">
-    Convertisseur
-   </a>
-  </div>
-  <div class="sidebar">
-   <h2>
-    Navigation
-   </h2>
-   <a href="index.html">
-    Accueil
-   </a>
-   <a href="dorusis.html">
-    Dorusis
-   </a>
-   <a href="guilde.html">
-    Guilde
-   </a>
-   <a href="liste.html">
-    Liste complète
-   </a>
-   <a href="convertisseur.html">
-    Convertisseur
-   </a>
-  </div>
-  <div class="content">
-   <div class="convert-controls">
-    <label>
-     Devise:
-     <select id="convCurrency">
-     </select>
-    </label>
-    <label>
-     Quantité:
-     <input id="convQty" type="number" value="1"/>
-    </label>
-   </div>
-   <h2>
-    Convertisseur Monétaire
-   </h2>
-   <table id="convResultsTable">
-    <thead>
-     <tr>
-      <th>
-       Denomination
-      </th>
-      <th>
-       Equivalent en unité
-      </th>
-     </tr>
-    </thead>
-    <tbody id="convResults">
-    </tbody>
-   </table>
-  </div>
-  <script src="data.js">
-  </script>
-  <script src="convert.js">
-  </script>
- </body>
-</html>
+<html><head><meta charset="utf-8"><title>Convertisseur</title>
+<link rel="stylesheet" href="style.css"></head><body>
+<div class="sidebar">...</div><div class="content">
+<h2>Convertisseur Monétaire</h2>
+<label>Devise:<select id="convCurrency"></select></label>
+<label>Quantité:<input type="number" id="convQty" value="1"></label>
+<table id="convResultsTable"><thead><tr><th>Denomination</th><th>Equivalent en unité</th></tr></thead><tbody id="convResults"></tbody></table>
+</div>
+<script src="data.js"></script>
+<script src="convert.js"></script>
+</body></html>
