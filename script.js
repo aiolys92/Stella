@@ -177,84 +177,71 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// --- Dorusis : Inventaire en ligne via Google Sheets ---
-async function loadDorusis() {
-  const respP = await fetch(`${API_URL}?type=pieces`);
-  const pieces = await respP.json();
-  const respG = await fetch(`${API_URL}?type=gemmes`);
-  const gemmes = await respG.json();
-  // Clear tables
+// --- File-based Persistence ---
+
+// Inventory file load/save
+async function loadFromFileInventory(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const data = JSON.parse(text);
+  // Clear and rebuild inventory
   document.getElementById('inventaireTablePieces').innerHTML = '';
   document.getElementById('inventaireTableGemmes').innerHTML = '';
-  // Rebuild pieces
-  pieces.forEach(p => {
-    addInventaireRow('pieces');
-    const tbl = document.getElementById('inventaireTablePieces');
-    const last = tbl.rows[tbl.rows.length - 1];
-    last.querySelector('select').value = p.name;
-    last.querySelector('input.qte').value = p.qty;
-    updateInventaire({ target: last.querySelector('input.qte') });
-  });
-  // Rebuild gemmes
-  gemmes.forEach(g => {
-    addInventaireRow('gemmes');
-    const tbl = document.getElementById('inventaireTableGemmes');
-    const last = tbl.rows[tbl.rows.length - 1];
-    last.querySelector('select').value = g.name;
-    last.querySelector('input.qte').value = g.qty;
-    updateInventaire({ target: last.querySelector('input.qte') });
+  data.forEach(item => {
+    addInventaireRow(item.type);
+    const tbl = document.getElementById(item.type==='pieces'?'inventaireTablePieces':'inventaireTableGemmes');
+    const last = tbl.rows[tbl.rows.length-1];
+    last.querySelector('select').value = item.name;
+    last.querySelector('input.qte').value = item.qty;
+    updateInventaire({target:last.querySelector('input.qte')});
   });
 }
 
-async function saveDorusisRow(type, name, qty) {
-  await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type, name, qty })
+function saveToFileInventory() {
+  const rows = [];
+  document.querySelectorAll('#inventaireTablePieces tbody tr').forEach(tr => {
+    rows.push({type:'pieces', name:tr.querySelector('select').value, qty:tr.querySelector('input.qte').value});
   });
+  document.querySelectorAll('#inventaireTableGemmes tbody tr').forEach(tr => {
+    rows.push({type:'gemmes', name:tr.querySelector('select').value, qty:tr.querySelector('input.qte').value});
+  });
+  const blob = new Blob([JSON.stringify(rows)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'inventaire.json';
+  a.click();
 }
 
-// Attach Dorusis listeners
-document.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('inventaireTablePieces')) {
-    loadDorusis();
-    ['inventaireTablePieces','inventaireTableGemmes'].forEach(id => {
-      const tbl = document.getElementById(id);
-      tbl.addEventListener('change', e => {
-        const tr = e.target.closest('tr');
-        saveDorusisRow(id.includes('Pieces') ? 'pieces' : 'gemmes',
-                      tr.querySelector('select').value,
-                      tr.querySelector('input.qte').value);
-      });
-      tbl.addEventListener('input', e => {
-        const tr = e.target.closest('tr');
-        saveDorusisRow(id.includes('Pieces') ? 'pieces' : 'gemmes',
-                      tr.querySelector('select').value,
-                      tr.querySelector('input.qte').value);
-      });
-    });
+// Guild file load/save
+async function loadFromFileGuild(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  document.getElementById('guildContent').innerHTML = text;
+}
+
+function saveToFileGuild() {
+  const content = document.getElementById('guildContent').innerHTML;
+  const blob = new Blob([content], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'guilde.html';
+  a.click();
+}
+
+// Attach file controls
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInputInv = document.getElementById('fileInputInventory');
+  const saveInvBtn = document.getElementById('saveInventoryBtn');
+  if (fileInputInv && saveInvBtn) {
+    fileInputInv.addEventListener('change', loadFromFileInventory);
+    saveInvBtn.addEventListener('click', saveToFileInventory);
   }
-});
-
-// --- Guilde : contenu éditable en ligne via Google Sheets ---
-async function loadGuild() {
-  const resp = await fetch(`${API_URL}?type=guild`);
-  const data = await resp.json();
-  document.getElementById('guildContent').innerHTML = data[0]?.content || '';
-}
-
-async function saveGuild(content) {
-  await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type:'guild', name:'main', content })
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('guildContent')) {
-    loadGuild();
-    const div = document.getElementById('guildContent');
-    div.addEventListener('input', () => saveGuild(div.innerHTML));
+  const fileInputGuild = document.getElementById('fileInputGuild');
+  const saveGuildBtn = document.getElementById('saveGuildBtn');
+  if (fileInputGuild && saveGuildBtn) {
+    fileInputGuild.addEventListener('change', loadFromFileGuild);
+    saveGuildBtn.addEventListener('click', saveToFileGuild);
   }
 });
