@@ -61,7 +61,7 @@ window.updateInventaire = updateInventaire;
 function addConvertRow() {
   const table = document.getElementById("convertTable");
   const row = table.insertRow(-1);
-  const options = Object.entries(objets).map(([name, value]) => 
+  const options = Object.entries(window.objets).map(([name, value]) => 
     `<option value="${name}">${name}</option>`).join('');
   row.innerHTML = `
     <td><select onchange="updateConvertRow(this)">${options}</select></td>

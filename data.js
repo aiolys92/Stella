@@ -18,3 +18,8 @@ if (!window.monnaies) {
     }
   };
 }
+
+window.objets = {
+  ...window.monnaies.pieces,
+  ...window.monnaies.gemmes
+};
