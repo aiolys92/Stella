@@ -173,5 +173,19 @@ document.addEventListener("DOMContentLoaded", updateAll);</script>
 <script src="data.js"></script>
 <script src="site.js"></script>
 <script src="header.js"></script>
+
+<script>
+window.onload = () => {
+  const keys = Object.keys(objets);
+  const fromSelect = document.getElementById('fromSelect');
+  const toSelect = document.getElementById('toSelect');
+  keys.forEach(k => {
+    fromSelect.innerHTML += `<option value="${k}">${k}</option>`;
+    toSelect.innerHTML += `<option value="${k}">${k}</option>`;
+  });
+  fromSelect.onchange = updateTaux;
+  toSelect.onchange = updateTaux;
+};
+</script>
 </body>
 </html>

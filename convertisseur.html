@@ -80,12 +80,12 @@ function addInventaireRow(type) {
   const options = Object.keys(objList)
     .map(n => `<option value="${n}">${n}</option>`)
     .join('');
-  row.innerHTML = \`
+  row.innerHTML = `
     <td><select onchange="updateInventaire()">${options}</select></td>
     <td><input type='number' value='0' class='qte' oninput='updateInventaire()'></td>
     <td><span class='valeur'>0</span></td>
     <td><span class='total'>0</span></td>
-  \`;
+  `;
 }
 
 function updateInventaire() {
@@ -118,12 +118,12 @@ function addConvertRow() {
   const options = Object.keys(allObj)
     .map(n => `<option value="${n}">${n}</option>`)
     .join('');
-  row.innerHTML = \`
+  row.innerHTML = `
     <td><select onchange="updateConvert()">${options}</select></td>
     <td><span class='valeur'>0</span></td>
     <td><input type='number' value='0' class='qte' oninput='updateConvert()'></td>
     <td><span class='result'>0</span></td>
-  \`;
+  `;
 }
 
 function updateConvert() {
@@ -153,16 +153,16 @@ function updateAll() {
   const to = document.getElementById("toSelect");
   const all = Object.keys({ ...monnaies.pieces, ...monnaies.gemmes });
 
-  from.innerHTML = all.map(o => \`<option value="\${o}">\${o}</option>\`).join('');
+  from.innerHTML = all.map(o => `<option value="\${o}">\${o}</option>`).join('');
   to.innerHTML = from.innerHTML;
 
   const pieceList = document.getElementById("pieceList");
   pieceList.innerHTML = Object.entries(monnaies.pieces)
-    .map(([k, v]) => \`<tr><td>\${k}</td><td>\${v !== null ? v : '-'}</td></tr>\`).join('');
+    .map(([k, v]) => `<tr><td>\${k}</td><td>\${v !== null ? v : '-'}</td></tr>`).join('');
 
   const gemmeList = document.getElementById("gemmeList");
   gemmeList.innerHTML = Object.entries(monnaies.gemmes)
-    .map(([k, v]) => \`<tr><td>\${k}</td><td>\${v}</td></tr>\`).join('');
+    .map(([k, v]) => `<tr><td>\${k}</td><td>\${v}</td></tr>`).join('');
 
   updateTaux();
   updateInventaire();
