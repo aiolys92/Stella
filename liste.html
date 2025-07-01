@@ -56,22 +56,6 @@
      <h2>
       Liste des objets
      </h2>
-     <div style="text-align: right; margin-bottom: 10px;">
-      <label>
-       Afficher :
-      </label>
-      <select id="displayMode" onchange="updateDisplayMode()">
-       <option value="both">
-        PM &amp; PF
-       </option>
-       <option value="pm">
-        PM uniquement
-       </option>
-       <option value="pf">
-        PF uniquement
-       </option>
-      </select>
-     </div>
      <h3>
       Pièces
      </h3>
@@ -110,21 +94,23 @@
     <script>
      window.onload = updateListe;
     </script>
-    <script>
-     function updateDisplayMode() {
-  const mode = document.getElementById("displayMode").value;
-  const pmEls = document.querySelectorAll(".valeur-pm, .total-pm");
-  const pfEls = document.querySelectorAll(".valeur-pf, .total-pf");
-
-  pmEls.forEach(el => el.style.display = (mode === 'pm' || mode === 'both') ? 'table-cell' : 'none');
-  pfEls.forEach(el => el.style.display = (mode === 'pf' || mode === 'both') ? 'table-cell' : 'none');
-}
-    </script>
    </div>
   </div>
   <script src="data.js">
   </script>
   <script src="script.js">
+  </script>
+  <script>
+   document.addEventListener('DOMContentLoaded', function() {
+  const tbody = document.getElementById('pieceList');
+  if (window.monnaies && monnaies.pieces) {
+    Object.entries(monnaies.pieces).forEach(([name, value]) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${name}</td><td>${value}</td>`;
+      tbody.appendChild(row);
+    });
+  }
+});
   </script>
  </body>
 </html>

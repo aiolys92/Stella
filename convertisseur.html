@@ -56,22 +56,6 @@
      <h2>
       Convertisseur
      </h2>
-     <div style="text-align: right; margin-bottom: 10px;">
-      <label>
-       Afficher :
-      </label>
-      <select id="displayMode" onchange="updateDisplayMode()">
-       <option value="both">
-        PM &amp; PF
-       </option>
-       <option value="pm">
-        PM uniquement
-       </option>
-       <option value="pf">
-        PF uniquement
-       </option>
-      </select>
-     </div>
      <table id="convertTable">
       <tr>
        <th>
@@ -114,16 +98,6 @@
       row.querySelector(".valeur").textContent = valeur;
       row.querySelector(".resultat").textContent = (valeur * qte).toFixed(2);
     }
-    </script>
-    <script>
-     function updateDisplayMode() {
-  const mode = document.getElementById("displayMode").value;
-  const pmEls = document.querySelectorAll(".valeur-pm, .total-pm");
-  const pfEls = document.querySelectorAll(".valeur-pf, .total-pf");
-
-  pmEls.forEach(el => el.style.display = (mode === 'pm' || mode === 'both') ? 'table-cell' : 'none');
-  pfEls.forEach(el => el.style.display = (mode === 'pf' || mode === 'both') ? 'table-cell' : 'none');
-}
     </script>
    </div>
   </div>
