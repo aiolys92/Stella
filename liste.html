@@ -1,1 +1,23 @@
-<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'><title>Liste</title><link rel='stylesheet' href='style.css'><link rel='icon' href='img/favicon.ico'></head><body><div id='header'></div><div class='section' id='liste'><h2>Liste des objets</h2><h3>Pièces</h3><table><thead><tr><th>Nom</th><th>Valeur (PM)</th></tr></thead><tbody id='pieceList'></tbody></table><h3>Gemmes</h3><table><thead><tr><th>Nom</th><th>Valeur (PM)</th></tr></thead><tbody id='gemmeList'></tbody></table></div><script src='header.js'></script><script src='data.js'></script><script src='site.js'></script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Liste</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="img/favicon.ico">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="section" id="liste">
+    <h2>Liste des objets</h2>
+    <h3>Pièces</h3>
+    <table><thead><tr><th>Nom</th><th>Valeur</th></tr></thead><tbody id="pieceList"></tbody></table>
+    <h3>Gemmes</h3>
+    <table><thead><tr><th>Nom</th><th>Valeur</th></tr></thead><tbody id="gemmeList"></tbody></table>
+  </div>
+  <script src="data.js"></script>
+  <script src="site.js"></script>
+  <script src="header.js"></script>
+  <script>window.onload = updateListe;</script>
+</body>
+</html>

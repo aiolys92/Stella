@@ -81,3 +81,45 @@ function updateConvertRow(elm) {
 }
 window.addConvertRow = addConvertRow;
 window.updateConvertRow = updateConvertRow;
+
+function updateAll() {
+  updateTotal();
+  updateListe();
+}
+
+function updateInventaire(select) {
+  const row = select.closest("tr");
+  const type = row.parentElement.parentElement.id.includes("Pieces") ? "pieces" : "gemmes";
+  const objName = select.value;
+  const valeur = monnaies[type][objName] || 0;
+  const qte = row.querySelector(".qte").value;
+  row.querySelector(".valeur").textContent = valeur;
+  row.querySelector(".total").textContent = (valeur * qte).toFixed(2);
+  updateTotal();
+}
+
+function updateTotal() {
+  let total = 0;
+  document.querySelectorAll(".total").forEach(el => total += parseFloat(el.textContent || 0));
+  const totalElem = document.getElementById("totalInventaire");
+  if (totalElem) totalElem.textContent = total.toFixed(2);
+}
+
+function updateListe() {
+  const pieceList = document.getElementById("pieceList");
+  const gemmeList = document.getElementById("gemmeList");
+  if (!pieceList || !gemmeList) return;
+
+  pieceList.innerHTML = "";
+  gemmeList.innerHTML = "";
+  Object.entries(monnaies.pieces).forEach(([k,v]) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${k}</td><td>${v}</td>`;
+    pieceList.appendChild(row);
+  });
+  Object.entries(monnaies.gemmes).forEach(([k,v]) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `<td>${k}</td><td>${v}</td>`;
+    gemmeList.appendChild(row);
+  });
+}

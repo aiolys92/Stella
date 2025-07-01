@@ -1,1 +1,30 @@
-<!DOCTYPE html><html lang='fr'><head><meta charset='UTF-8'><title>Guilde</title><link rel='stylesheet' href='style.css'><link rel='icon' href='img/favicon.ico'></head><body><div id='header'></div><div class='section' id='inventaire'><h2>Inventaire Guilde</h2><table id='inventaireTablePieces'><tr><th>Objet</th><th>Quantité</th><th>Valeur</th><th>Total</th></tr></table><button onclick="addInventaireRow('pieces')">➕ Ajouter une pièce</button><table id='inventaireTableGemmes'><tr><th>Objet</th><th>Quantité</th><th>Valeur</th><th>Total</th></tr></table><button onclick="addInventaireRow('gemmes')">➕ Ajouter une gemme</button></div><script src='header.js'></script><script src='data.js'></script><script src='site.js'></script></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Guilde</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="img/favicon.ico">
+</head>
+<body>
+  <div id="header"></div>
+  <div class="section" id="inventaire">
+    <h2>Inventaire Guilde</h2>
+    <h3>Pièces</h3>
+    <table id="inventaireTablePieces">
+      <tr><th>Objet</th><th>Quantité</th><th>Valeur</th><th>Total</th></tr>
+    </table>
+    <button onclick="addInventaireRow('pieces')">➕ Ajouter une pièce</button>
+    <h3>Gemmes</h3>
+    <table id="inventaireTableGemmes">
+      <tr><th>Objet</th><th>Quantité</th><th>Valeur</th><th>Total</th></tr>
+    </table>
+    <button onclick="addInventaireRow('gemmes')">➕ Ajouter une gemme</button>
+    <p><strong>Total :</strong> <span id="totalInventaire">0</span> PM</p>
+  </div>
+  <script src="data.js"></script>
+  <script src="site.js"></script>
+  <script src="header.js"></script>
+  <script>window.onload = updateAll;</script>
+</body>
+</html>
