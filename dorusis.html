@@ -22,7 +22,7 @@
     Guilde
    </a>
    <a href="liste.html">
-    Liste PM/PF
+    Liste compl&egrave;te
    </a>
    <a href="convertisseur.html">
     Convertisseur
@@ -43,7 +43,7 @@
      Guilde
     </a>
     <a href="liste.html">
-     Liste PM/PF
+     Liste compl&egrave;te
     </a>
     <a href="convertisseur.html">
      Convertisseur
@@ -56,24 +56,8 @@
      <h2>
       Inventaire Dorusis
      </h2>
-     <div style="text-align: right; margin-bottom: 10px;">
-      <label>
-       Afficher :
-      </label>
-      <select id="displayMode" onchange="updateDisplayMode()">
-       <option value="both">
-        PM &amp; PF
-       </option>
-       <option value="pm">
-        PM uniquement
-       </option>
-       <option value="pf">
-        PF uniquement
-       </option>
-      </select>
-     </div>
      <h3>
-      Pièces
+      Pi&egrave;ces
      </h3>
      <table id="inventaireTablePieces">
       <tr>
@@ -81,7 +65,7 @@
         Objet
        </th>
        <th>
-        Quantité
+        Quantit&eacute;
        </th>
        <th>
         Valeur
@@ -92,7 +76,7 @@
       </tr>
      </table>
      <button onclick="addInventaireRow('pieces')">
-      ➕ Ajouter une pièce
+      ➕ Ajouter une pi&egrave;ce
      </button>
      <h3>
       Gemmes
@@ -103,7 +87,7 @@
         Objet
        </th>
        <th>
-        Quantité
+        Quantit&eacute;
        </th>
        <th>
         Valeur
@@ -126,22 +110,6 @@
       PM
      </p>
     </div>
-    <script>
-     window.onload = () => {
-  addInventaireRow('pieces');
-  addInventaireRow('gemmes');
-};
-    </script>
-    <script>
-     function updateDisplayMode() {
-  const mode = document.getElementById("displayMode").value;
-  const pmEls = document.querySelectorAll(".valeur-pm, .total-pm");
-  const pfEls = document.querySelectorAll(".valeur-pf, .total-pf");
-
-  pmEls.forEach(el => el.style.display = (mode === 'pm' || mode === 'both') ? 'table-cell' : 'none');
-  pfEls.forEach(el => el.style.display = (mode === 'pf' || mode === 'both') ? 'table-cell' : 'none');
-}
-    </script>
    </div>
   </div>
   <script src="data.js">

@@ -22,7 +22,7 @@
     Guilde
    </a>
    <a href="liste.html">
-    Liste PM/PF
+    Liste compl&egrave;te
    </a>
    <a href="convertisseur.html">
     Convertisseur
@@ -43,7 +43,7 @@
      Guilde
     </a>
     <a href="liste.html">
-     Liste PM/PF
+     Liste compl&egrave;te
     </a>
     <a href="convertisseur.html">
      Convertisseur
@@ -65,10 +65,10 @@
         Valeur (PM)
        </th>
        <th>
-        Quantité
+        Quantit&eacute;
        </th>
        <th>
-        Résultat
+        R&eacute;sultat
        </th>
       </tr>
      </table>
@@ -76,29 +76,6 @@
       ➕ Ajouter une ligne
      </button>
     </div>
-    <script>
-     function addConvertRow() {
-      const table = document.getElementById("convertTable");
-      const row = table.insertRow(-1);
-      const options = Object.entries(monnaies.pieces).concat(Object.entries(monnaies.gemmes))
-        .map(([k]) => `<option value="${k}">${k}</option>`).join('');
-      row.innerHTML = `
-        <td><select onchange="updateConvert(this)">${options}</select></td>
-        <td class="valeur">0</td>
-        <td><input type='number' value='0' oninput='updateConvert(this)'></td>
-        <td class="resultat">0</td>
-      `;
-    }
-    function updateConvert(el) {
-      const row = el.closest("tr");
-      const select = row.querySelector("select");
-      const obj = select.value;
-      const valeur = monnaies.pieces[obj] || monnaies.gemmes[obj] || 0;
-      const qte = parseFloat(row.querySelector("input").value || 0);
-      row.querySelector(".valeur").textContent = valeur;
-      row.querySelector(".resultat").textContent = (valeur * qte).toFixed(2);
-    }
-    </script>
    </div>
   </div>
   <script src="data.js">

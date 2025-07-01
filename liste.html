@@ -3,14 +3,14 @@
  <head>
   <meta charset="utf-8"/>
   <title>
-   Liste
+   Liste compl&egrave;te
   </title>
   <link href="style.css" rel="stylesheet"/>
  </head>
  <body>
   <div class="sidebar">
    <h2>
-    Navigation
+    Liste compl&egrave;te
    </h2>
    <a href="index.html">
     Accueil
@@ -22,7 +22,7 @@
     Guilde
    </a>
    <a href="liste.html">
-    Liste PM/PF
+    Liste compl&egrave;te
    </a>
    <a href="convertisseur.html">
     Convertisseur
@@ -43,7 +43,7 @@
      Guilde
     </a>
     <a href="liste.html">
-     Liste PM/PF
+     Liste compl&egrave;te
     </a>
     <a href="convertisseur.html">
      Convertisseur
@@ -57,7 +57,7 @@
       Liste des objets
      </h2>
      <h3>
-      Pièces
+      Pi&egrave;ces
      </h3>
      <table>
       <thead>
@@ -91,26 +91,11 @@
       </tbody>
      </table>
     </div>
-    <script>
-     window.onload = updateListe;
-    </script>
    </div>
   </div>
   <script src="data.js">
   </script>
   <script src="script.js">
-  </script>
-  <script>
-   document.addEventListener('DOMContentLoaded', function() {
-  const tbody = document.getElementById('pieceList');
-  if (window.monnaies && monnaies.pieces) {
-    Object.entries(monnaies.pieces).forEach(([name, value]) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${name}</td><td>${value}</td>`;
-      tbody.appendChild(row);
-    });
-  }
-});
   </script>
  </body>
 </html>

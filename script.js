@@ -1,22 +1,3 @@
-function addInventaireRow(type) {
-  const tableId = type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes';
-  const table = document.getElementById(tableId);
-  const objList = type === 'pieces' ? monnaies.pieces : monnaies.gemmes;
-  const row = table.insertRow(-1);
-  const options = Object.keys(objList)
-    .map(n => `<option value="${n}
-document.getElementById("header").innerHTML = `
-  <header>
-    <h1>Monnaie de Jeu</h1>
-    <nav>
-      <a href="index.html">Accueil</a>
-      <a href="dorusis.html">Dorusis</a>
-      <a href="guilde.html">Guilde</a>
-      <a href="convertisseur.html">Convertisseur</a>
-      <a href="liste.html">Liste</a>
-    </nav>
-  </header>
-`;
 
 function updateInventaire(event) {
   const row = event.target.closest("tr");
@@ -64,3 +45,21 @@ function addInventaireRow(type) {
   const totalSpan = document.getElementById("totalInventaire");
   if (totalSpan) totalSpan.innerText = totalPM.toFixed(2);
 }
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Inventory page population
+  if (document.getElementById('inventaireTablePieces')) {
+    addInventaireRow('pieces');
+    addInventaireRow('gemmes');
+  }
+  // Liste complète page population
+  const tbody = document.getElementById('pieceList');
+  if (tbody && window.monnaies && monnaies.pieces) {
+    Object.entries(monnaies.pieces).forEach(([name, value]) => {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${name}</td><td>${value}</td>`;
+      tbody.appendChild(row);
+    });
+  }
+});
