@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
  <head>
   <meta charset="utf-8"/>
   <title>
-   Guilde
+   Dorusis
   </title>
   <link href="style.css" rel="stylesheet"/>
  </head>
@@ -28,112 +28,75 @@
     Convertisseur
    </a>
   </div>
-  <div class="content fade-in">
-   <div class="file-controls">
-    <input accept=".json,.txt" id="fileInputGuild" type="file"/>
-    <button id="saveGuildBtn">
-     Sauvegarder Guild
+  <div class="content">
+   <div class="file-controls" style="margin-bottom:1em;">
+    <input accept=".html,.txt" id="fileInputGuild" type="file"/>
+    <button id="saveGuildBtn" type="button">
+     Sauvegarder Guilde
     </button>
    </div>
-   <div class="sidebar">
-    <h2>
-     Navigation
-    </h2>
-    <a href="index.html">
-     Accueil
-    </a>
-    <a href="dorusis.html">
-     Dorusis
-    </a>
-    <a href="guilde.html">
-     Guilde
-    </a>
-    <a href="liste.html">
-     Liste complète
-    </a>
-    <a href="convertisseur.html">
-     Convertisseur
-    </a>
-   </div>
-   <div class="content fade-in">
-    <div id="header">
-    </div>
-    <div class="section" id="inventaire">
-     <h2>
-      Inventaire Guilde
-     </h2>
-     <h3>
-      Pièces
-     </h3>
-     <table id="inventaireTablePieces">
-      <thead>
-       <tr>
-        <th>
-         Nom
-        </th>
-        <th>
-         Quantité
-        </th>
-        <th>
-         Valeur
-        </th>
-        <th>
-         Total
-        </th>
-        <th>
-         Supprimer
-        </th>
-       </tr>
-      </thead>
-      <tbody>
-      </tbody>
-     </table>
-     <button onclick="addInventaireRow('pieces')">
-      ➕ Ajouter une pièce
-     </button>
-     <h3>
-      Gemmes
-     </h3>
-     <table id="inventaireTableGemmes">
-      <thead>
-       <tr>
-        <th>
-         Nom
-        </th>
-        <th>
-         Quantité
-        </th>
-        <th>
-         Valeur
-        </th>
-        <th>
-         Total
-        </th>
-        <th>
-         Supprimer
-        </th>
-       </tr>
-      </thead>
-      <tbody>
-      </tbody>
-     </table>
-     <button onclick="addInventaireRow('gemmes')">
-      ➕ Ajouter une gemme
-     </button>
-     <p>
-      <strong>
-       Total :
-      </strong>
-      <span id="totalInventaire">
-       0
-      </span>
-      PM
-     </p>
-    </div>
-   </div>
+   <h2>
+    Inventaire Guilde
+   </h2>
+   <h3>
+    Pièces
+   </h3>
+   <table id="inventaireTablePieces">
+    <thead>
+     <tr>
+      <th>
+       Nom
+      </th>
+      <th>
+       Quantité
+      </th>
+      <th>
+       Valeur
+      </th>
+      <th>
+       Total
+      </th>
+      <th>
+       Supprimer
+      </th>
+     </tr>
+    </thead>
+    <tbody>
+    </tbody>
+   </table>
+   <button onclick="addInventaireRow('pieces')" type="button">
+    ➕ Ajouter une pièce
+   </button>
+   <h3>
+    Gemmes
+   </h3>
+   <table id="inventaireTableGemmes">
+    <thead>
+     <tr>
+      <th>
+       Nom
+      </th>
+      <th>
+       Quantité
+      </th>
+      <th>
+       Valeur
+      </th>
+      <th>
+       Total
+      </th>
+      <th>
+       Supprimer
+      </th>
+     </tr>
+    </thead>
+    <tbody>
+    </tbody>
+   </table>
+   <button onclick="addInventaireRow('gemmes')" type="button">
+    ➕ Ajouter une gemme
+   </button>
   </div>
-  \n
-  \n
   <script src="data.js">
   </script>
   <script src="script.js">

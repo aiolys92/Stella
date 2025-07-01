@@ -1,140 +1,142 @@
 
-// Inventory update
+// script.js — inventory and list
+
+// Inventory functions
 function updateInventaire(event) {
   const row = event.target.closest('tr');
   const select = row.querySelector('select');
   const qty = parseFloat(row.querySelector('input.qte').value) || 0;
   const name = select.value;
-  const val = (monnaies.pieces[name] !== undefined) 
-    ? monnaies.pieces[name] 
-    : (monnaies.gemmes[name] || 0);
+  const val = monnaies.pieces[name] !== undefined ? monnaies.pieces[name] :
+              monnaies.gemmes[name] !== undefined ? monnaies.gemmes[name] : 0;
   row.querySelector('td.valeur').textContent = val.toFixed(2);
   row.querySelector('td.total').textContent = (val * qty).toFixed(2);
-  // recalc total
-  let sum=0;
-  document.querySelectorAll('td.total').forEach(td => { sum += parseFloat(td.textContent)||0; });
-  const totalSpan = document.getElementById('totalInventaire');
-  if(totalSpan) totalSpan.textContent = sum.toFixed(2);
+  let sum = 0;
+  document.querySelectorAll('td.total').forEach(td => sum += parseFloat(td.textContent)||0);
+  const total = document.getElementById('totalInventaire');
+  if (total) total.textContent = sum.toFixed(2);
 }
 
-// Add inventory row with delete button
 function addInventaireRow(type) {
-  const table = document.getElementById('inventaireTable' + (type==='pieces'?'Pieces':'Gemmes'));
-  if(!table) return;
+  const table = document.getElementById(type==='pieces'?'inventaireTablePieces':'inventaireTableGemmes');
+  if (!table) return;
   const list = type==='pieces'?monnaies.pieces:monnaies.gemmes;
-  const row = table.insertRow(-1);
-  // name
-  const cell1 = row.insertCell();
-  const sel = document.createElement('select');
-  sel.onchange = updateInventaire;
-  for(const name in list){
-    const opt = document.createElement('option');
-    opt.value = name;
-    opt.textContent = name;
-    sel.appendChild(opt);
-  }
-  cell1.appendChild(sel);
-  // qty
-  const cell2 = row.insertCell();
-  const inp = document.createElement('input');
-  inp.type = 'number';
-  inp.value = 0;
-  inp.className = 'qte';
-  inp.oninput = updateInventaire;
-  cell2.appendChild(inp);
-  // valeur
-  const cell3 = row.insertCell();
-  cell3.className = 'valeur';
-  cell3.textContent = '0.00';
-  // total
-  const cell4 = row.insertCell();
-  cell4.className = 'total';
-  cell4.textContent = '0.00';
-  // delete
-  const cell5 = row.insertCell();
-  const btn = document.createElement('button');
-  btn.type='button';
-  btn.textContent='🗑️';
-  btn.onclick = function(){ removeInventaireRow(this); };
-  cell5.appendChild(btn);
+  const row = table.insertRow();
+  row.innerHTML = `
+    <td><select onchange="updateInventaire(event)">${Object.keys(list).map(n=>'<option>'+n+'</option>').join('')}</select></td>
+    <td><input class="qte" type="number" value="0" oninput="updateInventaire(event)"></td>
+    <td class="valeur">0.00</td>
+    <td class="total">0.00</td>
+    <td><button type="button" onclick="removeInventaireRow(this)">🗑️</button></td>
+  `;
 }
 
-// Remove inventory row
+// Remove row
 function removeInventaireRow(btn) {
-  const row = btn.closest('tr');
-  row.remove();
-  // recalc
-  let sum=0;
-  document.querySelectorAll('td.total').forEach(td => { sum += parseFloat(td.textContent)||0; });
-  const totalSpan = document.getElementById('totalInventaire');
-  if(totalSpan) totalSpan.textContent = sum.toFixed(2);
+  btn.closest('tr').remove();
+  updateInventaire({target: document.querySelector('input.qte')});
 }
 
-document.addEventListener('DOMContentLoaded', function(){
-  // init for Dorusis and Guilde pages
-  if(document.getElementById('inventaireTablePieces')){
+// List functions
+function updateListe() {
+  const pbody = document.getElementById('pieceList');
+  if (pbody) {
+    pbody.innerHTML = '';
+    Object.entries(monnaies.pieces).forEach(([n,v]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${n}</td><td>${v}</td>`;
+      pbody.appendChild(tr);
+    });
+  }
+  const gbody = document.getElementById('gemmeList');
+  if (gbody) {
+    gbody.innerHTML = '';
+    Object.entries(monnaies.gemmes).forEach(([n,v]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${n}</td><td>${v}</td>`;
+      gbody.appendChild(tr);
+    });
+  }
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('inventaireTablePieces')) {
     addInventaireRow('pieces');
     addInventaireRow('gemmes');
   }
-});
-
-
-// --- List complete functions ---
-function updateListe() {
-  const tbody = document.getElementById('pieceList');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  Object.entries(monnaies.pieces).forEach(([name, value]) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${name}</td><td>${value}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function updateGemmes() {
-  const tbody = document.getElementById('gemmeList');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  Object.entries(monnaies.gemmes).forEach(([name, value]) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${name}</td><td>${value}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-// Call for list page
-document.addEventListener('DOMContentLoaded', function() {
   if (document.getElementById('pieceList')) {
     updateListe();
-    updateGemmes();
   }
 });
 
-// --- Converter functions ---
-function updateConvert(event) {
-  var row = event.target.closest('tr');
-  var name = row.querySelector('.convert-select').value;
-  var qty = parseFloat(row.querySelector('.qte').value) || 0;
-  var val = monnaies.pieces[name] || 0;
-  row.querySelector('.convert-result').textContent = (val * qty).toFixed(2);
+
+// --- File-based Persistence ---
+// Load inventory from file
+async function loadFromFileInventory(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const data = JSON.parse(text);
+  // clear tables
+  document.querySelectorAll('#inventaireTablePieces tbody, #inventaireTableGemmes tbody').forEach(tb=>tb.innerHTML='');
+  data.forEach(item => {
+    addInventaireRow(item.type);
+    const tbl = document.getElementById(item.type==='pieces'?'inventaireTablePieces':'inventaireTableGemmes');
+    const last = tbl.querySelector('tbody').lastElementChild;
+    last.querySelector('select').value = item.name;
+    last.querySelector('input.qte').value = item.qty;
+    updateInventaire({target:last.querySelector('input.qte')});
+  });
 }
 
-function addConvertRow() {
-  var table = document.getElementById('convertTable');
-  if (!table) return;
-  var row = table.insertRow(-1);
-  var opts = Object.keys(monnaies.pieces).map(function(n){
-    return '<option value="'+n+'">'+n+'</option>';
-  }).join('');
-  row.innerHTML = '<td><select class="convert-select" onchange="updateConvert(event)">'+opts+'</select></td>'
-                + '<td><input type="number" value="1" class="qte" oninput="updateConvert(event)"></td>'
-                + '<td class="convert-result">0.00</td>';
-  updateConvert({target: row.querySelector('.convert-select')});
+// Save inventory to file
+function saveToFileInventory() {
+  const rows = [];
+  document.querySelectorAll('#inventaireTablePieces tbody tr').forEach(tr => {
+    rows.push({type:'pieces', name:tr.querySelector('select').value, qty:tr.querySelector('input.qte').value});
+  });
+  document.querySelectorAll('#inventaireTableGemmes tbody tr').forEach(tr => {
+    rows.push({type:'gemmes', name:tr.querySelector('select').value, qty:tr.querySelector('input.qte').value});
+  });
+  const blob = new Blob([JSON.stringify(rows, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'inventaire.json';
+  a.click();
 }
 
-// Hook converter init
-document.addEventListener('DOMContentLoaded', function(){
-  if (document.getElementById('convertTable')) {
-    addConvertRow();
+// Load guild content from file
+async function loadFromFileGuild(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const div = document.getElementById('guildContent');
+  div.innerHTML = text;
+}
+
+// Save guild content to file
+function saveToFileGuild() {
+  const content = document.getElementById('guildContent').innerHTML;
+  const blob = new Blob([content], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'guilde.html';
+  a.click();
+}
+
+// Attach file controls on load
+document.addEventListener('DOMContentLoaded', function() {
+  const fileInputInv = document.getElementById('fileInputInventory');
+  const saveInvBtn = document.getElementById('saveInventoryBtn');
+  if (fileInputInv && saveInvBtn) {
+    fileInputInv.addEventListener('change', loadFromFileInventory);
+    saveInvBtn.addEventListener('click', saveToFileInventory);
+  }
+  const fileInputGuild = document.getElementById('fileInputGuild');
+  const saveGuildBtn = document.getElementById('saveGuildBtn');
+  if (fileInputGuild && saveGuildBtn) {
+    fileInputGuild.addEventListener('change', loadFromFileGuild);
+    saveGuildBtn.addEventListener('click', saveToFileGuild);
   }
 });
