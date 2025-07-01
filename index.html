@@ -2,79 +2,18 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Monnaie de Jeu</title>
+  <title>Accueil</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
-    h1 { text-align: center; }
-    .nav { text-align: center; margin-bottom: 20px; }
-    .nav button { margin: 0 10px; padding: 10px 20px; font-size: 1em; }
-    .section { background: white; padding: 20px; margin: 20px auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 1000px; display: none; }
-    .section.active { display: block; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95em; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
-    th { background-color: #eee; }
-    input, select { padding: 5px; font-size: 1em; }
-    input[type="number"] { width: 100px; }
-    .add-row-btn { margin-top: 10px; }
-    .icon { font-size: 1.2em; margin-right: 5px; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="accueil" style="text-align:center;">
-    <p>Choisissez un inventaire :</p>
-    <a href="dorusis.html"><button>Entrer en tant que Dorusis</button></a>
-    <a href="guilde.html"><button>Entrer en tant que Guilde</button></a>
-    
-
-  <div id="contenu" style="display:none;">
-    <div class="nav">
-      <button onclick="showSection('inventaire')">Inventaire</button>
-      <button onclick="showSection('convertisseur')">Convertisseur</button>
-      <button onclick="showSection('liste')">Liste</button>
-      <button onclick="showSection('taux')">Taux</button>
-      <button onclick="retourAccueil()">⬅️ Retour</button>
-    </div>
-
-    <div class="section active" id="inventaire">
-      <h2>Inventaire</h2>
-      <h3>Pièces</h3>
-      <table id="inventaireTablePieces">
-        <tr><th>Objet</th><th>Quantité</th><th>Valeur unitaire (PM)</th><th>Total (PM)</th></tr>
-      </table>
-      <button class="add-row-btn" onclick="addInventaireRow('pieces')">➕ Ajouter une pièce</button>
-      <h3>Gemmes</h3>
-      <table id="inventaireTableGemmes">
-        <tr><th>Objet</th><th>Quantité</th><th>Valeur unitaire (PM)</th><th>Total (PM)</th></tr>
-      </table>
-      <button class="add-row-btn" onclick="addInventaireRow('gemmes')">➕ Ajouter une gemme</button>
-      <p><strong>Total inventaire :</strong> <span id="totalInventaire">0</span> PM</p>
-    </div>
-
-    <div class="section" id="convertisseur">
-      <h2>Convertisseur</h2>
-      <table id="convertTable">
-        <tr><th>Objet</th><th>Valeur (PM)</th><th>Quantité</th><th>Résultat</th></tr>
-      </table>
-      <button class="add-row-btn" onclick="addConvertRow()">➕ Ajouter une ligne</button>
-    </div>
-
-    <div class="section" id="liste">
-      <h2>Liste</h2>
-      <h3>Pièces</h3>
-      <table><thead><tr><th>Nom</th><th>Valeur (PM)</th></tr></thead><tbody id="pieceList"></tbody></table>
-      <h3>Gemmes</h3>
-      <table><thead><tr><th>Nom</th><th>Valeur (PM)</th></tr></thead><tbody id="gemmeList"></tbody></table>
-    </div>
-
-    <div class="section" id="taux">
-      <h2>Taux de conversion</h2>
-      <label>De : <select id="fromSelect"></select></label>
-      <label>Vers : <select id="toSelect"></select></label>
-      <p><strong>Taux :</strong> <span id="conversionRate">0</span></p>
-      <p><strong>Valeur en pièce maîtresse :</strong> <span id="conversionValue">0</span> PM</p>
-    </div>
-  </div>
+  
+<div id="accueil" style="text-align:center;">
+  <h1>Bienvenue</h1>
+  <p>Choisissez un inventaire :</p>
+  <a href="dorusis.html"><button>Entrer en tant que Dorusis</button></a>
+  <a href="guilde.html"><button>Entrer en tant que Guilde</button></a>
+</div>
 
   <script src="data.js"></script>
   <script src="site.js"></script>
