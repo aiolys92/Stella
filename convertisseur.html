@@ -79,14 +79,14 @@ function addInventaireRow(type) {
     .map(n => `<option value="${n}">${n}</option>`)
     .join('');
   row.innerHTML = `
-    <td><select onchange="updateInventaire()">${options}</select></td>
-    <td><input type='number' value='0' class='qte' oninput='updateInventaire()'></td>
+    <td><select onchange="updateConvertRow()">${options}</select></td>
+    <td><input type='number' value='0' class='qte' oninput='updateConvertRow()'></td>
     <td><span class='valeur'>0</span></td>
     <td><span class='total'>0</span></td>
   `;
 }
 
-function updateInventaire() {
+function updateConvertRow() {
   let total = 0;
 
   ['pieces', 'gemmes'].forEach(type => {
@@ -163,7 +163,7 @@ function updateAll() {
     .map(([k, v]) => `<tr><td>\${k}</td><td>\${v}</td></tr>`).join('');
 
   updateTaux();
-  updateInventaire();
+  updateConvertRow();
   updateConvert();
 }
 
