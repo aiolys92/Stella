@@ -1,0 +1,9 @@
+
+.valeur-pm, .total-pm {
+  background-color: #f0f8ff;  /* Bleu pâle */
+  font-weight: bold;
+}
+.valeur-pf, .total-pf {
+  background-color: #fff8dc;  /* Jaune clair */
+  font-weight: bold;
+}
