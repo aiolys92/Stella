@@ -11,146 +11,76 @@
     .nav button { margin: 0 10px; padding: 10px 20px; font-size: 1em; }
     .section { background: white; padding: 20px; margin: 20px auto; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 1000px; display: none; }
     .section.active { display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.95em; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    th { background-color: #eee; }
+    input, select { padding: 5px; font-size: 1em; }
+    input[type="number"] { width: 100px; }
+    .add-row-btn { margin-top: 10px; }
+    .icon { font-size: 1.2em; margin-right: 5px; }
   </style>
 </head>
 <body>
-  <h1>Monnaie de Jeu</h1>
-  <p>Le contenu complet du site est à intégrer ici…</p>
+  <div id="accueil" style="text-align:center;">
+    <p>Choisissez un inventaire :</p>
+    <a href="dorusis.html"><button>Entrer en tant que Dorusis</button></a>
+    <a href="guilde.html"><button>Entrer en tant que Guilde</button></a>
+    
+    <h1>Bienvenue</h1>
+    <button onclick="choisirProfil('dorusis')">Entrer en tant que Dorusis</button>
+    <button onclick="choisirProfil('guilde')">Entrer en tant que Guilde</button>
+  </div>
 
-  <!-- Inclusion de la base de données -->
+  <div id="contenu" style="display:none;">
+    <div class="nav">
+      <button onclick="showSection('inventaire')">Inventaire</button>
+      <button onclick="showSection('convertisseur')">Convertisseur</button>
+      <button onclick="showSection('liste')">Liste</button>
+      <button onclick="showSection('taux')">Taux</button>
+      <button onclick="retourAccueil()">⬅️ Retour</button>
+    </div>
+
+    <div class="section active" id="inventaire">
+      <h2>Inventaire</h2>
+      <h3>Pièces</h3>
+      <table id="inventaireTablePieces">
+        <tr><th>Objet</th><th>Quantité</th><th>Valeur unitaire (PM)</th><th>Total (PM)</th></tr>
+      </table>
+      <button class="add-row-btn" onclick="addInventaireRow('pieces')">➕ Ajouter une pièce</button>
+      <h3>Gemmes</h3>
+      <table id="inventaireTableGemmes">
+        <tr><th>Objet</th><th>Quantité</th><th>Valeur unitaire (PM)</th><th>Total (PM)</th></tr>
+      </table>
+      <button class="add-row-btn" onclick="addInventaireRow('gemmes')">➕ Ajouter une gemme</button>
+      <p><strong>Total inventaire :</strong> <span id="totalInventaire">0</span> PM</p>
+    </div>
+
+    <div class="section" id="convertisseur">
+      <h2>Convertisseur</h2>
+      <table id="convertTable">
+        <tr><th>Objet</th><th>Valeur (PM)</th><th>Quantité</th><th>Résultat</th></tr>
+      </table>
+      <button class="add-row-btn" onclick="addConvertRow()">➕ Ajouter une ligne</button>
+    </div>
+
+    <div class="section" id="liste">
+      <h2>Liste</h2>
+      <h3>Pièces</h3>
+      <table><thead><tr><th>Nom</th><th>Valeur (PM)</th></tr></thead><tbody id="pieceList"></tbody></table>
+      <h3>Gemmes</h3>
+      <table><thead><tr><th>Nom</th><th>Valeur (PM)</th></tr></thead><tbody id="gemmeList"></tbody></table>
+    </div>
+
+    <div class="section" id="taux">
+      <h2>Taux de conversion</h2>
+      <label>De : <select id="fromSelect"></select></label>
+      <label>Vers : <select id="toSelect"></select></label>
+      <p><strong>Taux :</strong> <span id="conversionRate">0</span></p>
+      <p><strong>Valeur en pièce maîtresse :</strong> <span id="conversionValue">0</span> PM</p>
+    </div>
+  </div>
+
   <script src="data.js"></script>
-<script>
-// Fusion objets
-const objets = {};
-Object.entries(monnaies.pieces).forEach(([k,v]) => { if (v !== null) objets[k] = v; });
-Object.entries(monnaies.gemmes).forEach(([k,v]) => { objets[k] = v; });
-
-// Navigation
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-// Choix de profil
-function choisirProfil(profil) {
-  document.getElementById('accueil').style.display = 'none';
-  document.getElementById('contenu').style.display = 'block';
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('inventaire').classList.add('active');
-  profilActif = profil;
-  restaurerInventaire();
-}
-
-function retourAccueil() {
-  sauvegarderInventaire();
-  document.getElementById('accueil').style.display = 'block';
-  document.getElementById('contenu').style.display = 'none';
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-}
-
-let profilActif = null;
-
-function sauvegarderInventaire() {
-  const data = { pieces: [], gemmes: [] };
-  ['pieces', 'gemmes'].forEach(type => {
-    const table = document.getElementById('inventaireTable' + capitalize(type));
-    Array.from(table.rows).slice(1).forEach(row => {
-      const select = row.querySelector('select');
-      const qte = row.querySelector('.qte')?.value || 0;
-      if (select) {
-        data[type].push({ objet: select.value, qte });
-      }
-    });
-  });
-  localStorage.setItem('inventaire_' + profilActif, JSON.stringify(data));
-}
-
-function restaurerInventaire() {
-  ['inventaireTablePieces', 'inventaireTableGemmes'].forEach(id => {
-    const table = document.getElementById(id);
-    while (table.rows.length > 1) table.deleteRow(1);
-  });
-
-  const sauvegarde = localStorage.getItem('inventaire_' + profilActif);
-  if (!sauvegarde) return;
-  const data = JSON.parse(sauvegarde);
-  if (data.pieces) {
-    data.pieces.forEach(item => {
-      addInventaireRow('pieces');
-      const row = document.getElementById('inventaireTablePieces').rows[
-        document.getElementById('inventaireTablePieces').rows.length - 1
-      ];
-      row.querySelector('select').value = item.objet;
-      row.querySelector('.qte').value = item.qte;
-      updateInventaire(row.querySelector('select'));
-    });
-  }
-  if (data.gemmes) {
-    data.gemmes.forEach(item => {
-      addInventaireRow('gemmes');
-      const row = document.getElementById('inventaireTableGemmes').rows[
-        document.getElementById('inventaireTableGemmes').rows.length - 1
-      ];
-      row.querySelector('select').value = item.objet;
-      row.querySelector('.qte').value = item.qte;
-      updateInventaire(row.querySelector('select'));
-    });
-  }
-}
-
-function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function addInventaireRow(type) {
-  const table = document.getElementById(type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes');
-  const objList = type === 'pieces' ? monnaies.pieces : monnaies.gemmes;
-  const row = table.insertRow(-1);
-  const options = Object.entries(objList).map(([name]) => `<option value="${name}">${name}</option>`).join('');
-  row.innerHTML = `
-    <td><select onchange="updateInventaire(this)">${options}</select></td>
-    <td><input type='number' value='0' class='qte'></td>
-    <td><span class='valeur'>0</span></td>
-    <td><span class='total'>0</span></td>
-  `;
-}
-
-function updateInventaire(select) {
-  const row = select.closest('tr');
-  const valeur = objets[select.value] ?? 0;
-  const qte = parseFloat(row.querySelector('.qte').value) || 0;
-  row.querySelector('.valeur').textContent = valeur;
-  row.querySelector('.total').textContent = (valeur * qte).toFixed(2);
-  updateTotal();
-}
-
-function updateTotal() {
-  let total = 0;
-  ['inventaireTablePieces', 'inventaireTableGemmes'].forEach(id => {
-    const rows = document.querySelectorAll(`#${id} tr`);
-    rows.forEach((row, idx) => {
-      if (idx === 0) return;
-      const val = parseFloat(row.querySelector('.total')?.textContent || 0);
-      total += val;
-    });
-  });
-  document.getElementById('totalInventaire').textContent = total.toFixed(2);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("Site prêt.");
-});
-</script>
-<script>
-// Reste des fonctions JS
-const objets = {};
-Object.entries(monnaies.pieces).forEach(([k,v]) => { if (v !== null) objets[k] = v; });
-Object.entries(monnaies.gemmes).forEach(([k,v]) => { objets[k] = v; });
-
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-</script>
+  <script src="site.js"></script>
 </body>
 </html>
