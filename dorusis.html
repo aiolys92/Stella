@@ -1,59 +1,145 @@
 <!DOCTYPE html>
-
 <html lang="fr">
-<head>
-<meta charset="utf-8"/>
-<title>Dorusis</title>
-<link href="style.css" rel="stylesheet"/>
-<link href="img/favicon.ico" rel="icon"/>
-<link href="css/style.css" rel="stylesheet"/></head>
-<body>
-
-<div class="sidebar">
-    <h2>Navigation</h2>
-    <a href="index.html">Accueil</a>
-    <a href="dorusis.html">Dorusis</a>
-    <a href="guilde.html">Guilde</a>
-    <a href="liste.html">Liste PM/PF</a>
-    <a href="convertisseur.html">Convertisseur</a>
-</div>
-
-<div class='content fade-in'>
-
-<div id="header"></div>
-<div class="section" id="inventaire">
-<h2>Inventaire Dorusis</h2>
-<div style="text-align: right; margin-bottom: 10px;">
-<label>Afficher :</label>
-<select id="displayMode" onchange="updateDisplayMode()">
-<option value="both">PM &amp; PF</option>
-<option value="pm">PM uniquement</option>
-<option value="pf">PF uniquement</option>
-</select>
-</div>
-<h3>Pièces</h3>
-<table id="inventaireTablePieces">
-<tr><th>Objet</th><th>Quantité</th><th>Valeur</th><th>Total</th></tr>
-</table>
-<button onclick="addInventaireRow('pieces')">➕ Ajouter une pièce</button>
-<h3>Gemmes</h3>
-<table id="inventaireTableGemmes">
-<tr><th>Objet</th><th>Quantité</th><th>Valeur</th><th>Total</th></tr>
-</table>
-<button onclick="addInventaireRow('gemmes')">➕ Ajouter une gemme</button>
-<p><strong>Total :</strong> <span id="totalInventaire">0</span> PM</p>
-</div>
-<script src="data.js"></script>
-<script src="site.js"></script>
-<script src="header.js"></script>
-<script>
-window.onload = () => {
+ <head>
+  <meta charset="utf-8"/>
+  <title>
+   Dorusis
+  </title>
+  <link href="style.css" rel="stylesheet"/>
+ </head>
+ <body>
+  <div class="sidebar">
+   <h2>
+    Navigation
+   </h2>
+   <a href="index.html">
+    Accueil
+   </a>
+   <a href="dorusis.html">
+    Dorusis
+   </a>
+   <a href="guilde.html">
+    Guilde
+   </a>
+   <a href="liste.html">
+    Liste PM/PF
+   </a>
+   <a href="convertisseur.html">
+    Convertisseur
+   </a>
+  </div>
+  <div class="content fade-in">
+   <div class="sidebar">
+    <h2>
+     Navigation
+    </h2>
+    <a href="index.html">
+     Accueil
+    </a>
+    <a href="dorusis.html">
+     Dorusis
+    </a>
+    <a href="guilde.html">
+     Guilde
+    </a>
+    <a href="liste.html">
+     Liste PM/PF
+    </a>
+    <a href="convertisseur.html">
+     Convertisseur
+    </a>
+   </div>
+   <div class="content fade-in">
+    <div id="header">
+    </div>
+    <div class="section" id="inventaire">
+     <h2>
+      Inventaire Dorusis
+     </h2>
+     <div style="text-align: right; margin-bottom: 10px;">
+      <label>
+       Afficher :
+      </label>
+      <select id="displayMode" onchange="updateDisplayMode()">
+       <option value="both">
+        PM &amp; PF
+       </option>
+       <option value="pm">
+        PM uniquement
+       </option>
+       <option value="pf">
+        PF uniquement
+       </option>
+      </select>
+     </div>
+     <h3>
+      Pi&egrave;ces
+     </h3>
+     <table id="inventaireTablePieces">
+      <tr>
+       <th>
+        Objet
+       </th>
+       <th>
+        Quantit&eacute;
+       </th>
+       <th>
+        Valeur
+       </th>
+       <th>
+        Total
+       </th>
+      </tr>
+     </table>
+     <button onclick="addInventaireRow('pieces')">
+      ➕ Ajouter une pi&egrave;ce
+     </button>
+     <h3>
+      Gemmes
+     </h3>
+     <table id="inventaireTableGemmes">
+      <tr>
+       <th>
+        Objet
+       </th>
+       <th>
+        Quantit&eacute;
+       </th>
+       <th>
+        Valeur
+       </th>
+       <th>
+        Total
+       </th>
+      </tr>
+     </table>
+     <button onclick="addInventaireRow('gemmes')">
+      ➕ Ajouter une gemme
+     </button>
+     <p>
+      <strong>
+       Total :
+      </strong>
+      <span id="totalInventaire">
+       0
+      </span>
+      PM
+     </p>
+    </div>
+    <script src="data.js">
+    </script>
+    <script src="site.js">
+    </script>
+    <script src="header.js">
+    </script>
+    <script>
+     window.onload = () => {
   addInventaireRow('pieces');
   addInventaireRow('gemmes');
 };
-</script>
-<script>
-function updateDisplayMode() {
+    </script>
+    <script>
+     function updateDisplayMode() {
   const mode = document.getElementById("displayMode").value;
   const pmEls = document.querySelectorAll(".valeur-pm, .total-pm");
   const pfEls = document.querySelectorAll(".valeur-pf, .total-pf");
@@ -61,8 +147,12 @@ function updateDisplayMode() {
   pmEls.forEach(el => el.style.display = (mode === 'pm' || mode === 'both') ? 'table-cell' : 'none');
   pfEls.forEach(el => el.style.display = (mode === 'pf' || mode === 'both') ? 'table-cell' : 'none');
 }
-</script></div>
-<script src='data.js'></script>
-<script src='script.js'></script>
-</body>
+    </script>
+   </div>
+  </div>
+  <script src="data.js">
+  </script>
+  <script src="script.js">
+  </script>
+ </body>
 </html>
