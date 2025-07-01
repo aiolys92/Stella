@@ -5,17 +5,37 @@
   <title>Accueil</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <style>
+    .menu-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 40px;
+    }
+    .menu-buttons a {
+      display: inline-block;
+      background-color: #0077cc;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    .menu-buttons a:hover {
+      background-color: #005fa3;
+    }
+  </style>
 </head>
 <body>
-  <div class="section">
-    <h2>Accéder à un profil</h2>
-    <ul>
-      <li><a href="dorusis.html">Inventaire Dorusis</a></li>
-      <li><a href="guilde.html">Inventaire Guilde</a></li>
-      <li><a href="convertisseur.html">Convertisseur</a></li>
-      <li><a href="liste.html">Liste des objets</a></li>
-      <li><a href="taux.html">Taux de conversion</a></li>
-    </ul>
+  <h1>Bienvenue sur le site de Monnaie de Jeu</h1>
+  <div class="menu-buttons">
+    <a href="dorusis.html">Inventaire Dorusis</a>
+    <a href="guilde.html">Inventaire Guilde</a>
+    <a href="convertisseur.html">Convertisseur</a>
+    <a href="liste.html">Liste des objets</a>
+    <a href="taux.html">Taux de conversion</a>
   </div>
   <script src="header.js"></script>
 </body>
