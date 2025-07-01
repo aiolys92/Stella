@@ -1,3 +1,10 @@
+function addInventaireRow(type) {
+  const tableId = type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes';
+  const table = document.getElementById(tableId);
+  const objList = type === 'pieces' ? monnaies.pieces : monnaies.gemmes;
+  const row = table.insertRow(-1);
+  const options = Object.keys(objList)
+    .map(n => `<option value="${n}
 document.getElementById("header").innerHTML = `
   <header>
     <h1>Monnaie de Jeu</h1>
