@@ -122,3 +122,6 @@ function updateAll() {
 }
 
 document.addEventListener("DOMContentLoaded", updateAll);
+
+window.addInventaireRow = addInventaireRow;
+window.addConvertRow = addConvertRow;
