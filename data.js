@@ -5,7 +5,7 @@ if (!window.monnaies) {
       "Or": 1, 
       "Argent": 1, 
       "Électrum": 1, 
-      "Fer": 0,01041667,
+      "Fer": 0.01041667,
       "Nickel": 0,
       "Cuivre": 0,
       "Titane": 0,
