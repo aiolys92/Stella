@@ -1,8 +1,15 @@
 if (!window.monnaies) {
   window.monnaies = {
     pieces: {
-      "Platine": 3, "Or": 1, "Argent": 1, "Électrum": 1, "Fer": 0,01041667,
-      "Nickel": 0, "Cuivre": 0, "Titane": 0, "Plomp": 0
+      "Platine": 3,
+      "Or": 1, 
+      "Argent": 1, 
+      "Électrum": 1, 
+      "Fer": 0,01041667,
+      "Nickel": 0,
+      "Cuivre": 0,
+      "Titane": 0,
+      "Plomp": 0
     },
     gemmes: {
   "Rubis": 83.33,
