@@ -9,7 +9,7 @@ if (!window.monnaies) {
       "Nickel": 0,
       "Cuivre": 0,
       "Titane": 0,
-      "Plomp": 0
+      "Plomp": 0,
     },
     gemmes: {
   "Rubis": 83.33,
@@ -50,7 +50,7 @@ if (!window.monnaies) {
   "Corail": 0.1,
   "Jais": 0.06,
   "Nacre": 0.04,
-  "Ecaille": 0.02
+  "Ecaille": 0.02,
     }
   };
 }
