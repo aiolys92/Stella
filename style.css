@@ -296,18 +296,6 @@ label select, label input {
   font-size: 1.2em;
 }
 
-/* ===== ANIMATIONS ===== */
-@keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
 /* ===== STYLES SPÉCIFIQUES PAGE POIDS ===== */
 
 /* En-tête de page */
@@ -890,6 +878,29 @@ label select, label input {
   font-size: 0.9em;
 }
 
+/* Animations */
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes fadeInTab {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
 /* Animations pour la pop-in */
 @keyframes fadeInOverlay {
   from { opacity: 0; }
@@ -907,20 +918,54 @@ label select, label input {
   }
 }
 
-/* Animations */
-@keyframes fadeInTab {
-  from { 
-    opacity: 0; 
-    transform: translateY(10px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
-/* Responsive pour la page poids */
+/* ===== RESPONSIVE DESIGN ===== */
 @media (max-width: 768px) {
+  :root {
+    --sidebar-width: 0;
+    --content-margin: 0;
+  }
+  
+  .sidebar {
+    display: none;
+  }
+  
+  .mobile-nav {
+    display: flex;
+  }
+  
+  .content {
+    margin-left: 0;
+    margin-top: 60px;
+    padding: 15px;
+  }
+  
+  body {
+    padding: 10px;
+  }
+  
+  .file-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .nav {
+    grid-template-columns: 1fr;
+  }
+  
+  table {
+    font-size: 14px;
+  }
+  
+  th, td {
+    padding: 6px 4px;
+  }
+  
+  button {
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* Responsive pour la page poids */
   .cta-container {
     flex-direction: column;
     text-align: center;
@@ -1014,52 +1059,6 @@ label select, label input {
   .inventory-table td {
     padding: 6px 4px;
     font-size: 13px;
-  }
-}
-@media (max-width: 768px) {
-  :root {
-    --sidebar-width: 0;
-    --content-margin: 0;
-  }
-  
-  .sidebar {
-    display: none;
-  }
-  
-  .mobile-nav {
-    display: flex;
-  }
-  
-  .content {
-    margin-left: 0;
-    margin-top: 60px;
-    padding: 15px;
-  }
-  
-  body {
-    padding: 10px;
-  }
-  
-  .file-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .nav {
-    grid-template-columns: 1fr;
-  }
-  
-  table {
-    font-size: 14px;
-  }
-  
-  th, td {
-    padding: 6px 4px;
-  }
-  
-  button {
-    padding: 12px;
-    font-size: 14px;
   }
 }
 
