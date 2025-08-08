@@ -1,4 +1,393 @@
-// ===== SCRIPT UNIFIÉ POUR LA GESTION DES POIDS =====
+poidsEquipements += poids;
+      }
+    }
+  });
+  
+  return DORUSIS_BASE_WEIGHT + poidsEquipements;
+}
+
+/**
+ * Ajoute automatiquement Dorusis avec son équipement au cheval
+ */
+function ajouterDorusisAuCheval() {
+  const poidsTotal = calculerPoidsDorusis();
+  
+  const confirmation = confirm(
+    `🐴 Monter Dorusis sur le cheval ?\n\n` +
+    `👤 Dorusis: ${DORUSIS_BASE_WEIGHT} kg\n` +
+    `🎒 Équipements: ${(poidsTotal - DORUSIS_BASE_WEIGHT).toFixed(1)} kg\n` +
+    `⚖️ Poids total: ${poidsTotal.toFixed(1)} kg`
+  );
+  
+  if (!confirmation) return;
+  
+  // Vérifier si Dorusis est déjà sur le cheval
+  const chevalTable = document.getElementById('inventaireTableCheval');
+  let dorusisRow = null;
+  
+  chevalTable.querySelectorAll('tbody tr').forEach(row => {
+    const objectSelect = row.querySelector('.object-select');
+    if (objectSelect && objectSelect.value.includes('Dorusis')) {
+      dorusisRow = row;
+    }
+  });
+  
+  if (dorusisRow) {
+    // Mettre à jour le poids existant
+    const quantityInput = dorusisRow.querySelector('.quantity-input');
+    quantityInput.value = '1';
+    
+    // Mettre à jour le poids dans les données
+    window.modifierObjetPoids('Dorusis (1.80m, forte musculature)', poidsTotal);
+    
+    updateInventairePoids(dorusisRow.querySelector('.object-select'));
+    showNotification(`🔄 Poids de Dorusis mis à jour: ${poidsTotal.toFixed(1)} kg`);
+  } else {
+    // Ajouter une nouvelle ligne pour Dorusis
+    addInventaireRowPoids('cheval');
+    
+    const chevalTable = document.getElementById('inventaireTableCheval');
+    const lastRow = chevalTable.querySelector('tbody').lastElementChild;
+    
+    if (lastRow) {
+      // Sélectionner la catégorie "Personnages"
+      const categorySelect = lastRow.querySelector('.category-select');
+      categorySelect.value = 'Personnages';
+      updateObjetOptions(categorySelect);
+      
+      // Sélectionner Dorusis
+      setTimeout(() => {
+        const objectSelect = lastRow.querySelector('.object-select');
+        objectSelect.value = 'Dorusis (1.80m, forte musculature)';
+        
+        // Mettre à jour le poids dans les données
+        window.modifierObjetPoids('Dorusis (1.80m, forte musculature)', poidsTotal);
+        
+        updateInventairePoids(objectSelect);
+        
+        // Changer vers l'onglet cheval
+        switchTab('cheval');
+        
+        showNotification(`🐴 Dorusis monté sur le cheval (${poidsTotal.toFixed(1)} kg)`);
+      }, 100);
+    }
+  }
+}
+
+/**
+ * Retire Dorusis du cheval
+ */
+function retirerDorusis() {
+  const chevalTable = document.getElementById('inventaireTableCheval');
+  let dorusisRow = null;
+  
+  chevalTable.querySelectorAll('tbody tr').forEach(row => {
+    const objectSelect = row.querySelector('.object-select');
+    if (objectSelect && objectSelect.value.includes('Dorusis')) {
+      dorusisRow = row;
+    }
+  });
+  
+  if (dorusisRow) {
+    const confirmation = confirm('👤 Faire descendre Dorusis du cheval ?');
+    if (confirmation) {
+      dorusisRow.remove();
+      updateTotalPoids();
+      showNotification('👤 Dorusis est descendu du cheval');
+    }
+  } else {
+    showNotification('❌ Dorusis n\'est pas sur le cheval');
+  }
+}
+
+// ===== 5. GESTION DE LA LISTE DES OBJETS (CONSULTATION UNIQUEMENT) =====
+/**
+ * Met à jour l'affichage de la liste des objets par catégories (sans boutons de suppression)
+ */
+function updateObjectsList() {
+  const container = document.getElementById('categoriesContainer');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  // Pour chaque catégorie
+  window.getCategoriesPoids().forEach(categorieName => {
+    const objets = window.getObjetsByCategorie(categorieName);
+    
+    if (Object.keys(objets).length === 0) return;
+    
+    const categorySection = document.createElement('div');
+    categorySection.className = 'category-section';
+    categorySection.innerHTML = `
+      <h3 class="category-title">${categorieName} (${Object.keys(objets).length} objets)</h3>
+      <div class="objects-grid">
+        ${Object.entries(objets)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([nom, poids]) => `
+            <div class="object-card">
+              <div class="object-info">
+                <strong class="object-name">${nom}</strong>
+                <span class="object-weight">${poids} kg</span>
+              </div>
+            </div>
+          `).join('')}
+      </div>
+    `;
+    
+    container.appendChild(categorySection);
+  });
+}
+
+/**
+ * Peuple tous les selects avec les catégories
+ */
+function populateSelects() {
+  // Select pour filtrer
+  const categoryFilter = document.getElementById('categoryFilter');
+  if (categoryFilter) {
+    categoryFilter.innerHTML = `
+      <option value="">Toutes les catégories</option>
+      ${window.getCategoriesPoids().map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+    `;
+  }
+}
+
+// ===== 6. RECHERCHE ET FILTRES =====
+/**
+ * Filtre les objets par catégorie
+ * @param {string} categorie - Catégorie à afficher (vide = toutes)
+ */
+function filtrerParCategorie(categorie) {
+  const sections = document.querySelectorAll('.category-section');
+  
+  sections.forEach(section => {
+    const title = section.querySelector('.category-title').textContent;
+    section.style.display = (!categorie || title.includes(categorie)) ? 'block' : 'none';
+  });
+}
+
+/**
+ * Recherche dans les objets
+ * @param {string} terme - Terme de recherche
+ */
+function rechercherObjets(terme) {
+  const cards = document.querySelectorAll('.object-card');
+  
+  cards.forEach(card => {
+    const nom = card.querySelector('.object-name').textContent.toLowerCase();
+    const match = nom.includes(terme.toLowerCase());
+    card.style.display = match ? 'block' : 'none';
+  });
+  
+  // Masquer les catégories vides lors de la recherche
+  if (terme) {
+    document.querySelectorAll('.category-section').forEach(section => {
+      const visibleCards = section.querySelectorAll('.object-card[style="display: block"], .object-card:not([style*="display: none"])');
+      section.style.display = visibleCards.length > 0 ? 'block' : 'none';
+    });
+  } else {
+    // Réafficher toutes les catégories si pas de recherche
+    document.querySelectorAll('.category-section').forEach(section => {
+      section.style.display = 'block';
+    });
+  }
+}
+
+// ===== 7. SAUVEGARDE/CHARGEMENT =====
+function saveInventairesPoids() {
+  const inventaires = {};
+  
+  TABS_ORDER.forEach(tab => {
+    const table = document.querySelector(`#inventaireTable${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+    if (!table) return;
+    
+    const rows = [];
+    table.querySelectorAll('tbody tr').forEach(row => {
+      const categorySelect = row.querySelector('.category-select');
+      const objectSelect = row.querySelector('.object-select');
+      const quantityInput = row.querySelector('.quantity-input');
+      const carriedCheckbox = row.querySelector('.carried-checkbox');
+      
+      if (objectSelect && objectSelect.value && quantityInput.value) {
+        rows.push({
+          categorie: categorySelect.value,
+          objet: objectSelect.value,
+          quantite: parseFloat(quantityInput.value),
+          porte: carriedCheckbox.checked
+        });
+      }
+    });
+    
+    inventaires[tab] = rows;
+  });
+  
+  const data = {
+    inventaires: inventaires,
+    objets: window.monnaies.poids,
+    dorusisBaseWeight: DORUSIS_BASE_WEIGHT,
+    saveDate: new Date().toISOString(),
+    version: "2.0"
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  
+  a.href = url;
+  a.download = `inventaires-poids-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  
+  URL.revokeObjectURL(url);
+  showNotification('💾 Inventaires sauvegardés');
+}
+
+/**
+ * Charge les inventaires depuis un fichier
+ */
+async function loadInventairesPoids(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    
+    // Charger les objets si présents
+    if (data.objets) {
+      Object.assign(window.monnaies.poids, data.objets);
+      window.objets = {
+        ...window.monnaies.pieces,
+        ...window.monnaies.gemmes
+      };
+      // Aplatir les objets poids
+      Object.values(window.monnaies.poids).forEach(categorie => {
+        Object.assign(window.objets, categorie);
+      });
+      updateObjectsList();
+    }
+    
+    // Charger les inventaires
+    if (data.inventaires) {
+      TABS_ORDER.forEach(tab => {
+        const inventaire = data.inventaires[tab];
+        if (!inventaire) return;
+        
+        // Vider la table existante
+        const table = document.querySelector(`#inventaireTable${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+        if (!table) return;
+        
+        const tbody = table.querySelector('tbody');
+        tbody.innerHTML = '';
+        
+        // Charger chaque objet
+        inventaire.forEach(item => {
+          addInventaireRowPoids(tab);
+          
+          const lastRow = tbody.lastElementChild;
+          if (lastRow) {
+            const categorySelect = lastRow.querySelector('.category-select');
+            const objectSelect = lastRow.querySelector('.object-select');
+            const quantityInput = lastRow.querySelector('.quantity-input');
+            const carriedCheckbox = lastRow.querySelector('.carried-checkbox');
+            
+            if (categorySelect && objectSelect && quantityInput) {
+              categorySelect.value = item.categorie;
+              updateObjetOptions(categorySelect);
+              
+              setTimeout(() => {
+                objectSelect.value = item.objet;
+                quantityInput.value = item.quantite;
+                carriedCheckbox.checked = item.porte || false;
+                updateInventairePoids(objectSelect);
+              }, 50);
+            }
+          }
+        });
+      });
+    }
+    
+    showNotification('✅ Inventaires chargés avec succès');
+    
+  } catch (error) {
+    console.error('Erreur chargement:', error);
+    alert('❌ Erreur lors du chargement du fichier');
+  }
+  
+  // Réinitialiser l'input
+  event.target.value = '';
+}
+
+// ===== 8. UTILITAIRES =====
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed; top: 20px; right: 20px; z-index: 10000;
+    background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+    color: white; padding: 15px 25px; border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    font-family: "Quattrocento Sans", Arial, sans-serif;
+    font-weight: bold; font-size: 14px;
+    border: 2px solid #228B22;
+    animation: slideIn 0.3s ease;
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
+}
+
+// ===== 9. INITIALISATION =====
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🏋️ Initialisation du système de poids...');
+  
+  // Vérifier qu'on est sur la bonne page
+  if (!document.querySelector('.tabs-container')) {
+    console.log('❌ Pas sur la page des poids');
+    return;
+  }
+  
+  // Initialiser l'interface
+  populateSelects();
+  updateObjectsList();
+  
+  // Activer le premier onglet
+  switchTab('dorusis');
+  addInventaireRowPoids('dorusis');
+  
+  // Configurer les événements de sauvegarde
+  const saveBtn = document.getElementById('saveInventoryBtn');
+  const fileInput = document.getElementById('fileInputInventory');
+  
+  if (saveBtn) {
+    saveBtn.addEventListener('click', saveInventairesPoids);
+  }
+  
+  if (fileInput) {
+    fileInput.addEventListener('change', loadInventairesPoids);
+  }
+  
+  console.log('✅ Système de poids initialisé !');
+});
+
+// ===== EXPOSITION DES FONCTIONS GLOBALES =====
+window.switchTab = switchTab;
+window.addInventaireRowPoids = addInventaireRowPoids;
+window.updateObjetOptions = updateObjetOptions;
+window.updateInventairePoids = updateInventairePoids;
+window.removeInventaireRowPoids = removeInventaireRowPoids;
+window.duplicateRowPoids = duplicateRowPoids;
+window.filtrerParCategorie = filtrerParCategorie;
+window.rechercherObjets = rechercherObjets;
+window.ajouterDorusisAuCheval = ajouterDorusisAuCheval;
+window.retirerDorusis = retirerDorusis;
+window.calculerPoidsDorusis = calculerPoidsDorusis;
+window.ouvrirPopinAjout = ouvrirPopinAjout;
+window.fermerPopinAjout = fermerPopinAjout;
+window.ajouterNouvelObjetPopin = ajouterNouvelObjetPopin;// ===== SCRIPT UNIFIÉ POUR LA GESTION DES POIDS =====
 // Un seul fichier poids.js pour tout gérer !
 
 // ===== VARIABLES GLOBALES =====
@@ -31,32 +420,60 @@ function switchTab(tabName) {
   }
 }
 
-// ===== 2. GESTION DES OBJETS PERSONNALISÉS =====
+// ===== 2. GESTION DES OBJETS PERSONNALISÉS AVEC POP-IN =====
 /**
- * Ajoute un nouvel objet dans une catégorie
+ * Ouvre la pop-in pour ajouter un objet
  */
-function ajouterNouvelObjet() {
-  const categorieSelect = document.getElementById('newObjectCategory');
-  const nomInput = document.getElementById('newObjectName');
-  const poidsInput = document.getElementById('newObjectWeight');
+function ouvrirPopinAjout() {
+  const popin = document.getElementById('popinAjout');
+  if (popin) {
+    // Peupler le select des catégories
+    const categorySelect = document.getElementById('popinCategory');
+    if (categorySelect) {
+      categorySelect.innerHTML = window.getCategoriesPoids()
+        .map(cat => `<option value="${cat}">${cat}</option>`)
+        .join('');
+    }
+    
+    // Réinitialiser le formulaire
+    document.getElementById('popinName').value = '';
+    document.getElementById('popinWeight').value = '';
+    document.getElementById('popinDescription').value = '';
+    
+    // Afficher la pop-in
+    popin.classList.add('active');
+    document.getElementById('popinName').focus();
+    
+    // Empêcher le scroll de la page
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+/**
+ * Ferme la pop-in
+ */
+function fermerPopinAjout() {
+  const popin = document.getElementById('popinAjout');
+  if (popin) {
+    popin.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+/**
+ * Ajoute un nouvel objet depuis la pop-in
+ */
+function ajouterNouvelObjetPopin(event) {
+  event.preventDefault();
   
-  const categorie = categorieSelect.value;
-  const nom = nomInput.value.trim();
-  const poids = parseFloat(poidsInput.value);
+  const categorie = document.getElementById('popinCategory').value;
+  const nom = document.getElementById('popinName').value.trim();
+  const poids = parseFloat(document.getElementById('popinWeight').value);
+  const description = document.getElementById('popinDescription').value.trim();
   
   // Vérifications
-  if (!categorie) {
-    alert('⚠️ Veuillez sélectionner une catégorie');
-    return;
-  }
-  
-  if (!nom) {
-    alert('⚠️ Veuillez saisir un nom d\'objet');
-    return;
-  }
-  
-  if (isNaN(poids) || poids < 0) {
-    alert('⚠️ Veuillez saisir un poids valide (≥ 0)');
+  if (!categorie || !nom || isNaN(poids) || poids < 0) {
+    alert('⚠️ Veuillez remplir tous les champs obligatoires');
     return;
   }
   
@@ -70,52 +487,53 @@ function ajouterNouvelObjet() {
   // Ajouter l'objet
   window.ajouterObjetPoids(nom, poids, categorie);
   
+  // Sauvegarder la description si fournie (optionnel)
+  if (description) {
+    console.log(`Description pour ${nom}: ${description}`);
+  }
+  
   // Rafraîchir l'interface
   updateObjectsList();
   populateSelects();
   
-  // Vider le formulaire
-  nomInput.value = '';
-  poidsInput.value = '';
+  // Fermer la pop-in
+  fermerPopinAjout();
   
-  showNotification(`✅ Objet "${nom}" ajouté dans ${categorie} (${poids} kg)`);
+  // Message de confirmation
+  showNotification(`✅ Objet "${nom}" créé dans ${categorie} (${poids} kg)`);
 }
 
 /**
- * Supprime un objet
+ * Gestion des touches clavier pour la pop-in
  */
-function supprimerObjet(nom) {
-  if (confirm(`❌ Supprimer "${nom}" ?`)) {
-    if (window.supprimerObjetPoids(nom)) {
-      updateObjectsList();
-      populateSelects();
-      showNotification(`🗑️ Objet "${nom}" supprimé`);
-    }
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'Escape') {
+    fermerPopinAjout();
   }
-}
+});
 
 // ===== 3. GESTION DES INVENTAIRES =====
 /**
- * Ajoute une ligne d'inventaire avec catégorie + objet + poids porté
+ * Ajoute une ligne à l'inventaire
+ * @param {string} inventaire - Nom de l'inventaire (dorusis, guilde, cheval)
  */
 function addInventaireRowPoids(inventaire) {
   const tableId = `inventaireTable${inventaire.charAt(0).toUpperCase() + inventaire.slice(1)}`;
   const table = document.getElementById(tableId);
   
   if (!table) {
-    console.error('❌ Table non trouvée:', tableId);
+    console.error('Table non trouvée:', tableId);
     return;
   }
   
   const tbody = table.querySelector('tbody');
   const row = tbody.insertRow();
   
-  // Options des catégories
+  // Créer les options pour les catégories
   const categoriesOptions = window.getCategoriesPoids()
     .map(cat => `<option value="${cat}">${cat}</option>`)
     .join('');
   
-  // Créer la ligne complète
   row.innerHTML = `
     <td>
       <select onchange="updateObjetOptions(this)" class="category-select">
@@ -293,317 +711,4 @@ function calculerPoidsDorusis() {
     if (totalCell && totalCell.textContent !== '-') {
       const poids = parseFloat(totalCell.textContent.replace(' kg', ''));
       if (!isNaN(poids)) {
-        poidsEquipements += poids;
-      }
-    }
-  });
-  
-  return DORUSIS_BASE_WEIGHT + poidsEquipements;
-}
-
-/**
- * Ajoute automatiquement Dorusis avec son équipement au cheval
- */
-function ajouterDorusisAuCheval() {
-  const poidsTotal = calculerPoidsDorusis();
-  
-  const confirmation = confirm(
-    `🐴 Monter Dorusis sur le cheval ?\n\n` +
-    `👤 Dorusis: ${DORUSIS_BASE_WEIGHT} kg\n` +
-    `🎒 Équipements: ${(poidsTotal - DORUSIS_BASE_WEIGHT).toFixed(1)} kg\n` +
-    `⚖️ Poids total: ${poidsTotal.toFixed(1)} kg`
-  );
-  
-  if (!confirmation) return;
-  
-  // Vérifier si Dorusis est déjà sur le cheval
-  const chevalTable = document.getElementById('inventaireTableCheval');
-  let dorusisRow = null;
-  
-  chevalTable.querySelectorAll('tbody tr').forEach(row => {
-    const objectSelect = row.querySelector('.object-select');
-    if (objectSelect && objectSelect.value.includes('Dorusis')) {
-      dorusisRow = row;
-    }
-  });
-  
-  if (dorusisRow) {
-    // Mettre à jour le poids existant
-    const quantityInput = dorusisRow.querySelector('.quantity-input');
-    quantityInput.value = '1';
-    
-    // Mettre à jour le poids dans les données
-    window.modifierObjetPoids('Dorusis (1.80m, forte musculature)', poidsTotal);
-    
-    updateInventairePoids(dorusisRow.querySelector('.object-select'));
-    showNotification(`🔄 Poids de Dorusis mis à jour: ${poidsTotal.toFixed(1)} kg`);
-  } else {
-    // Ajouter une nouvelle ligne pour Dorusis
-    addInventaireRowPoids('cheval');
-    
-    const chevalTable = document.getElementById('inventaireTableCheval');
-    const lastRow = chevalTable.querySelector('tbody').lastElementChild;
-    
-    if (lastRow) {
-      // Sélectionner la catégorie "Personnages"
-      const categorySelect = lastRow.querySelector('.category-select');
-      categorySelect.value = 'Personnages';
-      updateObjetOptions(categorySelect);
-      
-      // Sélectionner Dorusis
-      setTimeout(() => {
-        const objectSelect = lastRow.querySelector('.object-select');
-        objectSelect.value = 'Dorusis (1.80m, forte musculature)';
-        
-        // Mettre à jour le poids dans les données
-        window.modifierObjetPoids('Dorusis (1.80m, forte musculature)', poidsTotal);
-        
-        updateInventairePoids(objectSelect);
-        
-        // Changer vers l'onglet cheval
-        switchTab('cheval');
-        
-        showNotification(`🐴 Dorusis monté sur le cheval (${poidsTotal.toFixed(1)} kg)`);
-      }, 100);
-    }
-  }
-}
-
-/**
- * Retire Dorusis du cheval
- */
-function retirerDorusis() {
-  const chevalTable = document.getElementById('inventaireTableCheval');
-  let dorusisRow = null;
-  
-  chevalTable.querySelectorAll('tbody tr').forEach(row => {
-    const objectSelect = row.querySelector('.object-select');
-    if (objectSelect && objectSelect.value.includes('Dorusis')) {
-      dorusisRow = row;
-    }
-  });
-  
-  if (dorusisRow) {
-    const confirmation = confirm('👤 Faire descendre Dorusis du cheval ?');
-    if (confirmation) {
-      dorusisRow.remove();
-      updateTotalPoids();
-      showNotification('👤 Dorusis est descendu du cheval');
-    }
-  } else {
-    showNotification('❌ Dorusis n\'est pas sur le cheval');
-  }
-}
-
-// ===== 5. GESTION DE LA LISTE DES OBJETS =====
-/**
- * Met à jour la liste complète des objets par catégories
- */
-function updateObjectsList() {
-  const container = document.getElementById('categoriesContainer');
-  if (!container) return;
-  
-  container.innerHTML = '';
-  
-  // Pour chaque catégorie
-  window.getCategoriesPoids().forEach(categorieName => {
-    const objets = window.getObjetsByCategorie(categorieName);
-    
-    if (Object.keys(objets).length === 0) return;
-    
-    // Créer la section de catégorie
-    const categorySection = document.createElement('div');
-    categorySection.className = 'category-section';
-    categorySection.innerHTML = `
-      <h3 class="category-title">${categorieName} (${Object.keys(objets).length} objets)</h3>
-      <div class="objects-grid">
-        ${Object.entries(objets)
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([nom, poids]) => `
-            <div class="object-card">
-              <div class="object-info">
-                <strong>${nom}</strong>
-                <span class="object-weight">${poids} kg</span>
-              </div>
-              <div class="object-actions">
-                <input type="number" value="${poids}" step="0.1" min="0" 
-                       onchange="modifierPoids('${nom}', this.value)" 
-                       class="weight-input">
-                <button onclick="supprimerObjet('${nom}')" class="btn-delete-small">🗑️</button>
-              </div>
-            </div>
-          `).join('')}
-      </div>
-    `;
-    
-    container.appendChild(categorySection);
-  });
-}
-
-/**
- * Modifie le poids d'un objet existant
- */
-function modifierPoids(nom, nouveauPoids) {
-  const poids = parseFloat(nouveauPoids);
-  if (isNaN(poids) || poids < 0) {
-    alert('⚠️ Poids invalide');
-    return;
-  }
-  
-  if (window.modifierObjetPoids(nom, poids)) {
-    updateObjectsList();
-    showNotification(`✏️ Poids de "${nom}" modifié: ${poids} kg`);
-  }
-}
-
-/**
- * Peuple tous les selects avec les catégories
- */
-function populateSelects() {
-  // Select pour ajouter un nouvel objet
-  const newObjectCategory = document.getElementById('newObjectCategory');
-  if (newObjectCategory) {
-    newObjectCategory.innerHTML = window.getCategoriesPoids()
-      .map(cat => `<option value="${cat}">${cat}</option>`)
-      .join('');
-  }
-  
-  // Select pour filtrer
-  const categoryFilter = document.getElementById('categoryFilter');
-  if (categoryFilter) {
-    categoryFilter.innerHTML = `
-      <option value="">Toutes les catégories</option>
-      ${window.getCategoriesPoids().map(cat => `<option value="${cat}">${cat}</option>`).join('')}
-    `;
-  }
-}
-
-// ===== 5. RECHERCHE ET FILTRES =====
-function filtrerParCategorie(categorie) {
-  const sections = document.querySelectorAll('.category-section');
-  sections.forEach(section => {
-    const title = section.querySelector('.category-title').textContent;
-    section.style.display = (!categorie || title.includes(categorie)) ? 'block' : 'none';
-  });
-}
-
-function rechercherObjets(terme) {
-  const cards = document.querySelectorAll('.object-card');
-  cards.forEach(card => {
-    const nom = card.textContent.toLowerCase();
-    card.style.display = nom.includes(terme.toLowerCase()) ? 'block' : 'none';
-  });
-}
-
-// ===== 7. SAUVEGARDE/CHARGEMENT =====
-function saveInventairesPoids() {
-  const inventaires = {};
-  
-  TABS_ORDER.forEach(tab => {
-    const table = document.querySelector(`#inventaireTable${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
-    if (!table) return;
-    
-    const rows = [];
-    table.querySelectorAll('tbody tr').forEach(row => {
-      const categorySelect = row.querySelector('.category-select');
-      const objectSelect = row.querySelector('.object-select');
-      const quantityInput = row.querySelector('.quantity-input');
-      const carriedCheckbox = row.querySelector('.carried-checkbox');
-      
-      if (objectSelect && objectSelect.value && quantityInput.value) {
-        rows.push({
-          categorie: categorySelect.value,
-          objet: objectSelect.value,
-          quantite: parseFloat(quantityInput.value),
-          porte: carriedCheckbox.checked
-        });
-      }
-    });
-    
-    inventaires[tab] = rows;
-  });
-  
-  const data = {
-    inventaires: inventaires,
-    objets: window.monnaies.poids,
-    dorusisBaseWeight: DORUSIS_BASE_WEIGHT,
-    saveDate: new Date().toISOString(),
-    version: "2.0"
-  };
-  
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  
-  a.href = url;
-  a.download = `inventaires-poids-${new Date().toISOString().slice(0, 10)}.json`;
-  a.click();
-  
-  URL.revokeObjectURL(url);
-  showNotification('💾 Inventaires sauvegardés');
-}
-
-// ===== 7. UTILITAIRES =====
-function showNotification(message) {
-  const notification = document.createElement('div');
-  notification.textContent = message;
-  notification.style.cssText = `
-    position: fixed; top: 20px; right: 20px; z-index: 10000;
-    background: #4CAF50; color: white; padding: 12px 20px;
-    border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    animation: slideIn 0.3s ease;
-  `;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.style.animation = 'slideOut 0.3s ease';
-    setTimeout(() => notification.remove(), 300);
-  }, 3000);
-}
-
-// ===== 8. INITIALISATION =====
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('🏋️ Initialisation du système de poids...');
-  
-  // Vérifier qu'on est sur la bonne page
-  if (!document.querySelector('.tabs-container')) {
-    console.log('❌ Pas sur la page des poids');
-    return;
-  }
-  
-  // Initialiser l'interface
-  populateSelects();
-  updateObjectsList();
-  
-  // Activer le premier onglet
-  switchTab('dorusis');
-  addInventaireRowPoids('dorusis');
-  
-  // Configurer les événements de sauvegarde
-  const saveBtn = document.getElementById('saveInventoryBtn');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', saveInventairesPoids);
-  }
-  
-  console.log('✅ Système de poids initialisé !');
-});
-
-// ===== EXPOSITION DES FONCTIONS GLOBALES =====
-window.switchTab = switchTab;
-window.ajouterNouvelObjet = ajouterNouvelObjet;
-window.addInventaireRowPoids = addInventaireRowPoids;
-window.updateObjetOptions = updateObjetOptions;
-window.updateInventairePoids = updateInventairePoids;
-window.removeInventaireRowPoids = removeInventaireRowPoids;
-window.duplicateRowPoids = duplicateRowPoids;
-window.supprimerObjet = supprimerObjet;
-window.modifierPoids = modifierPoids;
-window.filtrerParCategorie = filtrerParCategorie;
-window.rechercherObjets = rechercherObjets;
-window.ajouterDorusisAuCheval = ajouterDorusisAuCheval;
-window.retirerDorusis = retirerDorusis;
-window.calculerPoidsDorusis = calculerPoidsDorusis;
-window.ouvrirPopinAjout = ouvrirPopinAjout;
-window.fermerPopinAjout = fermerPopinAjout;
-window.ajouterNouvelObjetPopin = ajouterNouvelObjetPopin;
+        poidsEquipements
