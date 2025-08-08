@@ -11,8 +11,8 @@
   <div class="content fade-in">
     <!-- En-tête de la page -->
     <header class="page-header">
-      <h1>📖 GRIMOIRE MAGIQUE 📖</h1>
-      <p class="page-subtitle">Livre de documentation et règles du système</p>
+      <h1>📖 Grimoire de la guilde 📖</h1>
+      <p class="page-subtitle">Les explorateurs du vent</p>
     </header>
 
     <!-- Contrôles du PDF -->
@@ -81,9 +81,9 @@
      * Charge le PDF par défaut
      */
     function loadDefaultPdf() {
-      const viewer = document.getElementById('pdfViewer');
+      const viewer = document.getElementById('img/grimoire.pdf');
       // Remplacez cette URL par le chemin vers votre PDF
-      const pdfUrl = img/grimoire.pdf ; // Chemin vers votre PDF
+      const pdfUrl = "img/grimoire.pdf" ; // Chemin vers votre PDF
       
       if (viewer) {
         viewer.src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`;
@@ -121,8 +121,8 @@
     function downloadPdf() {
       // Créer un lien de téléchargement
       const link = document.createElement('a');
-      link.href = 'img/grimoire.pdf'; // Chemin vers votre PDF
-      link.download = 'grimoire-magicus.pdf';
+      link.href = "img/grimoire.pdf"; // Chemin vers votre PDF
+      link.download = 'img/grimoire.pdf';
       link.style.display = 'none';
       
       document.body.appendChild(link);
