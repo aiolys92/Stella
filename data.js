@@ -57,108 +57,47 @@ if (!window.monnaies) {
       "Équipements et Armures": {
         "Armure de cuir clouté": 6,
         "Bottes de Talna": 1,
-        "Cape de Voltumna": 1,
-        "Casque": 2,
-        "Bouclier": 3,
-        "Cotte de mailles": 20,
-        "Armure de plaques": 30,
-        "Gants": 0.5,
-        "Braconnières": 2
+        "Cape de Voltumna": 1
       },
       
       "Armes": {
         "Dague": 1,
         "Dagues de lancé": 1,
-        "Baton Férré (argent/or)": 1,
-        "Épée courte": 2,
-        "Épée longue": 3,
-        "Épée à deux mains": 6,
-        "Hache de guerre": 4,
-        "Arc long": 2,
-        "Carquois + 20 flèches": 3,
-        "Arbalète": 5,
-        "Lance": 3
+        "Baton Férré (argent/or)": 1
       },
       
       "Outils et Équipements": {
         "Kit de crochetage": 1,
         "Outils spécialisé (Dessin)": 6,
         "Grappin": 4,
-        "Corde (15m)": 5,
-        "Piton": 0.25,
-        "Marteau": 3,
-        "Pelle": 5,
-        "Scie": 2,
-        "Hache": 4,
-        "Trousse de soins": 1,
-        "Kit d'escalade": 12,
-        "Matériel d'alpinisme": 15
+        "Corde": 1
       },
       
       "Consommables et Provisions": {
         "Gourde": 1,
         "Ration": 1,
         "Parchemin": 0.1,
-        "Torche": 1,
-        "Chandelle": 0.1,
-        "Huile (fiole)": 0.5,
-        "Potion de soin": 0.3,
-        "Antidote": 0.2,
-        "Pain": 0.5,
-        "Fromage": 0.3,
-        "Viande séchée": 0.2
+        "Torche": 1
       },
       
       "Équipement de Voyage": {
-        "Sac à dos": 2,
-        "Couverture": 3,
-        "Lanterne": 2,
-        "Tente (2 personnes)": 20,
-        "Sac de couchage": 4,
-        "Kit de cuisine": 8,
-        "Gourde de voyage": 2,
-        "Carte": 0.1,
-        "Boussole": 0.2,
-        "Longue-vue": 1
+        // Catégorie vide mais conservée
       },
       
       "Objets Précieux": {
-        "Livre": 2,
-        "Grimoire": 3,
-        "Parchemin magique": 0.1,
-        "Composants magiques": 1,
-        "Pierre runique": 5,
-        "Cristal magique": 2,
-        "Amulette": 0.2,
-        "Bague magique": 0.1
+        // Catégorie vide mais conservée
       },
       
       "Objets Lourds": {
-        "Enclume": 50,
-        "Coffre": 25,
-        "Cheval de trait": 80,
-        "Charrette": 200,
-        "Tonneau": 30,
-        "Meule": 100,
-        "Table": 40,
-        "Chaise": 10,
-        "Armoire": 60
+        "Cheval de trait": 80
       },
       
       "Montures et Créatures": {
-        "Cheval de guerre": 500,
-        "Poney": 200,
-        "Mulet": 300,
-        "Chien de garde": 35,
-        "Faucon": 2,
-        "Chat": 4,
-        "Familier magique": 5
+        // Catégorie vide mais conservée
       },
       
       "Objets Personnalisés": {
-        "Objet personnalisé 1": 1,
-        "Objet personnalisé 2": 1,
-        "Objet personnalisé 3": 1
+        // Catégorie pour les futurs ajouts
       }
     }
   };
