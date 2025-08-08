@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Grimoire Magique - Lecteur de Documents</title>
+  <title>Grimoire de la guilde</title>
   <meta name="description" content="Consultation des documents et grimoires du système">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -38,12 +38,13 @@
       <div class="pdf-container">
         <iframe
           id="pdfViewer"
-          src="https://mozilla.github.io/pdf.js/web/viewer.html"
+          src="about:blank"
           title="Grimoire Magique - Lecteur PDF"
           allowfullscreen>
         </iframe>
       </div>
     </section>
+  </div>
 
   <!-- Scripts -->
   <script src="data.js"></script>
@@ -52,8 +53,6 @@
     // Script pour la gestion du lecteur PDF
     document.addEventListener('DOMContentLoaded', function() {
       console.log('📖 Grimoire Magicus - Lecteur PDF initialisé');
-      
-      // Charger le PDF par défaut
       loadDefaultPdf();
     });
 
@@ -61,13 +60,14 @@
      * Charge le PDF par défaut
      */
     function loadDefaultPdf() {
-      const viewer = document.getElementById('Stella/img/grimoire.pdf');
-      // Remplacez cette URL par le chemin vers votre PDF
-      const pdfUrl = "Stella/img/grimoire.pdf" ; // Chemin vers votre PDF
-      
-      if (viewer) {
-        viewer.src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`;
-      }
+      const viewer = document.getElementById('pdfViewer');
+      if (!viewer) return;
+
+      // URL ABSOLUE vers ton PDF (nécessaire pour le viewer hébergé chez Mozilla)
+      const pdfUrl = new URL('img/grimoire.pdf', window.location.href).href;
+
+      // Charge le viewer PDF.js avec ton PDF en paramètre
+      viewer.src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`;
     }
 
     /**
@@ -86,7 +86,7 @@
     }
 
     /**
-     * Ouvre le PDF dans un nouvel onglet
+     * Ouvre le PDF (via le viewer) dans un nouvel onglet
      */
     function openInNewTab() {
       const viewer = document.getElementById('pdfViewer');
@@ -99,16 +99,13 @@
      * Télécharge le PDF
      */
     function downloadPdf() {
-      // Créer un lien de téléchargement
       const link = document.createElement('a');
-      link.href = "Stella/img/grimoire.pdf"; // Chemin vers votre PDF
-      link.download = 'Stella/img/grimoire.pdf';
+      link.href = 'img/grimoire.pdf';
+      link.download = 'grimoire.pdf';
       link.style.display = 'none';
-      
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
       showNotification('💾 Téléchargement du grimoire démarré');
     }
 
@@ -128,9 +125,7 @@
         border: 2px solid #228B22;
         animation: slideIn 0.3s ease;
       `;
-      
       document.body.appendChild(notification);
-      
       setTimeout(() => {
         notification.style.animation = 'slideOut 0.3s ease';
         setTimeout(() => notification.remove(), 300);
