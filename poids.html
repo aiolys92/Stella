@@ -15,33 +15,64 @@
       <p class="page-subtitle">Gérez vos inventaires par poids avec catégories et poids porté</p>
     </header>
 
-    <!-- Section Ajout d'objets personnalisés -->
+    <!-- Section Ajout d'objets - CTA avec pop-in -->
     <section class="section">
-      <h2>➕ Ajouter un nouvel objet</h2>
-      <div class="add-object-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="newObjectCategory">Catégorie :</label>
-            <select id="newObjectCategory" required>
-              <!-- Options générées dynamiquement -->
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="newObjectName">Nom de l'objet :</label>
-            <input type="text" id="newObjectName" placeholder="Ex: Épée longue" required>
-          </div>
-          <div class="form-group">
-            <label for="newObjectWeight">Poids (kg) :</label>
-            <input type="number" id="newObjectWeight" step="0.1" min="0" placeholder="2.5" required>
-          </div>
-          <div class="form-group">
-            <button type="button" onclick="ajouterNouvelObjet()" class="btn-add-object">
-              ➕ Ajouter
-            </button>
-          </div>
+      <div class="cta-container">
+        <div class="cta-content">
+          <h2>➕ Créer un nouvel objet</h2>
+          <p>Ajoutez vos propres objets avec leur poids dans une catégorie</p>
+          <button onclick="ouvrirPopinAjout()" class="cta-button">
+            ✨ Ajouter un objet personnalisé
+          </button>
+        </div>
+        <div class="cta-icon">
+          📦
         </div>
       </div>
     </section>
+
+    <!-- Pop-in pour ajouter un objet -->
+    <div id="popinAjout" class="popin-overlay" onclick="fermerPopinAjout()">
+      <div class="popin-content" onclick="event.stopPropagation()">
+        <div class="popin-header">
+          <h2>➕ Nouvel objet</h2>
+          <button onclick="fermerPopinAjout()" class="popin-close">✕</button>
+        </div>
+        
+        <form class="popin-form" onsubmit="ajouterNouvelObjetPopin(event)">
+          <div class="form-field">
+            <label for="popinCategory">Catégorie *</label>
+            <select id="popinCategory" required>
+              <!-- Options générées dynamiquement -->
+            </select>
+          </div>
+          
+          <div class="form-field">
+            <label for="popinName">Nom de l'objet *</label>
+            <input type="text" id="popinName" placeholder="Exemple: Épée enchantée" required>
+          </div>
+          
+          <div class="form-field">
+            <label for="popinWeight">Poids (kg) *</label>
+            <input type="number" id="popinWeight" step="0.1" min="0" placeholder="2.5" required>
+          </div>
+          
+          <div class="form-field">
+            <label for="popinDescription">Description (optionnel)</label>
+            <textarea id="popinDescription" placeholder="Courte description de l'objet..." rows="3"></textarea>
+          </div>
+          
+          <div class="popin-actions">
+            <button type="button" onclick="fermerPopinAjout()" class="btn-cancel">
+              Annuler
+            </button>
+            <button type="submit" class="btn-confirm">
+              ✅ Créer l'objet
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Contrôles de fichier et total -->
     <div class="section">
@@ -68,11 +99,11 @@
           <button class="tab-button active" onclick="switchTab('dorusis')" title="Inventaire personnel de Dorusis">
             👤 Dorusis
           </button>
-          <button class="tab-button" onclick="switchTab('guilde')" title="Inventaire collectif de la guilde">
-            ⚔️ Guilde
-          </button>
           <button class="tab-button" onclick="switchTab('cheval')" title="Inventaire du cheval de trait">
             🐴 Cheval de trait
+          </button>
+          <button class="tab-button" onclick="switchTab('guilde')" title="Inventaire collectif de la guilde">
+            ⚔️ Guilde
           </button>
         </div>
 
@@ -80,13 +111,52 @@
         <div id="tab-dorusis" class="tab-content active">
           <div class="tab-header">
             <h2>👤 Inventaire Dorusis</h2>
-            <button onclick="addInventaireRowPoids('dorusis')" class="btn-add-row">
-              ➕ Ajouter un objet
-            </button>
+            <div class="tab-actions">
+              <button onclick="addInventaireRowPoids('dorusis')" class="btn-add-row">
+                ➕ Ajouter un objet
+              </button>
+              <button onclick="ajouterDorusisAuCheval()" class="btn-transfer" title="Ajouter Dorusis (80kg + équipements) au cheval">
+                🐴 Monter sur le cheval
+              </button>
+            </div>
           </div>
           
           <div class="table-container">
             <table id="inventaireTableDorusis" class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="15%">Catégorie</th>
+                  <th width="20%">Objet</th>
+                  <th width="10%">Quantité</th>
+                  <th width="12%">Poids unit.</th>
+                  <th width="15%">Poids porté</th>
+                  <th width="12%">Total</th>
+                  <th width="16%">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Lignes générées dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Inventaire Cheval -->
+        <div id="tab-cheval" class="tab-content">
+          <div class="tab-header">
+            <h2>🐴 Inventaire Cheval de trait</h2>
+            <div class="tab-actions">
+              <button onclick="addInventaireRowPoids('cheval')" class="btn-add-row">
+                ➕ Ajouter un objet
+              </button>
+              <button onclick="retirerDorusis()" class="btn-remove" title="Retirer Dorusis du cheval">
+                👤 Descendre du cheval
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table id="inventaireTableCheval" class="inventory-table">
               <thead>
                 <tr>
                   <th width="15%">Catégorie</th>
@@ -133,41 +203,12 @@
             </table>
           </div>
         </div>
-
-        <!-- Inventaire Cheval -->
-        <div id="tab-cheval" class="tab-content">
-          <div class="tab-header">
-            <h2>🐴 Inventaire Cheval de trait</h2>
-            <button onclick="addInventaireRowPoids('cheval')" class="btn-add-row">
-              ➕ Ajouter un objet
-            </button>
-          </div>
-          
-          <div class="table-container">
-            <table id="inventaireTableCheval" class="inventory-table">
-              <thead>
-                <tr>
-                  <th width="15%">Catégorie</th>
-                  <th width="20%">Objet</th>
-                  <th width="10%">Quantité</th>
-                  <th width="12%">Poids unit.</th>
-                  <th width="15%">Poids porté</th>
-                  <th width="12%">Total</th>
-                  <th width="16%">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Lignes générées dynamiquement -->
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </section>
 
-    <!-- Liste des objets par catégories -->
+    <!-- Liste des objets par catégories (consultation uniquement) -->
     <section class="section">
-      <h2>📋 Gestion des objets par catégories</h2>
+      <h2>📋 Liste des objets par catégories</h2>
       
       <!-- Filtres et recherche -->
       <div class="filters-row">
