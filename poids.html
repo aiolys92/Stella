@@ -20,6 +20,12 @@
       <h2>Ajouter un nouvel objet</h2>
       <div class="add-object-form">
         <div class="form-group">
+          <label for="newObjectCategory">Catégorie :</label>
+          <select id="newObjectCategory">
+            <!-- Options générées dynamiquement -->
+          </select>
+        </div>
+        <div class="form-group">
           <label for="newObjectName">Nom de l'objet :</label>
           <input type="text" id="newObjectName" placeholder="Ex: Épée longue">
         </div>
@@ -66,9 +72,11 @@
         <table id="inventaireTableDorusis" class="inventory-table">
           <thead>
             <tr>
+              <th>Catégorie</th>
               <th>Nom de l'objet</th>
               <th>Nombre</th>
               <th>Poids unitaire (kg)</th>
+              <th>Poids porté</th>
               <th>Poids total (kg)</th>
               <th>Actions</th>
             </tr>
@@ -86,9 +94,11 @@
         <table id="inventaireTableGuilde" class="inventory-table">
           <thead>
             <tr>
+              <th>Catégorie</th>
               <th>Nom de l'objet</th>
               <th>Nombre</th>
               <th>Poids unitaire (kg)</th>
+              <th>Poids porté</th>
               <th>Poids total (kg)</th>
               <th>Actions</th>
             </tr>
@@ -106,9 +116,11 @@
         <table id="inventaireTableCheval" class="inventory-table">
           <thead>
             <tr>
+              <th>Catégorie</th>
               <th>Nom de l'objet</th>
               <th>Nombre</th>
               <th>Poids unitaire (kg)</th>
+              <th>Poids porté</th>
               <th>Poids total (kg)</th>
               <th>Actions</th>
             </tr>
@@ -118,11 +130,23 @@
       </div>
     </div>
 
-    <!-- Section Liste complète des objets avec gestion -->
+    <!-- Section Liste complète des objets avec gestion par catégories -->
     <section class="objects-management">
-      <h2>Liste des objets disponibles</h2>
-      <div class="objects-grid" id="objectsList">
-        <!-- Liste générée dynamiquement -->
+      <h2>Liste des objets par catégories</h2>
+      
+      <!-- Filtre par catégorie -->
+      <div class="category-filter">
+        <label for="categoryFilter">Filtrer par catégorie :</label>
+        <select id="categoryFilter" onchange="filtrerParCategorie(this.value)">
+          <option value="">Toutes les catégories</option>
+          <!-- Options générées dynamiquement -->
+        </select>
+        <input type="text" id="searchObjects" placeholder="Rechercher un objet..." 
+               oninput="rechercherObjets(this.value)">
+      </div>
+      
+      <div class="categories-container" id="categoriesContainer">
+        <!-- Catégories générées dynamiquement -->
       </div>
     </section>
   </div>
