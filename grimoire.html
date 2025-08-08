@@ -19,8 +19,8 @@
     <section class="section">
       <div class="pdf-controls">
         <div class="pdf-info">
-          <h3>📜 Document Actuel</h3>
-          <p>Grimoire principal du système - Règles et documentation</p>
+          <h3>📜 Le grimoire</h3>
+          <p>Grimoire - Règles et documentation</p>
         </div>
         <div class="pdf-actions">
           <button onclick="reloadPdf()" class="btn-action btn-load">
@@ -45,26 +45,6 @@
       </div>
     </section>
 
-    <!-- Liens utiles -->
-    <section class="section">
-      <h2>🔗 Liens Utiles</h2>
-      <div class="quick-actions">
-        <button onclick="window.location.href='index.html'" class="action-btn primary">
-          🏠 Retour à l'Accueil
-        </button>
-        <button onclick="window.location.href='dorusis.html'" class="action-btn secondary">
-          👤 Inventaire Dorusis
-        </button>
-        <button onclick="window.location.href='poids.html'" class="action-btn tertiary">
-          ⚖️ Gestion des Poids
-        </button>
-        <button onclick="downloadPdf()" class="action-btn quaternary">
-          💾 Télécharger PDF
-        </button>
-      </div>
-    </section>
-  </div>
-
   <!-- Scripts -->
   <script src="data.js"></script>
   <script src="nav.js"></script>
@@ -81,9 +61,9 @@
      * Charge le PDF par défaut
      */
     function loadDefaultPdf() {
-      const viewer = document.getElementById('img/grimoire.pdf');
+      const viewer = document.getElementById('Stella/img/grimoire.pdf');
       // Remplacez cette URL par le chemin vers votre PDF
-      const pdfUrl = "img/grimoire.pdf" ; // Chemin vers votre PDF
+      const pdfUrl = "Stella/img/grimoire.pdf" ; // Chemin vers votre PDF
       
       if (viewer) {
         viewer.src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`;
@@ -121,8 +101,8 @@
     function downloadPdf() {
       // Créer un lien de téléchargement
       const link = document.createElement('a');
-      link.href = "img/grimoire.pdf"; // Chemin vers votre PDF
-      link.download = 'img/grimoire.pdf';
+      link.href = "Stella/img/grimoire.pdf"; // Chemin vers votre PDF
+      link.download = 'Stella/img/grimoire.pdf';
       link.style.display = 'none';
       
       document.body.appendChild(link);
