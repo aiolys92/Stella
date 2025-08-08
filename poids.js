@@ -623,38 +623,82 @@ const addPoidsStyles = () => {
   const style = document.createElement('style');
   style.id = 'poids-styles';
   style.textContent = `
-    /* Styles pour les onglets */
+    /* Styles pour les onglets - AMÉLIORÉS */
     .tabs-container {
       margin: 20px 0;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      overflow: hidden;
     }
     
     .tabs-header {
       display: flex;
+      background: #f8f9fa;
       border-bottom: 2px solid var(--border-color);
-      margin-bottom: 20px;
+      margin: 0;
     }
     
     .tab-button {
-      padding: 12px 20px;
+      flex: 1;
+      padding: 15px 20px;
       border: none;
       background: transparent;
       cursor: pointer;
       border-bottom: 3px solid transparent;
       transition: all 0.3s ease;
+      font-weight: 500;
+      color: #666;
+    }
+    
+    .tab-button:hover {
+      background: #e9ecef;
+      color: var(--primary-bg);
     }
     
     .tab-button.active {
       background: var(--primary-bg);
       color: white;
       border-bottom-color: var(--primary-bg);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
     }
     
+    /* IMPORTANT: Gérer l'affichage des contenus d'onglets */
     .tab-content {
       display: none;
+      padding: 20px;
+      background: white;
+      min-height: 400px;
+      animation: fadeInTab 0.3s ease;
     }
     
     .tab-content.active {
       display: block;
+    }
+    
+    .tab-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eee;
+    }
+    
+    .tab-header h2 {
+      margin: 0;
+      color: var(--primary-bg);
+    }
+    
+    /* Animation pour les changements d'onglets */
+    @keyframes fadeInTab {
+      from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
     }
     
     /* Styles pour le formulaire d'ajout */
