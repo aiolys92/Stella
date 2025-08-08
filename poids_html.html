@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestion des Poids</title>
+  <meta name="description" content="Gestion des poids des objets et inventaires">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="content fade-in">
+    <!-- En-tête de la page -->
+    <header class="page-header">
+      <h1>🏋️ Gestion des Poids</h1>
+      <p class="page-subtitle">Gérez les inventaires par poids et ajoutez vos propres objets</p>
+    </header>
+
+    <!-- Section Ajout d'objets personnalisés -->
+    <section class="custom-objects-section">
+      <h2>Ajouter un nouvel objet</h2>
+      <div class="add-object-form">
+        <div class="form-group">
+          <label for="newObjectName">Nom de l'objet :</label>
+          <input type="text" id="newObjectName" placeholder="Ex: Épée longue">
+        </div>
+        <div class="form-group">
+          <label for="newObjectWeight">Poids (kg) :</label>
+          <input type="number" id="newObjectWeight" step="0.1" min="0" placeholder="Ex: 2.5">
+        </div>
+        <button type="button" onclick="ajouterNouvelObjet()" class="btn-add-object">
+          ➕ Ajouter l'objet
+        </button>
+      </div>
+    </section>
+
+    <!-- Contrôles de fichier -->
+    <div class="file-controls">
+      <input type="file" accept=".json" id="fileInputInventory">
+      <button id="saveInventoryBtn">💾 Sauvegarder Inventaire</button>
+      <button onclick="exporterObjets()" class="btn-export">📤 Exporter Liste Objets</button>
+      <input type="file" accept=".json" id="fileInputObjets" onchange="importerObjets(event)">
+    </div>
+
+    <!-- Affichage du total -->
+    <div class="total-display">
+      <p class="total-weight">
+        <span class="label">Poids total porté :</span>
+        <span id="totalPoids" class="value">0</span> kg
+      </p>
+    </div>
+
+    <!-- Onglets pour différents inventaires -->
+    <div class="tabs-container">
+      <div class="tabs-header">
+        <button class="tab-button active" onclick="switchTab('dorusis')">👤 Dorusis</button>
+        <button class="tab-button" onclick="switchTab('guilde')">⚔️ Guilde</button>
+        <button class="tab-button" onclick="switchTab('cheval')">🐴 Cheval de trait</button>
+      </div>
+
+      <!-- Inventaire Dorusis -->
+      <div id="tab-dorusis" class="tab-content active">
+        <h2>Inventaire Dorusis</h2>
+        <button onclick="addInventaireRowPoids('dorusis')" class="btn-add-row">
+          ➕ Ajouter un objet
+        </button>
+        <table id="inventaireTableDorusis" class="inventory-table">
+          <thead>
+            <tr>
+              <th>Nom de l'objet</th>
+              <th>Nombre</th>
+              <th>Poids unitaire (kg)</th>
+              <th>Poids total (kg)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Inventaire Guilde -->
+      <div id="tab-guilde" class="tab-content">
+        <h2>Inventaire Guilde</h2>
+        <button onclick="addInventaireRowPoids('guilde')" class="btn-add-row">
+          ➕ Ajouter un objet
+        </button>
+        <table id="inventaireTableGuilde" class="inventory-table">
+          <thead>
+            <tr>
+              <th>Nom de l'objet</th>
+              <th>Nombre</th>
+              <th>Poids unitaire (kg)</th>
+              <th>Poids total (kg)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Inventaire Cheval -->
+      <div id="tab-cheval" class="tab-content">
+        <h2>Inventaire Cheval de trait</h2>
+        <button onclick="addInventaireRowPoids('cheval')" class="btn-add-row">
+          ➕ Ajouter un objet
+        </button>
+        <table id="inventaireTableCheval" class="inventory-table">
+          <thead>
+            <tr>
+              <th>Nom de l'objet</th>
+              <th>Nombre</th>
+              <th>Poids unitaire (kg)</th>
+              <th>Poids total (kg)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Section Liste complète des objets avec gestion -->
+    <section class="objects-management">
+      <h2>Liste des objets disponibles</h2>
+      <div class="objects-grid" id="objectsList">
+        <!-- Liste générée dynamiquement -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  <script src="poids.js"></script>
+  <script src="nav.js"></script>
+</body>
+</html>
