@@ -1,95 +1,405 @@
 <!DOCTYPE html>
-<html>
- <head>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <meta charset="utf-8"/>
-  <title>
-   Dorusis
-  </title>
-  <link href="style.css" rel="stylesheet"/>
- </head>
- <body>
-  <div class="content">
-   <div class="file-controls">
-    <input accept=".json" id="fileInputInventory" type="file"/>
-    <button id="saveInventoryBtn">
-     Sauvegarder Inventaire
-    </button>
-   </div>
-   <p>
-    Total pièces (PM):
-    <span id="totalPieces">
-     0
-    </span>
-    PM
-   </p>
-   <h2>
-    Inventaire Dorusis
-   </h2>
-   <h3>
-    Pièces
-   </h3>
-   <table id="inventaireTablePieces">
-    <thead>
-     <tr>
-      <th>
-       Nom
-      </th>
-      <th>
-       Quantité
-      </th>
-      <th>
-       Valeur
-      </th>
-      <th>
-       Total
-      </th>
-      <th>
-       Supprimer
-      </th>
-     </tr>
-    </thead>
-    <button onclick="addInventaireRow('pieces')" type="button">
-     ➕ Ajouter une pièce
-    </button>
-    <tbody>
-    </tbody>
-   </table>
-   <h3>
-    Gemmes
-   </h3>
-   <table id="inventaireTableGemmes">
-    <thead>
-     <tr>
-      <th>
-       Nom
-      </th>
-      <th>
-       Quantité
-      </th>
-      <th>
-       Valeur
-      </th>
-      <th>
-       Total
-      </th>
-      <th>
-       Supprimer
-      </th>
-     </tr>
-    </thead>
-    <button onclick="addInventaireRow('gemmes')" type="button">
-     ➕ Ajouter une gemme
-    </button>
-    <tbody>
-    </tbody>
-   </table>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inventarium Dorusis</title>
+  <meta name="description" content="Inventaire personnel de Dorusis - Gestion des monnaies et gemmes">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="content fade-in">
+    <!-- En-tête de la page -->
+    <header class="page-header">
+      <h1>👤 INVENTARIUM DORUSIS 👤</h1>
+      <p class="page-subtitle">Thesaurus Personalis Militis Fortis</p>
+    </header>
+
+    <!-- Contrôles principaux -->
+    <section class="section">
+      <div class="controls-header">
+        <div class="controls-left">
+          <h2>💰 Gestio Thesauri</h2>
+        </div>
+        <div class="controls-right">
+          <input type="file" accept=".json" id="fileInputInventory" style="display: none;">
+          <button onclick="document.getElementById('fileInputInventory').click()" class="btn-action btn-load">
+            📂 Importare
+          </button>
+          <button id="saveInventoryBtn" class="btn-action btn-save">
+            💾 Salvare
+          </button>
+        </div>
+      </div>
+      
+      <!-- Affichage du total -->
+      <div class="total-display">
+        <span class="total-label">Valor Totalis:</span>
+        <span id="totalPieces" class="total-value">0</span>
+        <span class="total-unit">PM</span>
+      </div>
+    </section>
+
+    <!-- Onglets des inventaires -->
+    <section class="section">
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button class="tab-button active" onclick="switchInventoryTab('pieces')" title="Monnaies métalliques">
+            🪙 Monetae
+          </button>
+          <button class="tab-button" onclick="switchInventoryTab('gemmes')" title="Gemmes précieuses">
+            💎 Gemmae
+          </button>
+          <button class="tab-button" onclick="switchInventoryTab('search')" title="Recherche dans l'inventaire">
+            🔍 Quaerere
+          </button>
+        </div>
+
+        <!-- Inventaire des Pièces -->
+        <div id="tab-pieces" class="tab-content active">
+          <div class="tab-header">
+            <h2>🪙 Monetae Metallicae</h2>
+            <div class="tab-actions">
+              <button onclick="addInventaireRow('pieces')" class="btn-action btn-add">
+                ➕ Addere Monetam
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table id="inventaireTablePieces" class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="30%">Nomen</th>
+                  <th width="20%">Quantitas</th>
+                  <th width="20%">Valor Unitarius</th>
+                  <th width="20%">Valor Totalis</th>
+                  <th width="10%">Actiones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Lignes générées dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Inventaire des Gemmes -->
+        <div id="tab-gemmes" class="tab-content">
+          <div class="tab-header">
+            <h2>💎 Gemmae Pretiosae</h2>
+            <div class="tab-actions">
+              <button onclick="addInventaireRow('gemmes')" class="btn-action btn-add">
+                ➕ Addere Gemmam
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-container">
+            <table id="inventaireTableGemmes" class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="30%">Nomen</th>
+                  <th width="20%">Quantitas</th>
+                  <th width="20%">Valor Unitarius</th>
+                  <th width="20%">Valor Totalis</th>
+                  <th width="10%">Actiones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Lignes générées dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Onglet Recherche -->
+        <div id="tab-search" class="tab-content">
+          <div class="tab-header">
+            <h2>🔍 Quaerere in Thesauro</h2>
+          </div>
+          
+          <div class="search-container">
+            <div class="search-form">
+              <div>
+                <label for="searchInput">Quaerere nomen:</label>
+                <input type="text" id="searchInput" class="search-input" 
+                       placeholder="Exempli gratia: Aurum, Rubinus..." 
+                       oninput="performSearch()">
+              </div>
+              <button onclick="performSearch()" class="btn-action search-btn">
+                🔍 Quaerere
+              </button>
+              <button onclick="clearSearch()" class="btn-action clear-btn">
+                🗑️ Purgare
+              </button>
+            </div>
+          </div>
+          
+          <div class="search-results" id="searchResults">
+            <div class="no-results">
+              <p>🔍 Scribe nomen rei quam quaeris...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Informations sur l'inventaire -->
+    <section class="section">
+      <h2>📊 Statisticae Inventarii</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>🪙 Monetae Status</h3>
+          <div id="statsMonetae">
+            <p>Types disponibles: <span id="countMonetae">-</span></p>
+            <p>Valor medius: <span id="avgMonetae">-</span> PM</p>
+            <p>Valor maximus: <span id="maxMonetae">-</span> PM</p>
+          </div>
+        </div>
+        
+        <div class="info-card">
+          <h3>💎 Gemmae Status</h3>
+          <div id="statsGemmae">
+            <p>Types disponibles: <span id="countGemmae">-</span></p>
+            <p>Valor medius: <span id="avgGemmae">-</span> PM</p>
+            <p>Valor maximus: <span id="maxGemmae">-</span> PM</p>
+          </div>
+        </div>
+        
+        <div class="info-card">
+          <h3>⚖️ Totalis Inventarii</h3>
+          <div id="statsTotal">
+            <p>Items totales: <span id="countTotal">0</span></p>
+            <p>Valor totalis: <span id="valueTotal">0</span> PM</p>
+            <p>Thesaurus status: <span id="statusTotal">Vacuus</span></p>
+          </div>
+        </div>
+        
+        <div class="info-card">
+          <h3>📈 Distributio</h3>
+          <div id="statsDistribution">
+            <p>Monetae: <span id="percentMonetae">0%</span> valoris</p>
+            <p>Gemmae: <span id="percentGemmae">0%</span> valoris</p>
+            <p>Ratio: <span id="ratioMG">-</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-  <script src="data.js">
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  <script src="nav.js"></script>
+  <script>
+    // Variables globales pour la page Dorusis
+    let currentInventoryTab = 'pieces';
+
+    // ===== GESTION DES ONGLETS D'INVENTAIRE =====
+    function switchInventoryTab(tabName) {
+      // Désactiver tous les onglets
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      // Activer l'onglet sélectionné
+      const tabButton = document.querySelector(`[onclick="switchInventoryTab('${tabName}')"]`);
+      const tabContent = document.getElementById(`tab-${tabName}`);
+      
+      if (tabButton && tabContent) {
+        tabButton.classList.add('active');
+        tabContent.classList.add('active');
+        currentInventoryTab = tabName;
+        
+        if (tabName === 'search') {
+          document.getElementById('searchInput').focus();
+        }
+      }
+    }
+
+    // ===== FONCTIONS DE RECHERCHE =====
+    function performSearch() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const resultsContainer = document.getElementById('searchResults');
+      
+      if (!query) {
+        resultsContainer.innerHTML = '<div class="no-results"><p>🔍 Scribe nomen rei quam quaeris...</p></div>';
+        return;
+      }
+      
+      const results = [];
+      
+      // Rechercher dans les pièces
+      Object.entries(window.monnaies.pieces).forEach(([nom, valeur]) => {
+        if (nom.toLowerCase().includes(query)) {
+          results.push({
+            nom: nom,
+            valeur: valeur,
+            categorie: 'Monetae',
+            type: 'pieces'
+          });
+        }
+      });
+      
+      // Rechercher dans les gemmes
+      Object.entries(window.monnaies.gemmes).forEach(([nom, valeur]) => {
+        if (nom.toLowerCase().includes(query)) {
+          results.push({
+            nom: nom,
+            valeur: valeur,
+            categorie: 'Gemmae',
+            type: 'gemmes'
+          });
+        }
+      });
+      
+      displaySearchResults(results, query);
+    }
+    
+    function displaySearchResults(results, query) {
+      const container = document.getElementById('searchResults');
+      
+      if (results.length === 0) {
+        container.innerHTML = `
+          <div class="no-results">
+            <p>❌ Nihil inventum pro "${query}"</p>
+            <p><em>Conare aliam quaestionem...</em></p>
+          </div>
+        `;
+        return;
+      }
+      
+      const html = results.map(item => `
+        <div class="result-item">
+          <div class="result-header">
+            <span class="result-name">${item.nom}</span>
+            <span class="result-category">${item.categorie}</span>
+          </div>
+          <div class="result-value">Valor: ${item.valeur} PM</div>
+        </div>
+      `).join('');
+      
+      container.innerHTML = `
+        <h3>📋 Resultata pro "${query}" (${results.length})</h3>
+        ${html}
+      `;
+    }
+    
+    function clearSearch() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('searchResults').innerHTML = '<div class="no-results"><p>🔍 Scribe nomen rei quam quaeris...</p></div>';
+    }
+
+    // ===== STATISTIQUES =====
+    function updateStatistics() {
+      if (!window.monnaies) return;
+      
+      // Statistiques des monnaies
+      const monetaeKeys = Object.keys(window.monnaies.pieces);
+    // ===== STATISTIQUES =====
+    function updateStatistics() {
+      if (!window.monnaies) return;
+      
+      // Statistiques des monnaies
+      const monetaeKeys = Object.keys(window.monnaies.pieces);
+      const monetaeValues = Object.values(window.monnaies.pieces);
+      const avgMonetae = monetaeValues.reduce((a, b) => a + b, 0) / monetaeValues.length;
+      const maxMonetae = Math.max(...monetaeValues);
+      
+      document.getElementById('countMonetae').textContent = monetaeKeys.length;
+      document.getElementById('avgMonetae').textContent = avgMonetae.toFixed(2);
+      document.getElementById('maxMonetae').textContent = maxMonetae.toFixed(2);
+      
+      // Statistiques des gemmes
+      const gemmaeKeys = Object.keys(window.monnaies.gemmes);
+      const gemmaeValues = Object.values(window.monnaies.gemmes);
+      const avgGemmae = gemmaeValues.reduce((a, b) => a + b, 0) / gemmaeValues.length;
+      const maxGemmae = Math.max(...gemmaeValues);
+      
+      document.getElementById('countGemmae').textContent = gemmaeKeys.length;
+      document.getElementById('avgGemmae').textContent = avgGemmae.toFixed(2);
+      document.getElementById('maxGemmae').textContent = maxGemmae.toFixed(2);
+      
+      // Calculs pour l'inventaire actuel
+      const totalItems = document.querySelectorAll('#inventaireTablePieces tbody tr, #inventaireTableGemmes tbody tr').length;
+      const totalValue = parseFloat(document.getElementById('totalPieces').textContent) || 0;
+      
+      document.getElementById('countTotal').textContent = totalItems;
+      document.getElementById('valueTotal').textContent = totalValue.toFixed(2);
+      
+      // Status du thésaurus
+      let status = 'Vacuus';
+      if (totalValue > 1000) status = 'Ditissimus';
+      else if (totalValue > 500) status = 'Dives';
+      else if (totalValue > 100) status = 'Mediocris';
+      else if (totalValue > 0) status = 'Pauper';
+      
+      document.getElementById('statusTotal').textContent = status;
+      
+      // Distribution des valeurs
+      let monetaeTotal = 0, gemmaeTotal = 0;
+      
+      document.querySelectorAll('#inventaireTablePieces .total').forEach(cell => {
+        monetaeTotal += parseFloat(cell.textContent) || 0;
+      });
+      
+      document.querySelectorAll('#inventaireTableGemmes .total').forEach(cell => {
+        gemmaeTotal += parseFloat(cell.textContent) || 0;
+      });
+      
+      const percentMonetae = totalValue > 0 ? (monetaeTotal / totalValue * 100).toFixed(1) : 0;
+      const percentGemmae = totalValue > 0 ? (gemmaeTotal / totalValue * 100).toFixed(1) : 0;
+      const ratio = gemmaeTotal > 0 ? (monetaeTotal / gemmaeTotal).toFixed(2) : '-';
+      
+      document.getElementById('percentMonetae').textContent = percentMonetae + '%';
+      document.getElementById('percentGemmae').textContent = percentGemmae + '%';
+      document.getElementById('ratioMG').textContent = ratio;
+    }
+
+    // ===== INITIALISATION =====
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('👤 Inventarium Dorusis - Initialisé');
+      
+      // Mettre à jour les statistiques
+      updateStatistics();
+      
+      // Observer les changements dans les tableaux pour mettre à jour les stats
+      const observer = new MutationObserver(updateStatistics);
+      
+      const tables = document.querySelectorAll('#inventaireTablePieces tbody, #inventaireTableGemmes tbody');
+      tables.forEach(table => {
+        observer.observe(table, { childList: true, subtree: true });
+      });
+      
+      // Observer les changements du total
+      const totalObserver = new MutationObserver(updateStatistics);
+      const totalElement = document.getElementById('totalPieces');
+      if (totalElement) {
+        totalObserver.observe(totalElement, { childList: true, characterData: true, subtree: true });
+      }
+      
+      // Recherche en temps réel
+      document.getElementById('searchInput').addEventListener('input', function() {
+        if (this.value.length >= 2) {
+          performSearch();
+        } else if (this.value.length === 0) {
+          clearSearch();
+        }
+      });
+      
+      // Recherche par Entrée
+      document.getElementById('searchInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          performSearch();
+        }
+      });
+    });
+
+    // ===== EXPOSITION DES FONCTIONS =====
+    window.switchInventoryTab = switchInventoryTab;
+    window.performSearch = performSearch;
+    window.clearSearch = clearSearch;
+    window.updateStatistics = updateStatistics;
   </script>
-  <script src="script.js">
-  </script>
-  <script src="nav.js">
-  </script>
- </body>
+</body>
 </html>
