@@ -1,3 +1,5 @@
+// ===== OPTIMIZED NAVIGATION SYSTEM =====
+
 /**
  * Système de navigation dynamique pour desktop et mobile
  */
@@ -8,6 +10,7 @@ const NAV_CONFIG = {
     { href: 'index.html', text: 'Accueil', icon: '🏠' },
     { href: 'dorusis.html', text: 'Dorusis', icon: '👤' },
     { href: 'guilde.html', text: 'Guilde', icon: '⚔️' },
+    { href: 'poids.html', text: 'Gestion Poids', mobileText: 'Poids', icon: '🏋️' },
     { href: 'liste.html', text: 'Liste complète', mobileText: 'Liste', icon: '📋' },
     { href: 'convertisseur.html', text: 'Convertisseur', icon: '🔄' }
   ],
