@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grimoire Magicus - Lecteur de Documents</title>
+  <meta name="description" content="Consultation des documents et grimoires du système">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="content fade-in">
+    <!-- En-tête de la page -->
+    <header class="page-header">
+      <h1>📖 GRIMOIRE MAGICUS 📖</h1>
+      <p class="page-subtitle">Librum Documentorum et Legislum Systematis</p>
+    </header>
+
+    <!-- Contrôles du PDF -->
+    <section class="section">
+      <div class="pdf-controls">
+        <div class="pdf-info">
+          <h3>📜 Document Actuel</h3>
+          <p>Grimoire principal du système - Règles et documentation</p>
+        </div>
+        <div class="pdf-actions">
+          <button onclick="reloadPdf()" class="btn-action btn-load">
+            🔄 Recharger
+          </button>
+          <button onclick="openInNewTab()" class="btn-action btn-save">
+            🔗 Ouvrir dans nouvel onglet
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lecteur PDF intégré -->
+    <section class="section">
+      <div class="pdf-container">
+        <iframe
+          id="pdfViewer"
+          src="https://mozilla.github.io/pdf.js/web/viewer.html"
+          title="Grimoire Magicus - Lecteur PDF"
+          allowfullscreen>
+        </iframe>
+      </div>
+    </section>
+
+    <!-- Instructions d'utilisation -->
+    <section class="section">
+      <h2>📋 Instructiones Usus</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>🔍 Navigation</h3>
+          <ul>
+            <li><strong>Zoom:</strong> Utilise les contrôles + / - du lecteur</li>
+            <li><strong>Pages:</strong> Flèches directionnelles ou barre de navigation</li>
+            <li><strong>Recherche:</strong> Ctrl + F pour rechercher dans le document</li>
+            <li><strong>Plein écran:</strong> Bouton en haut à droite du lecteur</li>
+          </ul>
+        </div>
+        
+        <div class="info-card">
+          <h3>📱 Compatibilité</h3>
+          <ul>
+            <li><strong>Desktop:</strong> Tous navigateurs modernes</li>
+            <li><strong>Mobile:</strong> Safari, Chrome, Firefox</li>
+            <li><strong>Tablette:</strong> Support tactile complet</li>
+            <li><strong>Hors ligne:</strong> Cache automatique du document</li>
+          </ul>
+        </div>
+        
+        <div class="info-card">
+          <h3>🔧 Fonctionnalités</h3>
+          <ul>
+            <li><strong>Annotations:</strong> Possibilité d'annoter (navigateur compatible)</li>
+            <li><strong>Téléchargement:</strong> Bouton de téléchargement disponible</li>
+            <li><strong>Impression:</strong> Impression directe depuis le lecteur</li>
+            <li><strong>Partage:</strong> URL stable pour partager le document</li>
+          </ul>
+        </div>
+        
+        <div class="info-card">
+          <h3>⚙️ Configuration</h3>
+          <ul>
+            <li><strong>Thème:</strong> Mode sombre/clair selon préférence</li>
+            <li><strong>Vitesse:</strong> Chargement progressif optimisé</li>
+            <li><strong>Sécurité:</strong> Lecteur PDF.js sécurisé</li>
+            <li><strong>Performance:</strong> Cache intelligent</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Liens utiles -->
+    <section class="section">
+      <h2>🔗 Collegamenti Utiles</h2>
+      <div class="quick-actions">
+        <button onclick="window.location.href='index.html'" class="action-btn primary">
+          🏠 Retour à l'Accueil
+        </button>
+        <button onclick="window.location.href='dorusis.html'" class="action-btn secondary">
+          👤 Inventaire Dorusis
+        </button>
+        <button onclick="window.location.href='poids.html'" class="action-btn tertiary">
+          ⚖️ Gestion des Poids
+        </button>
+        <button onclick="downloadPdf()" class="action-btn quaternary">
+          💾 Télécharger PDF
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="nav.js"></script>
+  <script>
+    // Script pour la gestion du lecteur PDF
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('📖 Grimoire Magicus - Lecteur PDF initialisé');
+      
+      // Charger le PDF par défaut
+      loadDefaultPdf();
+    });
+
+    /**
+     * Charge le PDF par défaut
+     */
+    function loadDefaultPdf() {
+      const viewer = document.getElementById('pdfViewer');
+      // Remplacez cette URL par le chemin vers votre PDF
+      const pdfUrl = 'img/grimoire.pdf'; // Chemin vers votre PDF
+      
+      if (viewer) {
+        viewer.src = `https://mozilla.github.io/pdf.js/web/viewer.html?file=${encodeURIComponent(pdfUrl)}`;
+      }
+    }
+
+    /**
+     * Recharge le lecteur PDF
+     */
+    function reloadPdf() {
+      const viewer = document.getElementById('pdfViewer');
+      if (viewer) {
+        const currentSrc = viewer.src;
+        viewer.src = '';
+        setTimeout(() => {
+          viewer.src = currentSrc;
+        }, 100);
+      }
+      showNotification('🔄 Lecteur PDF rechargé');
+    }
+
+    /**
+     * Ouvre le PDF dans un nouvel onglet
+     */
+    function openInNewTab() {
+      const viewer = document.getElementById('pdfViewer');
+      if (viewer && viewer.src) {
+        window.open(viewer.src, '_blank', 'noopener,noreferrer');
+      }
+    }
+
+    /**
+     * Télécharge le PDF
+     */
+    function downloadPdf() {
+      // Créer un lien de téléchargement
+      const link = document.createElement('a');
+      link.href = 'img/grimoire.pdf'; // Chemin vers votre PDF
+      link.download = 'grimoire-magicus.pdf';
+      link.style.display = 'none';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showNotification('💾 Téléchargement du grimoire démarré');
+    }
+
+    /**
+     * Affiche une notification
+     */
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 10000;
+        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+        color: white; padding: 15px 25px; border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        font-family: "Quattrocento Sans", Arial, sans-serif;
+        font-weight: bold; font-size: 14px;
+        border: 2px solid #228B22;
+        animation: slideIn 0.3s ease;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
