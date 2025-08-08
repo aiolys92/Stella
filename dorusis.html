@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inventarium Dorusis</title>
+  <title>Inventaire Dorusis</title>
   <meta name="description" content="Inventaire personnel de Dorusis - Gestion des monnaies et gemmes">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -11,30 +11,30 @@
   <div class="content fade-in">
     <!-- En-tête de la page -->
     <header class="page-header">
-      <h1>👤 INVENTARIUM DORUSIS 👤</h1>
-      <p class="page-subtitle">Thesaurus Personalis Militis Fortis</p>
+      <h1>👤 INVENTAIRE DORUSIS 👤</h1>
+      <p class="page-subtitle">Trésor personnel du guerrier</p>
     </header>
 
     <!-- Contrôles principaux -->
     <section class="section">
       <div class="controls-header">
         <div class="controls-left">
-          <h2>💰 Gestio Thesauri</h2>
+          <h2>💰 Gestion du Trésor</h2>
         </div>
         <div class="controls-right">
           <input type="file" accept=".json" id="fileInputInventory" style="display: none;">
           <button onclick="document.getElementById('fileInputInventory').click()" class="btn-action btn-load">
-            📂 Importare
+            📂 Importer
           </button>
           <button id="saveInventoryBtn" class="btn-action btn-save">
-            💾 Salvare
+            💾 Sauvegarder
           </button>
         </div>
       </div>
       
       <!-- Affichage du total -->
       <div class="total-display">
-        <span class="total-label">Valor Totalis:</span>
+        <span class="total-label">Valeur Totale:</span>
         <span id="totalPieces" class="total-value">0</span>
         <span class="total-unit">PM</span>
       </div>
@@ -45,23 +45,23 @@
       <div class="tabs-container">
         <div class="tabs-header">
           <button class="tab-button active" onclick="switchInventoryTab('pieces')" title="Monnaies métalliques">
-            🪙 Monetae
+            🪙 Monnaies
           </button>
           <button class="tab-button" onclick="switchInventoryTab('gemmes')" title="Gemmes précieuses">
-            💎 Gemmae
+            💎 Gemmes
           </button>
           <button class="tab-button" onclick="switchInventoryTab('search')" title="Recherche dans l'inventaire">
-            🔍 Quaerere
+            🔍 Recherche
           </button>
         </div>
 
         <!-- Inventaire des Pièces -->
         <div id="tab-pieces" class="tab-content active">
           <div class="tab-header">
-            <h2>🪙 Monetae Metallicae</h2>
+            <h2>🪙 Monnaies Métalliques</h2>
             <div class="tab-actions">
               <button onclick="addInventaireRow('pieces')" class="btn-action btn-add">
-                ➕ Addere Monetam
+                ➕ Ajouter une monnaie
               </button>
             </div>
           </div>
@@ -70,11 +70,11 @@
             <table id="inventaireTablePieces" class="inventory-table">
               <thead>
                 <tr>
-                  <th width="30%">Nomen</th>
-                  <th width="20%">Quantitas</th>
-                  <th width="20%">Valor Unitarius</th>
-                  <th width="20%">Valor Totalis</th>
-                  <th width="10%">Actiones</th>
+                  <th width="30%">Nom</th>
+                  <th width="20%">Quantité</th>
+                  <th width="20%">Valeur Unitaire</th>
+                  <th width="20%">Valeur Totale</th>
+                  <th width="10%">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -87,10 +87,10 @@
         <!-- Inventaire des Gemmes -->
         <div id="tab-gemmes" class="tab-content">
           <div class="tab-header">
-            <h2>💎 Gemmae Pretiosae</h2>
+            <h2>💎 Gemmes Précieuses</h2>
             <div class="tab-actions">
               <button onclick="addInventaireRow('gemmes')" class="btn-action btn-add">
-                ➕ Addere Gemmam
+                ➕ Ajouter une gemme
               </button>
             </div>
           </div>
@@ -99,11 +99,11 @@
             <table id="inventaireTableGemmes" class="inventory-table">
               <thead>
                 <tr>
-                  <th width="30%">Nomen</th>
-                  <th width="20%">Quantitas</th>
-                  <th width="20%">Valor Unitarius</th>
-                  <th width="20%">Valor Totalis</th>
-                  <th width="10%">Actiones</th>
+                  <th width="30%">Nom</th>
+                  <th width="20%">Quantité</th>
+                  <th width="20%">Valeur Unitaire</th>
+                  <th width="20%">Valeur Totale</th>
+                  <th width="10%">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -116,29 +116,29 @@
         <!-- Onglet Recherche -->
         <div id="tab-search" class="tab-content">
           <div class="tab-header">
-            <h2>🔍 Quaerere in Thesauro</h2>
+            <h2>🔍 Recherche dans le Trésor</h2>
           </div>
           
           <div class="search-container">
             <div class="search-form">
               <div>
-                <label for="searchInput">Quaerere nomen:</label>
+                <label for="searchInput">Rechercher un nom:</label>
                 <input type="text" id="searchInput" class="search-input" 
-                       placeholder="Exempli gratia: Aurum, Rubinus..." 
+                       placeholder="Exemple: Or, Rubis..." 
                        oninput="performSearch()">
               </div>
               <button onclick="performSearch()" class="btn-action search-btn">
-                🔍 Quaerere
+                🔍 Rechercher
               </button>
               <button onclick="clearSearch()" class="btn-action clear-btn">
-                🗑️ Purgare
+                🗑️ Effacer
               </button>
             </div>
           </div>
           
           <div class="search-results" id="searchResults">
             <div class="no-results">
-              <p>🔍 Scribe nomen rei quam quaeris...</p>
+              <p>🔍 Tapez le nom de l'objet que vous cherchez...</p>
             </div>
           </div>
         </div>
@@ -147,40 +147,40 @@
 
     <!-- Informations sur l'inventaire -->
     <section class="section">
-      <h2>📊 Statisticae Inventarii</h2>
+      <h2>📊 Statistiques de l'Inventaire</h2>
       <div class="info-grid">
         <div class="info-card">
-          <h3>🪙 Monetae Status</h3>
+          <h3>🪙 État des Monnaies</h3>
           <div id="statsMonetae">
             <p>Types disponibles: <span id="countMonetae">-</span></p>
-            <p>Valor medius: <span id="avgMonetae">-</span> PM</p>
-            <p>Valor maximus: <span id="maxMonetae">-</span> PM</p>
+            <p>Valeur moyenne: <span id="avgMonetae">-</span> PM</p>
+            <p>Valeur maximale: <span id="maxMonetae">-</span> PM</p>
           </div>
         </div>
         
         <div class="info-card">
-          <h3>💎 Gemmae Status</h3>
+          <h3>💎 État des Gemmes</h3>
           <div id="statsGemmae">
             <p>Types disponibles: <span id="countGemmae">-</span></p>
-            <p>Valor medius: <span id="avgGemmae">-</span> PM</p>
-            <p>Valor maximus: <span id="maxGemmae">-</span> PM</p>
+            <p>Valeur moyenne: <span id="avgGemmae">-</span> PM</p>
+            <p>Valeur maximale: <span id="maxGemmae">-</span> PM</p>
           </div>
         </div>
         
         <div class="info-card">
-          <h3>⚖️ Totalis Inventarii</h3>
+          <h3>⚖️ Total de l'Inventaire</h3>
           <div id="statsTotal">
-            <p>Items totales: <span id="countTotal">0</span></p>
-            <p>Valor totalis: <span id="valueTotal">0</span> PM</p>
-            <p>Thesaurus status: <span id="statusTotal">Vacuus</span></p>
+            <p>Objets totaux: <span id="countTotal">0</span></p>
+            <p>Valeur totale: <span id="valueTotal">0</span> PM</p>
+            <p>État du trésor: <span id="statusTotal">Vide</span></p>
           </div>
         </div>
         
         <div class="info-card">
-          <h3>📈 Distributio</h3>
+          <h3>📈 Distribution</h3>
           <div id="statsDistribution">
-            <p>Monetae: <span id="percentMonetae">0%</span> valoris</p>
-            <p>Gemmae: <span id="percentGemmae">0%</span> valoris</p>
+            <p>Monnaies: <span id="percentMonetae">0%</span> de la valeur</p>
+            <p>Gemmes: <span id="percentGemmae">0%</span> de la valeur</p>
             <p>Ratio: <span id="ratioMG">-</span></p>
           </div>
         </div>
@@ -223,7 +223,7 @@
       const resultsContainer = document.getElementById('searchResults');
       
       if (!query) {
-        resultsContainer.innerHTML = '<div class="no-results"><p>🔍 Scribe nomen rei quam quaeris...</p></div>';
+        resultsContainer.innerHTML = '<div class="no-results"><p>🔍 Tapez le nom de l\'objet que vous cherchez...</p></div>';
         return;
       }
       
@@ -235,7 +235,7 @@
           results.push({
             nom: nom,
             valeur: valeur,
-            categorie: 'Monetae',
+            categorie: 'Monnaies',
             type: 'pieces'
           });
         }
@@ -247,7 +247,7 @@
           results.push({
             nom: nom,
             valeur: valeur,
-            categorie: 'Gemmae',
+            categorie: 'Gemmes',
             type: 'gemmes'
           });
         }
@@ -262,8 +262,8 @@
       if (results.length === 0) {
         container.innerHTML = `
           <div class="no-results">
-            <p>❌ Nihil inventum pro "${query}"</p>
-            <p><em>Conare aliam quaestionem...</em></p>
+            <p>❌ Aucun résultat pour "${query}"</p>
+            <p><em>Essayez une autre recherche...</em></p>
           </div>
         `;
         return;
@@ -275,27 +275,21 @@
             <span class="result-name">${item.nom}</span>
             <span class="result-category">${item.categorie}</span>
           </div>
-          <div class="result-value">Valor: ${item.valeur} PM</div>
+          <div class="result-value">Valeur: ${item.valeur} PM</div>
         </div>
       `).join('');
       
       container.innerHTML = `
-        <h3>📋 Resultata pro "${query}" (${results.length})</h3>
+        <h3>📋 Résultats pour "${query}" (${results.length})</h3>
         ${html}
       `;
     }
     
     function clearSearch() {
       document.getElementById('searchInput').value = '';
-      document.getElementById('searchResults').innerHTML = '<div class="no-results"><p>🔍 Scribe nomen rei quam quaeris...</p></div>';
+      document.getElementById('searchResults').innerHTML = '<div class="no-results"><p>🔍 Tapez le nom de l\'objet que vous cherchez...</p></div>';
     }
 
-    // ===== STATISTIQUES =====
-    function updateStatistics() {
-      if (!window.monnaies) return;
-      
-      // Statistiques des monnaies
-      const monetaeKeys = Object.keys(window.monnaies.pieces);
     // ===== STATISTIQUES =====
     function updateStatistics() {
       if (!window.monnaies) return;
@@ -327,12 +321,12 @@
       document.getElementById('countTotal').textContent = totalItems;
       document.getElementById('valueTotal').textContent = totalValue.toFixed(2);
       
-      // Status du thésaurus
-      let status = 'Vacuus';
-      if (totalValue > 1000) status = 'Ditissimus';
-      else if (totalValue > 500) status = 'Dives';
-      else if (totalValue > 100) status = 'Mediocris';
-      else if (totalValue > 0) status = 'Pauper';
+      // Status du trésor
+      let status = 'Vide';
+      if (totalValue > 1000) status = 'Très riche';
+      else if (totalValue > 500) status = 'Riche';
+      else if (totalValue > 100) status = 'Modeste';
+      else if (totalValue > 0) status = 'Pauvre';
       
       document.getElementById('statusTotal').textContent = status;
       
@@ -358,7 +352,7 @@
 
     // ===== INITIALISATION =====
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('👤 Inventarium Dorusis - Initialisé');
+      console.log('👤 Inventaire Dorusis - Initialisé');
       
       // Mettre à jour les statistiques
       updateStatistics();
