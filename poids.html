@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Gestion des Poids</title>
-  <meta name="description" content="Gestion des poids des objets et inventaires">
+  <meta name="description" content="Gestion des poids des objets et inventaires par catégories">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,149 +12,183 @@
     <!-- En-tête de la page -->
     <header class="page-header">
       <h1>🏋️ Gestion des Poids</h1>
-      <p class="page-subtitle">Gérez les inventaires par poids et ajoutez vos propres objets</p>
+      <p class="page-subtitle">Gérez vos inventaires par poids avec catégories et poids porté</p>
     </header>
 
     <!-- Section Ajout d'objets personnalisés -->
-    <section class="custom-objects-section">
-      <h2>Ajouter un nouvel objet</h2>
+    <section class="section">
+      <h2>➕ Ajouter un nouvel objet</h2>
       <div class="add-object-form">
-        <div class="form-group">
-          <label for="newObjectCategory">Catégorie :</label>
-          <select id="newObjectCategory">
-            <!-- Options générées dynamiquement -->
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="newObjectCategory">Catégorie :</label>
+            <select id="newObjectCategory" required>
+              <!-- Options générées dynamiquement -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="newObjectName">Nom de l'objet :</label>
+            <input type="text" id="newObjectName" placeholder="Ex: Épée longue" required>
+          </div>
+          <div class="form-group">
+            <label for="newObjectWeight">Poids (kg) :</label>
+            <input type="number" id="newObjectWeight" step="0.1" min="0" placeholder="2.5" required>
+          </div>
+          <div class="form-group">
+            <button type="button" onclick="ajouterNouvelObjet()" class="btn-add-object">
+              ➕ Ajouter
+            </button>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="newObjectName">Nom de l'objet :</label>
-          <input type="text" id="newObjectName" placeholder="Ex: Épée longue">
-        </div>
-        <div class="form-group">
-          <label for="newObjectWeight">Poids (kg) :</label>
-          <input type="number" id="newObjectWeight" step="0.1" min="0" placeholder="Ex: 2.5">
-        </div>
-        <button type="button" onclick="ajouterNouvelObjet()" class="btn-add-object">
-          ➕ Ajouter l'objet
-        </button>
       </div>
     </section>
 
-    <!-- Contrôles de fichier -->
-    <div class="file-controls">
-      <input type="file" accept=".json" id="fileInputInventory">
-      <button id="saveInventoryBtn">💾 Sauvegarder Inventaire</button>
-      <button onclick="exporterObjets()" class="btn-export">📤 Exporter Liste Objets</button>
-      <input type="file" accept=".json" id="fileInputObjets" onchange="importerObjets(event)">
-    </div>
-
-    <!-- Affichage du total -->
-    <div class="total-display">
-      <p class="total-weight">
-        <span class="label">Poids total porté :</span>
-        <span id="totalPoids" class="value">0</span> kg
-      </p>
-    </div>
-
-    <!-- Onglets pour différents inventaires -->
-    <div class="tabs-container">
-      <div class="tabs-header">
-        <button class="tab-button active" onclick="switchTab('dorusis')">👤 Dorusis</button>
-        <button class="tab-button" onclick="switchTab('guilde')">⚔️ Guilde</button>
-        <button class="tab-button" onclick="switchTab('cheval')">🐴 Cheval de trait</button>
-      </div>
-
-      <!-- Contenu des onglets - UN SEUL AFFICHÉ À LA FOIS -->
-      
-      <!-- Inventaire Dorusis -->
-      <div id="tab-dorusis" class="tab-content active">
-        <div class="tab-header">
-          <h2>📦 Inventaire Dorusis</h2>
-          <button onclick="addInventaireRowPoids('dorusis')" class="btn-add-row">
-            ➕ Ajouter un objet
+    <!-- Contrôles de fichier et total -->
+    <div class="section">
+      <div class="controls-row">
+        <div class="file-controls">
+          <input type="file" accept=".json" id="fileInputInventory" title="Charger un inventaire">
+          <button id="saveInventoryBtn" title="Sauvegarder tous les inventaires">
+            💾 Sauvegarder Inventaires
           </button>
         </div>
-        <table id="inventaireTableDorusis" class="inventory-table">
-          <thead>
-            <tr>
-              <th>Catégorie</th>
-              <th>Nom de l'objet</th>
-              <th>Nombre</th>
-              <th>Poids unitaire (kg)</th>
-              <th>Poids porté</th>
-              <th>Poids total (kg)</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- Inventaire Guilde -->
-      <div id="tab-guilde" class="tab-content">
-        <div class="tab-header">
-          <h2>⚔️ Inventaire Guilde</h2>
-          <button onclick="addInventaireRowPoids('guilde')" class="btn-add-row">
-            ➕ Ajouter un objet
-          </button>
+        
+        <div class="total-display">
+          <span class="total-label">Poids total :</span>
+          <span id="totalPoids" class="total-value">0</span>
+          <span class="total-unit">kg</span>
         </div>
-        <table id="inventaireTableGuilde" class="inventory-table">
-          <thead>
-            <tr>
-              <th>Catégorie</th>
-              <th>Nom de l'objet</th>
-              <th>Nombre</th>
-              <th>Poids unitaire (kg)</th>
-              <th>Poids porté</th>
-              <th>Poids total (kg)</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <!-- Inventaire Cheval -->
-      <div id="tab-cheval" class="tab-content">
-        <div class="tab-header">
-          <h2>🐴 Inventaire Cheval de trait</h2>
-          <button onclick="addInventaireRowPoids('cheval')" class="btn-add-row">
-            ➕ Ajouter un objet
-          </button>
-        </div>
-        <table id="inventaireTableCheval" class="inventory-table">
-          <thead>
-            <tr>
-              <th>Catégorie</th>
-              <th>Nom de l'objet</th>
-              <th>Nombre</th>
-              <th>Poids unitaire (kg)</th>
-              <th>Poids porté</th>
-              <th>Poids total (kg)</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
       </div>
     </div>
 
-    <!-- Section Liste complète des objets avec gestion par catégories -->
-    <section class="objects-management">
-      <h2>Liste des objets par catégories</h2>
+    <!-- Onglets des inventaires -->
+    <section class="section">
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button class="tab-button active" onclick="switchTab('dorusis')" title="Inventaire personnel de Dorusis">
+            👤 Dorusis
+          </button>
+          <button class="tab-button" onclick="switchTab('guilde')" title="Inventaire collectif de la guilde">
+            ⚔️ Guilde
+          </button>
+          <button class="tab-button" onclick="switchTab('cheval')" title="Inventaire du cheval de trait">
+            🐴 Cheval de trait
+          </button>
+        </div>
+
+        <!-- Inventaire Dorusis -->
+        <div id="tab-dorusis" class="tab-content active">
+          <div class="tab-header">
+            <h2>👤 Inventaire Dorusis</h2>
+            <button onclick="addInventaireRowPoids('dorusis')" class="btn-add-row">
+              ➕ Ajouter un objet
+            </button>
+          </div>
+          
+          <div class="table-container">
+            <table id="inventaireTableDorusis" class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="15%">Catégorie</th>
+                  <th width="20%">Objet</th>
+                  <th width="10%">Quantité</th>
+                  <th width="12%">Poids unit.</th>
+                  <th width="15%">Poids porté</th>
+                  <th width="12%">Total</th>
+                  <th width="16%">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Lignes générées dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Inventaire Guilde -->
+        <div id="tab-guilde" class="tab-content">
+          <div class="tab-header">
+            <h2>⚔️ Inventaire Guilde</h2>
+            <button onclick="addInventaireRowPoids('guilde')" class="btn-add-row">
+              ➕ Ajouter un objet
+            </button>
+          </div>
+          
+          <div class="table-container">
+            <table id="inventaireTableGuilde" class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="15%">Catégorie</th>
+                  <th width="20%">Objet</th>
+                  <th width="10%">Quantité</th>
+                  <th width="12%">Poids unit.</th>
+                  <th width="15%">Poids porté</th>
+                  <th width="12%">Total</th>
+                  <th width="16%">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Lignes générées dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Inventaire Cheval -->
+        <div id="tab-cheval" class="tab-content">
+          <div class="tab-header">
+            <h2>🐴 Inventaire Cheval de trait</h2>
+            <button onclick="addInventaireRowPoids('cheval')" class="btn-add-row">
+              ➕ Ajouter un objet
+            </button>
+          </div>
+          
+          <div class="table-container">
+            <table id="inventaireTableCheval" class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="15%">Catégorie</th>
+                  <th width="20%">Objet</th>
+                  <th width="10%">Quantité</th>
+                  <th width="12%">Poids unit.</th>
+                  <th width="15%">Poids porté</th>
+                  <th width="12%">Total</th>
+                  <th width="16%">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Lignes générées dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Liste des objets par catégories -->
+    <section class="section">
+      <h2>📋 Gestion des objets par catégories</h2>
       
-      <!-- Filtre par catégorie -->
-      <div class="category-filter">
-        <label for="categoryFilter">Filtrer par catégorie :</label>
-        <select id="categoryFilter" onchange="filtrerParCategorie(this.value)">
-          <option value="">Toutes les catégories</option>
-          <!-- Options générées dynamiquement -->
-        </select>
-        <input type="text" id="searchObjects" placeholder="Rechercher un objet..." 
-               oninput="rechercherObjets(this.value)">
+      <!-- Filtres et recherche -->
+      <div class="filters-row">
+        <div class="filter-group">
+          <label for="categoryFilter">Catégorie :</label>
+          <select id="categoryFilter" onchange="filtrerParCategorie(this.value)">
+            <option value="">Toutes les catégories</option>
+            <!-- Options générées dynamiquement -->
+          </select>
+        </div>
+        
+        <div class="search-group">
+          <label for="searchObjects">Rechercher :</label>
+          <input type="text" id="searchObjects" placeholder="Nom de l'objet..." 
+                 oninput="rechercherObjets(this.value)">
+        </div>
       </div>
       
+      <!-- Conteneur des catégories -->
       <div class="categories-container" id="categoriesContainer">
-        <!-- Catégories générées dynamiquement -->
+        <!-- Catégories générées dynamiquement par JavaScript -->
       </div>
     </section>
   </div>
