@@ -198,67 +198,6 @@
       </div>
     </section>
 
-    <!-- Liste des objets par catégories - CONSULTATION SEULEMENT -->
-    <section class="section">
-      <h2>📋 Liste de Toutes les Monnaies et Gemmes</h2>
-      <p class="section-subtitle"><em>Consultation seulement - Aucune action de suppression</em></p>
-      
-      <!-- Filtres et recherche -->
-      <div class="filters-row">
-        <div class="filter-group">
-          <label for="categoryFilter">Catégorie:</label>
-          <select id="categoryFilter" onchange="filtrerParCategorie(this.value)">
-            <option value="">Toutes les catégories</option>
-            <option value="pieces">Monnaies</option>
-            <option value="gemmes">Gemmes</option>
-          </select>
-        </div>
-        
-        <div class="search-group">
-          <label for="searchObjects">Rechercher:</label>
-          <input type="text" id="searchObjects" placeholder="Nom de l'objet..." 
-                 oninput="rechercherObjets(this.value)">
-        </div>
-      </div>
-      
-      <!-- Conteneur des catégories - LECTURE SEULE -->
-      <div class="categories-container" id="categoriesContainer">
-        <div class="category-section">
-          <h3>🪙 Monnaies Métalliques</h3>
-          <div class="table-container">
-            <table class="inventory-table">
-              <thead>
-                <tr>
-                  <th width="60%">Nom</th>
-                  <th width="40%">Valeur (PM)</th>
-                </tr>
-              </thead>
-              <tbody id="listMonetae">
-                <!-- Généré par JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
-        <div class="category-section">
-          <h3>💎 Gemmes Précieuses</h3>
-          <div class="table-container">
-            <table class="inventory-table">
-              <thead>
-                <tr>
-                  <th width="60%">Nom</th>
-                  <th width="40%">Valeur (PM)</th>
-                </tr>
-              </thead>
-              <tbody id="listGemmae">
-                <!-- Généré par JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- Informations sur le trésor de guilde -->
     <section class="section">
       <h2>📊 Statistiques du Trésor de Guilde</h2>
