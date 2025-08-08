@@ -1,348 +1,195 @@
-const content = document.getElementById('itemDetailContent');
-      content.innerHTML = `
-        <div class="detail-grid">
-          <div class="detail-section">
-            <h4>Informations Générales</h4>
-            <p><strong>Nom:</strong> ${item.name}</p>
-            ${item.surnom ? `<p><strong>Surnom:</strong> ${item.surnom}</p>` : ''}
-            <p><strong>Catégorie:</strong> ${item.categoryLabel}</p>
-            <p><strong>Type:</strong> ${item.type}</p>
-            <p><strong>Rareté:</strong> ${item.rarity}</p>
-            ${item.durete ? `<p><strong>Dureté:</strong> ${item.durete}</p>` : ''}
-          </div>
-          
-          <div class="detail-section">
-            <h4>Valeur et Équivalences</h4>
-            <p><strong>Valeur:</strong> ${item.value.toFixed(item.category === 'pieces' ? 4 : 2)} PM</p>
-            <p><strong>En Or:</strong> ${(item.value / (window.monnaies.pieces['Or'] || 1)).toFixed(2)} pièces</p>
-            <p><strong>En Argent:</strong> ${(item.value / (window.monnaies.pieces['Argent'] || 1)).toFixed(2)} pièces</p>
-            ${item.category === 'pieces' && item.usage ? `<p><strong>Usage:</strong> ${item.usage}</p>` : ''}
-          </div>
-          
-          ${item.category === 'gemmes' ? `
-          <div class="detail-section">
-            <h4>Propriétés Mystiques</h4>
-            ${item.zodiac ? `<p><strong>Liens Zodiacaux:</strong> ${item.zodiac}</p>` : ''}
-            ${item.divin ? `<p><strong>Liens Divins:</strong> ${item.divin}</p>` : ''}
-            ${item.symbolique ? `<p><strong>Symbolique:</strong> ${item.symbolique}</p>` : ''}
-            ${item.notes ? `<p><strong>Notes:</strong> ${item.notes}</p>` : ''}
-          </div>
-          ` : ''}
-          
-          <div class="detail-section">
-            <h4>Statistiques</h4>
-            <p><strong>Rang par valeur:</strong> ${getRankByValue(item)} / ${allItems.length}</p>
-            <p><strong>Percentile:</strong> ${getPercentile(item)}%</p>
-            <p><strong>Usage recommandé:</strong> ${getRecommendedUsage(item)}</p>
-          </div>
-        </div>
-      `;<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Liste Complète</title>
-  <meta name="description" content="Catalogue complet de toutes les monnaies et gemmes disponibles">
+  <title>Liste Complète - Catalogue Optimisé</title>
+  <meta name="description" content="Catalogue optimisé de toutes les monnaies, gemmes et objets">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="content fade-in">
-    <!-- En-tête de la page -->
+    <!-- En-tête optimisé -->
     <header class="page-header">
-      <h1>📋 LISTE COMPLÈTE 📋</h1>
-      <p class="page-subtitle">Catalogue de toutes les monnaies et gemmes</p>
+      <h1>📚 CATALOGUE COMPLET 📚</h1>
+      <p class="page-subtitle">Base de données complète et optimisée</p>
     </header>
 
-    <!-- Contrôles principaux -->
+    <!-- Contrôles et statistiques -->
     <section class="section">
       <div class="controls-header">
         <div class="controls-left">
-          <h2>🔍 Exploration du Catalogue</h2>
+          <h2>🔍 Exploration Intelligente</h2>
         </div>
         <div class="controls-right">
-          <button onclick="exportCatalog()" class="btn-action btn-save">
-            💾 Exporter le Catalogue
-          </button>
-          <button onclick="printCatalog()" class="btn-action btn-load">
-            🖨️ Imprimer
-          </button>
+          <button onclick="exportData()" class="btn-action btn-save">💾 Exporter</button>
+          <button onclick="resetFilters()" class="btn-action btn-load">🔄 Reset</button>
         </div>
       </div>
       
-      <!-- Statistiques rapides -->
-      <div class="quick-stats">
-        <div class="stat-item">
-          <span class="stat-number" id="totalItems">0</span>
-          <span class="stat-label">Objets Totaux</span>
+      <!-- Statistiques en temps réel -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalCount">0</div>
+          <div class="stat-label">Total Objets</div>
         </div>
-        <div class="stat-item">
-          <span class="stat-number" id="totalMonnaies">0</span>
-          <span class="stat-label">Monnaies</span>
+        <div class="stat-card">
+          <div class="stat-value" id="visibleCount">0</div>
+          <div class="stat-label">Affichés</div>
         </div>
-        <div class="stat-item">
-          <span class="stat-number" id="totalGemmes">0</span>
-          <span class="stat-label">Gemmes</span>
+        <div class="stat-card">
+          <div class="stat-value" id="maxValue">0</div>
+          <div class="stat-label">Valeur Max (PM)</div>
         </div>
-        <div class="stat-item">
-          <span class="stat-number" id="maxValue">0</span>
-          <span class="stat-label">Valeur Max (PM)</span>
+        <div class="stat-card">
+          <div class="stat-value" id="avgValue">0</div>
+          <div class="stat-label">Moyenne (PM)</div>
         </div>
       </div>
     </section>
 
-    <!-- Filtres et recherche avancée -->
+    <!-- Recherche et filtres optimisés -->
     <section class="section">
-      <h2>🎯 Filtres et Recherche</h2>
-      
-      <div class="advanced-filters">
-        <div class="filter-row">
-          <div class="filter-group">
-            <label for="categoryFilter">Catégorie:</label>
-            <select id="categoryFilter" onchange="applyFilters()">
-              <option value="">Toutes les catégories</option>
-              <option value="pieces">Monnaies Métalliques</option>
-              <option value="gemmes">Gemmes Précieuses</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label for="sortOrder">Tri par:</label>
-            <select id="sortOrder" onchange="applyFilters()">
-              <option value="value-desc">Valeur (Décroissant)</option>
-              <option value="value-asc">Valeur (Croissant)</option>
-              <option value="name-asc">Nom (A-Z)</option>
-              <option value="name-desc">Nom (Z-A)</option>
-            </select>
-          </div>
-          
-          <div class="filter-group">
-            <label for="valueRange">Plage de valeur:</label>
-            <select id="valueRange" onchange="applyFilters()">
-              <option value="">Toutes les valeurs</option>
-              <option value="0-1">0 - 1 PM</option>
-              <option value="1-10">1 - 10 PM</option>
-              <option value="10-50">10 - 50 PM</option>
-              <option value="50-100">50 - 100 PM</option>
-              <option value="100+">100+ PM</option>
-            </select>
-          </div>
+      <div class="search-panel">
+        <div class="search-main">
+          <input type="text" id="globalSearch" placeholder="🔍 Recherche globale..." class="search-input-main">
+          <div class="search-suggestions" id="searchSuggestions"></div>
         </div>
         
-        <div class="search-row">
-          <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" 
-                   placeholder="Rechercher par nom..." 
-                   oninput="applyFilters()">
-            <button onclick="clearFilters()" class="btn-action clear-btn">
-              🗑️ Effacer les filtres
-            </button>
+        <div class="filters-compact">
+          <select id="categoryFilter" class="filter-select">
+            <option value="">📋 Toutes catégories</option>
+            <option value="pieces">🪙 Monnaies</option>
+            <option value="gemmes">💎 Gemmes</option>
+            <option value="poids">⚖️ Objets</option>
+          </select>
+          
+          <select id="sortFilter" class="filter-select">
+            <option value="value-desc">💰 Plus cher</option>
+            <option value="value-asc">💰 Moins cher</option>
+            <option value="name-asc">🔤 A → Z</option>
+            <option value="name-desc">🔤 Z → A</option>
+            <option value="rarity">✨ Rareté</option>
+          </select>
+          
+          <div class="filter-toggle">
+            <button onclick="toggleAdvanced()" class="btn-filter" id="advancedBtn">⚙️ Filtres</button>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- Onglets du catalogue -->
-    <section class="section">
-      <div class="tabs-container">
-        <div class="tabs-header">
-          <button class="tab-button active" onclick="switchCatalogTab('all')" title="Voir tous les objets">
-            📋 Catalogue Complet
-          </button>
-          <button class="tab-button" onclick="switchCatalogTab('pieces')" title="Monnaies uniquement">
-            🪙 Monnaies
-          </button>
-          <button class="tab-button" onclick="switchCatalogTab('gemmes')" title="Gemmes uniquement">
-            💎 Gemmes
-          </button>
-          <button class="tab-button" onclick="switchCatalogTab('comparison')" title="Comparaison détaillée">
-            ⚖️ Comparaison
-          </button>
-        </div>
-
-        <!-- Catalogue complet -->
-        <div id="tab-all" class="tab-content active">
-          <div class="tab-header">
-            <h2>📋 Catalogue Complet</h2>
-            <div class="tab-actions">
-              <span class="results-count">Affichage de <span id="visibleCount">0</span> objets</span>
+      <!-- Filtres avancés (masqués par défaut) -->
+      <div class="advanced-panel" id="advancedPanel" style="display: none;">
+        <div class="advanced-grid">
+          <div class="filter-group">
+            <label>💰 Valeur (PM)</label>
+            <div class="range-inputs">
+              <input type="number" id="minValue" placeholder="Min" class="range-input">
+              <span>—</span>
+              <input type="number" id="maxValue" placeholder="Max" class="range-input">
             </div>
           </div>
           
+          <div class="filter-group">
+            <label>🎨 Couleur</label>
+            <select id="colorFilter" class="filter-select">
+              <option value="">Toutes</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>💎 Dureté</label>
+            <select id="hardnessFilter" class="filter-select">
+              <option value="">Toutes</option>
+              <option value="1-3">Tendre (1-3)</option>
+              <option value="4-6">Moyen (4-6)</option>
+              <option value="7-10">Dur (7-10)</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <label>🔮 Propriétés</label>
+            <input type="text" id="propertyFilter" placeholder="Symbolique, notes..." class="filter-input">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Résultats optimisés -->
+    <section class="section">
+      <div class="results-header">
+        <h2>📊 Résultats</h2>
+        <div class="view-controls">
+          <button onclick="setView('cards')" class="view-btn active" id="cardsBtn">🎴 Cartes</button>
+          <button onclick="setView('table')" class="view-btn" id="tableBtn">📋 Tableau</button>
+          <button onclick="setView('compact')" class="view-btn" id="compactBtn">📝 Compact</button>
+        </div>
+      </div>
+
+      <!-- Vue en cartes (par défaut) -->
+      <div class="results-container" id="resultsContainer">
+        <div class="cards-grid" id="cardsView">
+          <!-- Généré dynamiquement -->
+        </div>
+
+        <!-- Vue tableau -->
+        <div class="table-view" id="tableView" style="display: none;">
           <div class="table-container">
-            <table id="catalogTable" class="inventory-table">
+            <table class="results-table">
               <thead>
                 <tr>
-                  <th width="35%">Nom</th>
-                  <th width="20%">Catégorie</th>
-                  <th width="20%">Valeur (PM)</th>
-                  <th width="15%">Rareté</th>
-                  <th width="10%">Actions</th>
+                  <th>Nom</th>
+                  <th>Catégorie</th>
+                  <th>Valeur/Poids</th>
+                  <th>Type</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
-              <tbody id="catalogTableBody">
+              <tbody id="tableBody">
                 <!-- Généré dynamiquement -->
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- Monnaies uniquement -->
-        <div id="tab-pieces" class="tab-content">
-          <div class="tab-header">
-            <h2>🪙 Monnaies Métalliques</h2>
-            <div class="tab-actions">
-              <span class="results-count">Total: <span id="piecesCount">0</span> monnaies</span>
-            </div>
-          </div>
-          
-          <div class="table-container">
-            <table class="inventory-table">
-              <thead>
-                <tr>
-                  <th width="40%">Nom</th>
-                  <th width="25%">Valeur (PM)</th>
-                  <th width="20%">Ratio à l'Or</th>
-                  <th width="15%">Utilisation</th>
-                </tr>
-              </thead>
-              <tbody id="piecesTableBody">
-                <!-- Généré dynamiquement -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Gemmes uniquement -->
-        <div id="tab-gemmes" class="tab-content">
-          <div class="tab-header">
-            <h2>💎 Gemmes Précieuses</h2>
-            <div class="tab-actions">
-              <span class="results-count">Total: <span id="gemmesCount">0</span> gemmes</span>
-            </div>
-          </div>
-          
-          <div class="table-container">
-            <table class="inventory-table">
-              <thead>
-                <tr>
-                  <th width="35%">Nom</th>
-                  <th width="25%">Valeur (PM)</th>
-                  <th width="20%">Rareté</th>
-                  <th width="20%">Couleur</th>
-                </tr>
-              </thead>
-              <tbody id="gemmesTableBody">
-                <!-- Généré dynamiquement -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Comparaison -->
-        <div id="tab-comparison" class="tab-content">
-          <div class="tab-header">
-            <h2>⚖️ Comparaison Détaillée</h2>
-            <div class="tab-actions">
-              <button onclick="generateComparison()" class="btn-action btn-load">
-                📊 Générer Analyse
-              </button>
-            </div>
-          </div>
-          
-          <!-- Graphiques et comparaisons -->
-          <div class="comparison-container">
-            <div class="comparison-section">
-              <h3>📈 Distribution des Valeurs</h3>
-              <div class="chart-container" id="valueDistribution">
-                <!-- Graphique simple -->
-              </div>
-            </div>
-            
-            <div class="comparison-section">
-              <h3>🏆 Top 10 des Plus Précieux</h3>
-              <div class="top-items" id="topItems">
-                <!-- Liste des objets les plus précieux -->
-              </div>
-            </div>
-            
-            <div class="comparison-section">
-              <h3>⚖️ Équivalences</h3>
-              <div class="equivalences" id="equivalences">
-                <!-- Tableau d'équivalences -->
-              </div>
-            </div>
+        <!-- Vue compacte -->
+        <div class="compact-view" id="compactView" style="display: none;">
+          <div class="compact-list" id="compactList">
+            <!-- Généré dynamiquement -->
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- Informations détaillées -->
-    <section class="section">
-      <h2>📊 Analyse du Catalogue</h2>
-      <div class="info-grid">
-        <div class="info-card">
-          <h3>🪙 Monnaies Métalliques</h3>
-          <div id="statsMonnaies">
-            <p>Nombre total: <span id="statMonnaiesCount">-</span></p>
-            <p>Valeur moyenne: <span id="statMonnaiesAvg">-</span> PM</p>
-            <p>Valeur médiane: <span id="statMonnaiesMedian">-</span> PM</p>
-            <p>Plus précieuse: <span id="statMonnaiesMax">-</span></p>
-          </div>
-        </div>
-        
-        <div class="info-card">
-          <h3>💎 Gemmes Précieuses</h3>
-          <div id="statsGemmes">
-            <p>Nombre total: <span id="statGemmesCount">-</span></p>
-            <p>Valeur moyenne: <span id="statGemmesAvg">-</span> PM</p>
-            <p>Valeur médiane: <span id="statGemmesMedian">-</span> PM</p>
-            <p>Plus précieuse: <span id="statGemmesMax">-</span></p>
-          </div>
-        </div>
-        
-        <div class="info-card">
-          <h3>📈 Distribution</h3>
-          <div id="statsDistribution">
-            <p>Objets < 1 PM: <span id="statLow">-</span></p>
-            <p>Objets 1-10 PM: <span id="statMedium">-</span></p>
-            <p>Objets 10-50 PM: <span id="statHigh">-</span></p>
-            <p>Objets > 50 PM: <span id="statVeryHigh">-</span></p>
-          </div>
-        </div>
-        
-        <div class="info-card">
-          <h3>🔍 Utilisation</h3>
-          <div id="statsUsage">
-            <p>Filtres actifs: <span id="activeFilters">0</span></p>
-            <p>Résultats visibles: <span id="visibleItems">-</span></p>
-            <p>Dernière recherche: <span id="lastSearch">Aucune</span></p>
-            <p>Export disponible: <span id="exportStatus">Oui</span></p>
-          </div>
-        </div>
+      <!-- Indicateur de chargement -->
+      <div class="loading-indicator" id="loadingIndicator" style="display: none;">
+        <div class="spinner"></div>
+        <p>Chargement des données...</p>
+      </div>
+
+      <!-- Message vide -->
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-icon">🔍</div>
+        <h3>Aucun résultat trouvé</h3>
+        <p>Essayez de modifier vos critères de recherche</p>
+        <button onclick="resetFilters()" class="btn-action">🔄 Réinitialiser</button>
       </div>
     </section>
 
-    <!-- Modal de détails d'objet -->
-    <div id="itemDetailModal" class="popin-overlay" onclick="closeItemDetail()">
-      <div class="popin-content" onclick="event.stopPropagation()">
-        <div class="popin-header">
-          <h2 id="itemDetailName">Détails de l'Objet</h2>
-          <button onclick="closeItemDetail()" class="popin-close">✕</button>
+    <!-- Modal de détails optimisé -->
+    <div id="detailModal" class="modal-overlay" onclick="closeDetail()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h2 id="modalTitle">Détails</h2>
+          <button onclick="closeDetail()" class="modal-close">✕</button>
         </div>
         
-        <div class="popin-form">
-          <div class="item-detail-content" id="itemDetailContent">
-            <!-- Contenu généré dynamiquement -->
-          </div>
-          
-          <div class="item-actions">
-            <button onclick="addToPersonalInventory()" class="btn-action btn-add">
-              ➕ Ajouter à l'Inventaire
-            </button>
-            <button onclick="copyItemInfo()" class="btn-action btn-save">
-              📋 Copier les Infos
-            </button>
-          </div>
+        <div class="modal-body" id="modalBody">
+          <!-- Contenu généré dynamiquement -->
+        </div>
+        
+        <div class="modal-footer">
+          <button onclick="copyDetails()" class="btn-action">📋 Copier</button>
+          <button onclick="closeDetail()" class="btn-action btn-secondary">Fermer</button>
         </div>
       </div>
     </div>
@@ -353,630 +200,739 @@ const content = document.getElementById('itemDetailContent');
   <script src="script.js"></script>
   <script src="nav.js"></script>
   <script>
-    // Variables globales pour la page Liste
-    let currentCatalogTab = 'all';
+    // ===== VARIABLES GLOBALES =====
+    let allData = [];
     let filteredData = [];
-    let allItems = [];
+    let currentView = 'cards';
+    let searchTimeout = null;
 
     // ===== INITIALISATION =====
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('📋 Liste Complète - Initialisé');
-      
-      initializeData();
-      populateAllTables();
-      updateStatistics();
-      applyFilters();
+      console.log('📚 Catalogue Optimisé - Initialisé');
+      loadAllData();
+      setupEventListeners();
+      renderData();
+      updateStats();
     });
 
-    // ===== INITIALISATION DES DONNÉES =====
-    function initializeData() {
-      allItems = [];
+    // ===== CHARGEMENT DES DONNÉES =====
+    function loadAllData() {
+      allData = [];
       
-      // Base de données des gemmes avec vraies informations
-      const gemmeInfo = {
-        'Rubis': { surnom: 'Escarboucle', couleur: 'Rouge', zodiac: 'Sirène/Ecrevisse', divin: 'Perun, Gibil', symbolique: 'Volonté, Courage', durete: 9, notes: 'Pierre de protection' },
-        'Emeraude': { surnom: 'Turanite', couleur: 'Vert', zodiac: 'Cerf/Tortue', divin: 'Turan, Arcton', symbolique: 'Renaissance, Sagesse', durete: 8, notes: 'Pierre de fortification' },
-        'Saphir': { surnom: 'Werunite', couleur: 'Bleu', zodiac: 'Nuage/Tortue/Phénix/Epée/Dauphins', divin: 'Weru, Tannun, Shua', symbolique: 'Justice, Pureté, Liberté', durete: 9, notes: 'Pierre céleste' },
-        'Diamant': { surnom: 'Pierre des fous', couleur: 'Incolore', zodiac: 'Paon/Licorne/Ourlarque', divin: 'Usil, Atonar, Laran', symbolique: 'Invincible, Constance', durete: 10, notes: 'Protège contre la folie' },
-        'Topaze': { surnom: '', couleur: 'Jaune/Bleu/Rose', zodiac: 'Sirène/Phénix/Papillon/Ecrevisse/Tortue/Dauphins/Cerf/Epée', divin: 'Tannun', symbolique: 'Gaité, Energie', durete: 8, notes: 'Pierre de soin' },
-        'Aigue-Marine': { surnom: 'Llyrite', couleur: 'Bleu pâle', zodiac: 'Dauphins/Tortue/Sirène/Nuage/Ourlarque/Epée/Papillon/Epée', divin: 'Llyr, Tannun, Ulfer', symbolique: 'Sensibilité, Persévérance', durete: 8, notes: 'Protège les marins' },
-        'Améthyste': { surnom: 'Pérunite', couleur: 'Violet', zodiac: 'Phénix/Ourlarque/Licorne/Epée/Sirène/Nuage/Dauphins/Cerf', divin: 'Perun, Arcton, Ninmah', symbolique: 'Sagesse, Equilibre', durete: 7, notes: 'Pierre d\'apaisement, protège des poisons' },
-        'Grenat': { surnom: 'Usilite', couleur: 'Rouge/Pourpre/Violet', zodiac: 'Ourlarque/Sirène/Tortue/Phénix/Epée', divin: 'Usil', symbolique: 'Force, Charisme', durete: 7, notes: 'Pierre d\'armure, Pierre de lumière' },
-        'Péridot': { surnom: 'Turmite', couleur: 'Vert', zodiac: 'Tortue/Cerf/Paon/Epée/Sirène/Ourlarque', divin: 'Turina', symbolique: 'Equilibre, Fidélité, Chance', durete: 7, notes: 'Pierre de la paladin Pierre de protection' },
-        'Cyanite': { surnom: '', couleur: 'Bleu', zodiac: 'Epée/Ourlarque/Tortue/Phénix/Dauphins/Cerf/Licorne', divin: 'Shua', symbolique: 'Dextérité, Paix', durete: '4-6+', notes: 'Sort de boussole' },
-        'Citrine': { surnom: '', couleur: 'Jaune', zodiac: 'Papillon/Paon/Ourlarque/Nuage/Sirène/Epée', divin: 'Thalma, Arcton', symbolique: 'Vitalité, Joie, Arts', durete: 7, notes: 'Pierre de lumière, protection contre le vent' },
-        'Pierre de Lune': { surnom: 'Tilvrite', couleur: 'Lait et reflets bleus', zodiac: 'Ecrevisse/Papillon/Dauphins/Epée/Sirène/Tortue/Nuage/Ourlarque', divin: 'Tilvir, Darona', symbolique: 'Imagination, Pureté', durete: '6+', notes: '"Œil de poisson", Pierre de pluie' },
-        'Pierre de Soleil': { surnom: 'Atonarite', couleur: 'Doré pailleté', zodiac: 'Paon/Sirène/Licorne', divin: 'Atonar, Palustris', symbolique: 'Richesse, Jouvence', durete: '6+', notes: 'Pierre d\'orientation, Pierre de lumière' },
-        'Tourmaline': { surnom: '', couleur: 'Rose/Vert/Bleu/Noir', zodiac: 'Tortue/Ourlarque/Papillon/Tortue/Cerf/Ecrevisse', divin: 'Turan', symbolique: 'Quiétude, Protection', durete: '7+', notes: 'Pierre électrique, Pierre de bouclier' },
-        'Aventurine': { surnom: 'Pierre du destin', couleur: 'Vert', zodiac: 'Cerf/Papillon/Phénix/Epée/Ecrevisse', divin: 'Usil, Narax', symbolique: 'Harmonie, Prospérité', durete: '6+', notes: 'Pierre de chance' },
-        'Turquoise': { surnom: 'Pierre des dieux', couleur: 'Bleu-vert', zodiac: 'Phénix/Nuage/Dauphins/Cerf/Sirène/Epée/Tortue', divin: 'Perun, Thalma, Weru', symbolique: 'Communication, Energie', durete: '5+', notes: 'Pierre de piété, Protège les voyageurs' },
-        'Œil de loup (Chrysobéryl)': { surnom: 'Ulférite', couleur: 'Jaune-doré', zodiac: 'Tortue/Epée', divin: 'Ulfer', symbolique: 'Sang-froid, Abondance', durete: '8+', notes: 'Protège les survivants' },
-        'Œil de taureau (Quartz brun)': { surnom: '', couleur: 'Jaune-rouge', zodiac: 'Cerf', divin: 'Turan, Ulfer, Ninmah', symbolique: 'Courage, Fermeté', durete: 7, notes: 'Apporte le succès et aux sports' },
-        'Œil de tigre (Quartz brun)': { surnom: '', couleur: 'Orange', zodiac: 'Paon/Papillon/Ecrevisse/Epée/Tortue/Licorne/Cerf/Papillon', divin: 'Narax, Arcton, Weru, Laran', symbolique: 'Liberté, Largesse', durete: 7, notes: 'Protège les guerriers' },
-        'Œil de faucon (Quartz bleu)': { surnom: '', couleur: 'Gris-bleu', zodiac: 'Papillon/Nuage/Ourlarque/', divin: 'Thalma, Palustris, Narax', symbolique: 'Empathie, Evolution', durete: 7, notes: 'Pierre de vision, Pierre de protection' },
-        'Quartz fumé': { surnom: '', couleur: 'Brun', zodiac: 'Ourlarque/Sirène/Tortue/Epée/Phénix', divin: 'Usil, Voltumna, Narax', symbolique: 'Eveil, Volonté', durete: 7, notes: 'Pierre de protection, Pierre de clairvoyance' },
-        'Rhodite (Quartz rose)': { surnom: 'Pierre du cœur', couleur: 'Rose', zodiac: 'Cerf/Epée/Nuage/Ourlarque', divin: 'Turan, Tannun', symbolique: 'Calme, Tendresse', durete: 7, notes: 'Pierre d\'amour, Pierre de beauté' },
-        'Cristal (Quartz incolore)': { surnom: '', couleur: 'Incolore', zodiac: 'Ourlarque', divin: 'Usil, Darona, Palustris', symbolique: 'Clairvoyance, Méditatif', durete: 7, notes: 'Amplificateur' },
-        'Lapis Lazuli': { surnom: 'Pierre de vérité', couleur: 'Bleu', zodiac: 'Nuage/Licorne/Papillon/Paon/Epée/Tortue/Phénix/Dauphins/Cerf', divin: 'Weru, Ulfer', symbolique: 'Honnêteté, Intuition', durete: '5+', notes: 'Pierre d\'amitié' },
-        'Jais (Jaspe noir)': { surnom: '', couleur: 'Noir', zodiac: 'Ourlarque/Paon/Tortue', divin: 'Llyr, Voltumna, Guyona', symbolique: 'Durisme, Maîtrise', durete: '6-', notes: 'Pierre des ténèbres, Pierre des secrets' },
-        'Onyxline (Jaspe rouge)': { surnom: 'Corne', couleur: 'Rouge/Orange', zodiac: 'Sirène/Cerf/Tortue/Ecrevisse/Licorne/Paon/Epée', divin: 'Gibil, Arcton', symbolique: 'Vitalité, Initiative', durete: '6+', notes: 'Pierre de résilience' },
-        'Chrysoprase (Jaspe vert)': { surnom: '', couleur: 'Vert', zodiac: 'Cerf/Epée/Ecrevisse', divin: 'Guyona', symbolique: 'Compassion, Clairvoyance', durete: '6+', notes: 'Pierre de sceau, protège du venin, Invisibilité' },
-        'Sardoine (Jaspe brun)': { surnom: '', couleur: 'Brun-fauve', zodiac: 'Licorne/Tortue/Cerf/sirène', divin: 'Laran, Usil, Suvix', symbolique: 'Protection, Courage', durete: '6+', notes: 'Pierre de guérison' },
-        'Agate (Jaspe multicolore)': { surnom: 'Aurore', couleur: 'Marron/Bleu/Blanc/Rouge', zodiac: 'Papillon/Cerf/Dauphins/Ecrevisse/Epée/Nuage', divin: 'Thalma, Ulfer', symbolique: 'Curiosité, Adaptabilité', durete: '6+', notes: 'Pierre de bonheur, Pierre de paix' },
-        'Obsidienne': { surnom: '', couleur: 'Multicolore', zodiac: 'Epée/Tortue/Ecrevisse/Sirène/Papillon/Paon/Phénix/Nuage', divin: 'Atonar, Turan, Shua', symbolique: 'Espoir, Beauté, Arts', durete: 6, notes: 'Pierre de prémonition' },
-        'Serpentine': { surnom: 'Laranite', couleur: 'Vert', zodiac: 'Sirène/Epée/Phénix/Ourlarque', divin: 'Laran, Usil, Voltumna', symbolique: 'Introspection, Occultisme', durete: '5+', notes: 'Pierre de siège, Pierre de sceaux, combustible' },
-        'Malachite': { surnom: '', couleur: 'Vert écaillé', zodiac: 'Tortue/Papillon/Sirène/Dauphins', divin: 'Guyona, Llyr', symbolique: 'Guérison, Force', durete: '2+ à 4', notes: 'Pierre de sceau, talisman, Pierre des rêves' },
-        'Hématite': { surnom: '', couleur: 'Vert sombre', zodiac: 'Paon/Sirène/Phénix/Epée', divin: 'Tannun', symbolique: 'Protection, Jouvence', durete: 4, notes: 'Protège les voyageurs et enfants, Pierre de fer' },
-        'Perle': { surnom: 'Larmes de Llyr', couleur: 'Blanc/Rose/Bleu/Noir', zodiac: 'Ecrevisse/Papillon/Epée/Dauphins', divin: 'Tilvir, Perun, Turan, Darona', symbolique: 'Douceur, Pureté', durete: 3, notes: 'Parreux, pigment rouge' },
-        'Ambre': { surnom: 'Larmes d\'Atona', couleur: 'Orange', zodiac: 'Paon/Cerf/Papillon/Ecrevisse/Tortue', divin: 'Atonar', symbolique: 'Sérénité, Sagesse', durete: '2+', notes: 'Pierre électrique, combustible' },
-        'Corail': { surnom: 'Sang de basaltik', couleur: 'Blanc/Jaune/Orange/Rouge/', zodiac: 'Dauphins/Cerf/Ecrevisse', divin: 'Llyr, Ninmah, Guyona', symbolique: 'Vigueur, Fertilité', durete: '3+', notes: 'Pierre de protection, Pierre magique' },
-        'Jais': { surnom: 'Thanrite', couleur: 'Noir', zodiac: 'Ourlarque/Ecrevisse/Nuage', divin: 'Voltumna, Suvix', symbolique: 'Richesse, Spiritualité', durete: '2-4', notes: 'Pierre de protection, Pierre de deuil, combustible' },
-        'Nacre': { surnom: '', couleur: 'Nacre', zodiac: 'Ecrevisse/Sirène/Nuage', divin: 'Tilvir, Llyr, Ninmah', symbolique: 'Douceur, Intuition', durete: '2-4', notes: 'Pierre d\'apaisement' },
-        'Ecaille': { surnom: '', couleur: 'Vert/Brun/Blanc', zodiac: 'Tortue/Ecrevisse/Sirène/Dauphins', divin: 'Thalma, Llyr, Tannun', symbolique: 'Longévité, Sagesse', durete: '2+', notes: 'Pierre d\'endurance' }
-      };
-      
-      // Ajouter les monnaies
-      Object.entries(window.monnaies.pieces).forEach(([name, value]) => {
-        allItems.push({
-          name: name,
-          value: value,
-          category: 'pieces',
-          categoryLabel: 'Monnaie',
-          rarity: getMonnaieRarity(value),
-          type: 'Métallique',
-          usage: getUsageFrequency(name)
+      // Charger les monnaies
+      if (window.monnaies && window.monnaies.pieces) {
+        Object.entries(window.monnaies.pieces).forEach(([name, value]) => {
+          allData.push({
+            id: `pieces_${name}`,
+            name: name,
+            category: 'pieces',
+            categoryLabel: 'Monnaie',
+            value: value,
+            unit: 'PM',
+            type: 'Métallique',
+            rarity: getMonnaieRarity(value),
+            usage: getUsageFrequency(name),
+            searchableText: `${name} monnaie métallique PM`
+          });
         });
-      });
-      
-      // Ajouter les gemmes avec vraies informations
-      Object.entries(window.monnaies.gemmes).forEach(([name, value]) => {
-        const info = gemmeInfo[name] || { 
-          surnom: '', couleur: 'Inconnue', zodiac: '', divin: '', 
-          symbolique: '', durete: 0, notes: '' 
-        };
-        
-        allItems.push({
-          name: name,
-          value: value,
-          category: 'gemmes',
-          categoryLabel: 'Gemme',
-          rarity: getGemmeRarity(value),
-          type: info.couleur,
-          surnom: info.surnom,
-          zodiac: info.zodiac,
-          divin: info.divin,
-          symbolique: info.symbolique,
-          durete: info.durete,
-          notes: info.notes
+      }
+
+      // Charger les gemmes avec détails complets
+      if (window.gemmesDetaillees) {
+        Object.entries(window.gemmesDetaillees).forEach(([name, details]) => {
+          const searchText = `${name} ${details.surnom || ''} ${details.couleur} ${details.symbolique} ${details.notes} ${details.lienDivin} ${details.lienZodiacal}`.toLowerCase();
+          
+          allData.push({
+            id: `gemmes_${name}`,
+            name: name,
+            category: 'gemmes',
+            categoryLabel: 'Gemme',
+            value: details.valeur,
+            unit: 'PM',
+            type: details.couleur,
+            rarity: getGemmeRarity(details.valeur),
+            surnom: details.surnom,
+            couleur: details.couleur,
+            durete: details.durete,
+            symbolique: details.symbolique,
+            lienDivin: details.lienDivin,
+            lienZodiacal: details.lienZodiacal,
+            notes: details.notes,
+            searchableText: searchText
+          });
         });
-      });
-      
-      filteredData = [...allItems];
-    }
-
-    // ===== GESTION DES ONGLETS =====
-    function switchCatalogTab(tabName) {
-      // Désactiver tous les onglets
-      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-      // Activer l'onglet sélectionné
-      const tabButton = document.querySelector(`[onclick="switchCatalogTab('${tabName}')"]`);
-      const tabContent = document.getElementById(`tab-${tabName}`);
-      
-      if (tabButton && tabContent) {
-        tabButton.classList.add('active');
-        tabContent.classList.add('active');
-        currentCatalogTab = tabName;
-        
-        if (tabName === 'comparison') {
-          generateComparison();
-        }
       }
-    }
 
-    // ===== POPULATION DES TABLEAUX =====
-    function populateAllTables() {
-      populateCatalogTable();
-      populatePiecesTable();
-      populateGemmesTable();
-    }
-
-    function populateCatalogTable() {
-      const tbody = document.getElementById('catalogTableBody');
-      tbody.innerHTML = '';
-      
-      filteredData.forEach(item => {
-        const row = tbody.insertRow();
-        
-        // Colonne nom avec surnom si disponible
-        const nameCell = item.surnom ? 
-          `<strong>${item.name}</strong><br><small><em>${item.surnom}</em></small>` : 
-          `<strong>${item.name}</strong>`;
-        
-        row.innerHTML = `
-          <td>${nameCell}</td>
-          <td><span class="category-badge ${item.category}">${item.categoryLabel}</span></td>
-          <td>${item.value.toFixed(item.category === 'pieces' ? 4 : 2)}</td>
-          <td><span class="rarity-badge ${item.rarity.toLowerCase().replace(' ', '-')}">${item.rarity}</span></td>
-          <td>
-            <button onclick="showItemDetail('${item.name}', '${item.category}')" class="btn-action btn-load btn-small">
-              👁️
-            </button>
-          </td>
-        `;
-      });
-      
-      document.getElementById('visibleCount').textContent = filteredData.length;
-    }
-
-    function populatePiecesTable() {
-      const tbody = document.getElementById('piecesTableBody');
-      tbody.innerHTML = '';
-      
-      const goldValue = window.monnaies.pieces['Or'] || 1;
-      const pieces = Object.entries(window.monnaies.pieces)
-        .sort(([,a], [,b]) => b - a);
-      
-      pieces.forEach(([name, value]) => {
-        const ratio = (value / goldValue).toFixed(2);
-        const pieceData = allItems.find(item => item.name === name && item.category === 'pieces');
-        const usage = pieceData ? pieceData.usage : 'Rare';
-        
-        const row = tbody.insertRow();
-        row.innerHTML = `
-          <td><strong>${name}</strong></td>
-          <td>${value.toFixed(4)}</td>
-          <td>${ratio}×</td>
-          <td><span class="usage-badge ${usage.toLowerCase()}">${usage}</span></td>
-        `;
-      });
-      
-      document.getElementById('piecesCount').textContent = pieces.length;
-    }
-
-    function populateGemmesTable() {
-      const tbody = document.getElementById('gemmesTableBody');
-      tbody.innerHTML = '';
-      
-      const gemmes = Object.entries(window.monnaies.gemmes)
-        .sort(([,a], [,b]) => b - a);
-      
-      gemmes.forEach(([name, value]) => {
-        const gemmeData = allItems.find(item => item.name === name && item.category === 'gemmes');
-        const rarity = gemmeData ? gemmeData.rarity : 'Commune';
-        const couleur = gemmeData ? gemmeData.type : 'Inconnue';
-        
-        const nameWithSurname = gemmeData && gemmeData.surnom ? 
-          `<strong>${name}</strong><br><small><em>${gemmeData.surnom}</em></small>` : 
-          `<strong>${name}</strong>`;
-        
-        const row = tbody.insertRow();
-        row.innerHTML = `
-          <td>${nameWithSurname}</td>
-          <td>${value.toFixed(2)}</td>
-          <td><span class="rarity-badge ${rarity.toLowerCase().replace(' ', '-')}">${rarity}</span></td>
-          <td><span class="color-badge">${couleur}</span></td>
-        `;
-      });
-      
-      document.getElementById('gemmesCount').textContent = gemmes.length;
-    }
-
-    // ===== SYSTÈME DE FILTRES =====
-    function applyFilters() {
-      const categoryFilter = document.getElementById('categoryFilter').value;
-      const sortOrder = document.getElementById('sortOrder').value;
-      const valueRange = document.getElementById('valueRange').value;
-      const searchQuery = document.getElementById('searchInput').value.toLowerCase();
-      
-      // Filtrer les données
-      filteredData = allItems.filter(item => {
-        // Filtre par catégorie
-        if (categoryFilter && item.category !== categoryFilter) return false;
-        
-        // Filtre par recherche
-        if (searchQuery && !item.name.toLowerCase().includes(searchQuery)) return false;
-        
-        // Filtre par plage de valeur
-        if (valueRange) {
-          const [min, max] = valueRange.split('-').map(v => v === '' ? Infinity : parseFloat(v.replace('+', '')));
-          if (valueRange.includes('+')) {
-            if (item.value < min) return false;
-          } else {
-            if (item.value < min || item.value > max) return false;
-          }
-        }
-        
-        return true;
-      });
-      
-      // Trier les données
-      filteredData.sort((a, b) => {
-        switch (sortOrder) {
-          case 'value-desc': return b.value - a.value;
-          case 'value-asc': return a.value - b.value;
-          case 'name-asc': return a.name.localeCompare(b.name);
-          case 'name-desc': return b.name.localeCompare(a.name);
-          default: return 0;
-        }
-      });
-      
-      // Mettre à jour l'affichage
-      populateCatalogTable();
-      updateFilterStatus();
-    }
-
-    function clearFilters() {
-      document.getElementById('categoryFilter').value = '';
-      document.getElementById('sortOrder').value = 'value-desc';
-      document.getElementById('valueRange').value = '';
-      document.getElementById('searchInput').value = '';
-      
-      applyFilters();
-      showNotification('🗑️ Filtres effacés');
-    }
-
-    function updateFilterStatus() {
-      const activeFilters = [
-        document.getElementById('categoryFilter').value,
-        document.getElementById('valueRange').value,
-        document.getElementById('searchInput').value
-      ].filter(v => v).length;
-      
-      document.getElementById('activeFilters').textContent = activeFilters;
-      document.getElementById('visibleItems').textContent = filteredData.length;
-      
-      if (document.getElementById('searchInput').value) {
-        document.getElementById('lastSearch').textContent = document.getElementById('searchInput').value;
+      // Charger les objets avec poids
+      if (window.monnaies && window.monnaies.poids) {
+        Object.entries(window.monnaies.poids).forEach(([categorie, objets]) => {
+          Object.entries(objets).forEach(([name, poids]) => {
+            allData.push({
+              id: `poids_${name}`,
+              name: name,
+              category: 'poids',
+              categoryLabel: 'Objet',
+              value: poids,
+              unit: 'kg',
+              type: categorie,
+              rarity: 'Commun',
+              searchableText: `${name} ${categorie} poids objet kg`.toLowerCase()
+            });
+          });
+        });
       }
+
+      filteredData = [...allData];
+      populateColorFilter();
     }
 
-    // ===== FONCTIONS UTILITAIRES =====
+    // ===== UTILITAIRES =====
     function getMonnaieRarity(value) {
-      if (value > 2) return 'Très rare';
-      if (value > 1) return 'Rare';
-      if (value > 0.1) return 'Commune';
-      if (value > 0.01) return 'Fréquente';
-      return 'Basique';
+      if (value >= 3) return 'Très Rare';
+      if (value >= 1) return 'Rare';
+      if (value >= 0.1) return 'Commune';
+      return 'Fréquente';
     }
 
     function getGemmeRarity(value) {
-      if (value > 80) return 'Légendaire';
-      if (value > 50) return 'Très rare';
-      if (value > 20) return 'Rare';
-      if (value > 5) return 'Peu commune';
-      if (value > 1) return 'Commune';
+      if (value >= 100) return 'Légendaire';
+      if (value >= 50) return 'Très Rare';
+      if (value >= 20) return 'Rare';
+      if (value >= 5) return 'Peu Commune';
+      if (value >= 1) return 'Commune';
       return 'Fréquente';
     }
 
     function getUsageFrequency(name) {
       const frequent = ['Or', 'Argent', 'Fer'];
-      const occasionnel = ['Platine', 'Électrum', 'Cuivre'];
-      
+      const occasionnel = ['Platine', 'Électrum'];
       if (frequent.includes(name)) return 'Fréquent';
       if (occasionnel.includes(name)) return 'Occasionnel';
       return 'Rare';
     }
 
-    // ===== MODAL DE DÉTAILS =====
-    function showItemDetail(name, category) {
-      const item = allItems.find(i => i.name === name && i.category === category);
-      if (!item) return;
+    // ===== POPULATION DES FILTRES =====
+    function populateColorFilter() {
+      const colorSelect = document.getElementById('colorFilter');
+      const colors = new Set();
       
-      document.getElementById('itemDetailName').textContent = `Détails: ${name}`;
-      
-      const content = document.getElementById('itemDetailContent');
-      content.innerHTML = `
-        <div class="detail-grid">
-          <div class="detail-section">
-            <h4>Informations Générales</h4>
-            <p><strong>Nom:</strong> ${item.name}</p>
-            <p><strong>Catégorie:</strong> ${item.categoryLabel}</p>
-            <p><strong>Type:</strong> ${item.type}</p>
-            <p><strong>Rareté:</strong> ${item.rarity}</p>
-          </div>
-          
-          <div class="detail-section">
-            <h4>Valeur et Équivalences</h4>
-            <p><strong>Valeur:</strong> ${item.value.toFixed(item.category === 'pieces' ? 4 : 2)} PM</p>
-            <p><strong>En Or:</strong> ${(item.value / (window.monnaies.pieces['Or'] || 1)).toFixed(2)} pièces</p>
-            <p><strong>En Argent:</strong> ${(item.value / (window.monnaies.pieces['Argent'] || 1)).toFixed(2)} pièces</p>
-          </div>
-          
-          <div class="detail-section">
-            <h4>Statistiques</h4>
-            <p><strong>Rang par valeur:</strong> ${getRankByValue(item)} / ${allItems.length}</p>
-            <p><strong>Percentile:</strong> ${getPercentile(item)}%</p>
-            <p><strong>Usage recommandé:</strong> ${getRecommendedUsage(item)}</p>
-          </div>
-        </div>
-      `;
-      
-      document.getElementById('itemDetailModal').classList.add('active');
-    }
-
-    function closeItemDetail() {
-      document.getElementById('itemDetailModal').classList.remove('active');
-    }
-
-    function getRankByValue(item) {
-      const sorted = [...allItems].sort((a, b) => b.value - a.value);
-      return sorted.findIndex(i => i.name === item.name && i.category === item.category) + 1;
-    }
-
-    function getPercentile(item) {
-      const rank = getRankByValue(item);
-      return Math.round((1 - rank / allItems.length) * 100);
-    }
-
-    function getRecommendedUsage(item) {
-      if (item.value > 50) return 'Transactions importantes, objets magiques';
-      if (item.value > 10) return 'Commerce de luxe, équipements rares';
-      if (item.value > 1) return 'Commerce quotidien, services';
-      return 'Petites transactions, monnaie d\'appoint';
-    }
-
-    // ===== COMPARAISON ET ANALYSE =====
-    function generateComparison() {
-      generateValueDistribution();
-      generateTopItems();
-      generateEquivalences();
-    }
-
-    function generateValueDistribution() {
-      const container = document.getElementById('valueDistribution');
-      const ranges = [
-        { label: '0-1 PM', min: 0, max: 1, count: 0 },
-        { label: '1-10 PM', min: 1, max: 10, count: 0 },
-        { label: '10-50 PM', min: 10, max: 50, count: 0 },
-        { label: '50+ PM', min: 50, max: Infinity, count: 0 }
-      ];
-      
-      allItems.forEach(item => {
-        ranges.forEach(range => {
-          if (item.value >= range.min && item.value < range.max) {
-            range.count++;
-          }
-        });
+      allData.forEach(item => {
+        if (item.couleur) {
+          item.couleur.split('/').forEach(color => {
+            colors.add(color.trim());
+          });
+        }
       });
       
-      const maxCount = Math.max(...ranges.map(r => r.count));
+      Array.from(colors).sort().forEach(color => {
+        const option = document.createElement('option');
+        option.value = color;
+        option.textContent = color;
+        colorSelect.appendChild(option);
+      });
+    }
+
+    // ===== ÉVÉNEMENTS =====
+    function setupEventListeners() {
+      // Recherche avec debounce
+      document.getElementById('globalSearch').addEventListener('input', function(e) {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          applyFilters();
+        }, 300);
+      });
+
+      // Filtres instantanés
+      ['categoryFilter', 'sortFilter', 'colorFilter', 'hardnessFilter'].forEach(id => {
+        document.getElementById(id).addEventListener('change', applyFilters);
+      });
+
+      // Filtres de valeur avec debounce
+      ['minValue', 'maxValue', 'propertyFilter'].forEach(id => {
+        document.getElementById(id).addEventListener('input', function() {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(applyFilters, 500);
+        });
+      });
+    }
+
+    // ===== FILTRAGE =====
+    function applyFilters() {
+      const searchTerm = document.getElementById('globalSearch').value.toLowerCase();
+      const category = document.getElementById('categoryFilter').value;
+      const color = document.getElementById('colorFilter').value;
+      const hardness = document.getElementById('hardnessFilter').value;
+      const property = document.getElementById('propertyFilter').value.toLowerCase();
+      const minVal = parseFloat(document.getElementById('minValue').value) || 0;
+      const maxVal = parseFloat(document.getElementById('maxValue').value) || Infinity;
+      const sort = document.getElementById('sortFilter').value;
+
+      // Filtrer
+      filteredData = allData.filter(item => {
+        // Recherche globale
+        if (searchTerm && !item.searchableText.includes(searchTerm)) return false;
+        
+        // Catégorie
+        if (category && item.category !== category) return false;
+        
+        // Couleur
+        if (color && (!item.couleur || !item.couleur.includes(color))) return false;
+        
+        // Dureté
+        if (hardness && item.category === 'gemmes') {
+          const [min, max] = hardness.split('-').map(Number);
+          const itemHardness = parseFloat(String(item.durete).replace(/[^0-9.]/g, '')) || 0;
+          if (itemHardness < min || itemHardness > max) return false;
+        }
+        
+        // Propriétés
+        if (property && !item.searchableText.includes(property)) return false;
+        
+        // Valeur (seulement pour PM)
+        if (item.unit === 'PM' && (item.value < minVal || item.value > maxVal)) return false;
+        
+        return true;
+      });
+
+      // Trier
+      filteredData.sort((a, b) => {
+        switch (sort) {
+          case 'value-desc': return b.value - a.value;
+          case 'value-asc': return a.value - b.value;
+          case 'name-asc': return a.name.localeCompare(b.name);
+          case 'name-desc': return b.name.localeCompare(a.name);
+          case 'rarity': return getRarityWeight(b.rarity) - getRarityWeight(a.rarity);
+          default: return 0;
+        }
+      });
+
+      renderData();
+      updateStats();
+    }
+
+    function getRarityWeight(rarity) {
+      const weights = {
+        'Légendaire': 6,
+        'Très Rare': 5,
+        'Rare': 4,
+        'Peu Commune': 3,
+        'Commune': 2,
+        'Fréquente': 1,
+        'Commun': 1
+      };
+      return weights[rarity] || 0;
+    }
+
+    // ===== RENDU DES DONNÉES =====
+    function renderData() {
+      if (filteredData.length === 0) {
+        showEmptyState();
+        return;
+      }
+
+      hideEmptyState();
       
-      container.innerHTML = ranges.map(range => `
-        <div class="chart-bar">
-          <div class="bar-label">${range.label}</div>
-          <div class="bar-container">
-            <div class="bar-fill" style="width: ${(range.count / maxCount) * 100}%"></div>
-            <span class="bar-value">${range.count}</span>
+      switch (currentView) {
+        case 'cards': renderCards(); break;
+        case 'table': renderTable(); break;
+        case 'compact': renderCompact(); break;
+      }
+    }
+
+    function renderCards() {
+      const container = document.getElementById('cardsView');
+      container.innerHTML = '';
+
+      filteredData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = `item-card ${item.category}`;
+        
+        const rarityClass = item.rarity.toLowerCase().replace(/[^a-z]/g, '-');
+        const valueDisplay = `${item.value}${item.unit === 'PM' ? '' : ' kg'}`;
+        
+        card.innerHTML = `
+          <div class="card-header">
+            <h3 class="card-title">${item.name}</h3>
+            ${item.surnom ? `<div class="card-subtitle">${item.surnom}</div>` : ''}
+            <span class="category-tag ${item.category}">${item.categoryLabel}</span>
           </div>
-        </div>
-      `).join('');
-    }
-
-    function generateTopItems() {
-      const container = document.getElementById('topItems');
-      const top10 = [...allItems]
-        .sort((a, b) => b.value - a.value)
-        .slice(0, 10);
-      
-      container.innerHTML = top10.map((item, index) => `
-        <div class="top-item">
-          <span class="rank">#${index + 1}</span>
-          <span class="name">${item.name}</span>
-          <span class="category-badge ${item.category}">${item.categoryLabel}</span>
-          <span class="value">${item.value.toFixed(2)} PM</span>
-        </div>
-      `).join('');
-    }
-
-    function generateEquivalences() {
-      const container = document.getElementById('equivalences');
-      const baseValue = 100; // 100 PM de référence
-      
-      const equivalences = allItems
-        .filter(item => item.value > 0)
-        .map(item => ({
-          name: item.name,
-          category: item.category,
-          quantity: (baseValue / item.value).toFixed(2)
-        }))
-        .sort((a, b) => parseFloat(b.quantity) - parseFloat(a.quantity))
-        .slice(0, 8);
-      
-      container.innerHTML = `
-        <h4>Équivalence de ${baseValue} PM:</h4>
-        <div class="equivalence-grid">
-          ${equivalences.map(eq => `
-            <div class="equivalence-item">
-              <span class="eq-quantity">${eq.quantity}</span>
-              <span class="eq-name">${eq.name}</span>
+          
+          <div class="card-body">
+            <div class="card-value">
+              <span class="value-number">${valueDisplay}</span>
+              <span class="value-unit">${item.unit}</span>
             </div>
-          `).join('')}
-        </div>
-      `;
+            
+            <div class="card-details">
+              <div class="detail-row">
+                <span class="detail-label">Type:</span>
+                <span class="detail-value">${item.type}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Rareté:</span>
+                <span class="rarity-badge ${rarityClass}">${item.rarity}</span>
+              </div>
+              ${item.durete ? `
+                <div class="detail-row">
+                  <span class="detail-label">Dureté:</span>
+                  <span class="detail-value">${item.durete}</span>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+          
+          <div class="card-footer">
+            <button onclick="showDetail('${item.id}')" class="btn-detail">👁️ Détails</button>
+          </div>
+        `;
+        
+        container.appendChild(card);
+      });
     }
 
-    // ===== FONCTIONS D'EXPORT =====
-    function exportCatalog() {
-      const data = {
-        catalog: allItems,
-        exportDate: new Date().toISOString(),
-        version: '1.0',
-        totalItems: allItems.length
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+
+      filteredData.forEach(item => {
+        const row = tbody.insertRow();
+        const valueDisplay = item.unit === 'PM' ? `${item.value.toFixed(2)} PM` : `${item.value} kg`;
+        
+        row.innerHTML = `
+          <td>
+            <strong>${item.name}</strong>
+            ${item.surnom ? `<br><small class="text-muted">${item.surnom}</small>` : ''}
+          </td>
+          <td><span class="category-tag ${item.category}">${item.categoryLabel}</span></td>
+          <td>${valueDisplay}</td>
+          <td>${item.type}</td>
+          <td><button onclick="showDetail('${item.id}')" class="btn-detail btn-sm">👁️</button></td>
+        `;
+      });
+    }
+
+    function renderCompact() {
+      const container = document.getElementById('compactList');
+      container.innerHTML = '';
+
+      filteredData.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'compact-item';
+        
+        const valueDisplay = item.unit === 'PM' ? `${item.value.toFixed(2)} PM` : `${item.value} kg`;
+        
+        div.innerHTML = `
+          <div class="compact-main">
+            <span class="compact-name">${item.name}</span>
+            ${item.surnom ? `<span class="compact-subtitle">(${item.surnom})</span>` : ''}
+            <span class="compact-value">${valueDisplay}</span>
+          </div>
+          <button onclick="showDetail('${item.id}')" class="btn-detail btn-xs">👁️</button>
+        `;
+        
+        container.appendChild(div);
+      });
+    }
+
+    // ===== GESTION DES VUES =====
+    function setView(viewType) {
+      currentView = viewType;
+      
+      // Mettre à jour les boutons
+      document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(viewType + 'Btn').classList.add('active');
+      
+      // Masquer toutes les vues
+      ['cardsView', 'tableView', 'compactView'].forEach(id => {
+        document.getElementById(id).style.display = 'none';
+      });
+      
+      // Afficher la vue sélectionnée
+      document.getElementById(viewType + 'View').style.display = 'block';
+      
+      renderData();
+    }
+
+    // ===== MODAL DE DÉTAILS =====
+    function showDetail(itemId) {
+      const item = allData.find(i => i.id === itemId);
+      if (!item) return;
+
+      document.getElementById('modalTitle').textContent = item.name;
+      
+      const modalBody = document.getElementById('modalBody');
+      
+      if (item.category === 'gemmes') {
+        modalBody.innerHTML = `
+          <div class="detail-grid">
+            <div class="detail-section">
+              <h4>🔍 Informations Générales</h4>
+              <div class="info-row"><strong>Nom:</strong> ${item.name}</div>
+              ${item.surnom ? `<div class="info-row"><strong>Surnom:</strong> <em>"${item.surnom}"</em></div>` : ''}
+              <div class="info-row"><strong>Couleur:</strong> <span class="color-indicator">${item.couleur}</span></div>
+              <div class="info-row"><strong>Dureté:</strong> ${item.durete}</div>
+              <div class="info-row"><strong>Valeur:</strong> ${item.value} PM</div>
+            </div>
+            
+            <div class="detail-section">
+              <h4>🔮 Propriétés Mystiques</h4>
+              ${item.symbolique ? `<div class="info-row"><strong>Symbolique:</strong> ${item.symbolique}</div>` : ''}
+              ${item.lienDivin ? `<div class="info-row"><strong>Liens Divins:</strong> ${item.lienDivin}</div>` : ''}
+              ${item.lienZodiacal ? `<div class="info-row"><strong>Liens Zodiacaux:</strong> ${item.lienZodiacal}</div>` : ''}
+              ${item.notes ? `<div class="info-row"><strong>Notes:</strong> ${item.notes}</div>` : ''}
+            </div>
+          </div>
+        `;
+      } else if (item.category === 'pieces') {
+        const goldRatio = (item.value / (window.monnaies.pieces['Or'] || 1)).toFixed(2);
+        modalBody.innerHTML = `
+          <div class="detail-grid">
+            <div class="detail-section">
+              <h4>🪙 Informations Monétaires</h4>
+              <div class="info-row"><strong>Nom:</strong> ${item.name}</div>
+              <div class="info-row"><strong>Type:</strong> ${item.type}</div>
+              <div class="info-row"><strong>Valeur:</strong> ${item.value.toFixed(4)} PM</div>
+              <div class="info-row"><strong>Ratio à l'Or:</strong> ${goldRatio}×</div>
+              <div class="info-row"><strong>Usage:</strong> ${item.usage}</div>
+            </div>
+          </div>
+        `;
+      } else {
+        modalBody.innerHTML = `
+          <div class="detail-grid">
+            <div class="detail-section">
+              <h4>⚖️ Informations Objet</h4>
+              <div class="info-row"><strong>Nom:</strong> ${item.name}</div>
+              <div class="info-row"><strong>Catégorie:</strong> ${item.type}</div>
+              <div class="info-row"><strong>Poids:</strong> ${item.value} kg</div>
+            </div>
+          </div>
+        `;
+      }
+      
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function closeDetail() {
+      document.getElementById('detailModal').classList.remove('active');
+    }
+
+    // ===== UTILITAIRES INTERFACE =====
+    function toggleAdvanced() {
+      const panel = document.getElementById('advancedPanel');
+      const btn = document.getElementById('advancedBtn');
+      
+      if (panel.style.display === 'none') {
+        panel.style.display = 'block';
+        btn.textContent = '⚙️ Masquer';
+      } else {
+        panel.style.display = 'none';
+        btn.textContent = '⚙️ Filtres';
+      }
+    }
+
+    function resetFilters() {
+      document.getElementById('globalSearch').value = '';
+      document.getElementById('categoryFilter').value = '';
+      document.getElementById('sortFilter').value = 'value-desc';
+      document.getElementById('colorFilter').value = '';
+      document.getElementById('hardnessFilter').value = '';
+      document.getElementById('propertyFilter').value = '';
+      document.getElementById('minValue').value = '';
+      document.getElementById('maxValue').value = '';
+      
+      applyFilters();
+      showNotification('🔄 Filtres réinitialisés');
+    }
+
+    function showEmptyState() {
+      document.getElementById('resultsContainer').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'block';
+    }
+
+    function hideEmptyState() {
+      document.getElementById('resultsContainer').style.display = 'block';
+      document.getElementById('emptyState').style.display = 'none';
+    }
+
+    function updateStats() {
+      document.getElementById('totalCount').textContent = allData.length;
+      document.getElementById('visibleCount').textContent = filteredData.length;
+      
+      const valuableItems = filteredData.filter(item => item.unit === 'PM');
+      if (valuableItems.length > 0) {
+        const maxVal = Math.max(...valuableItems.map(item => item.value));
+        const avgVal = valuableItems.reduce((sum, item) => sum + item.value, 0) / valuableItems.length;
+        
+        document.getElementById('maxValue').textContent = maxVal.toFixed(2);
+        document.getElementById('avgValue').textContent = avgVal.toFixed(2);
+      } else {
+        document.getElementById('maxValue').textContent = '0';
+        document.getElementById('avgValue').textContent = '0';
+      }
+    }
+
+    // ===== EXPORT ET UTILITAIRES =====
+    function exportData() {
+      const exportData = {
+        timestamp: new Date().toISOString(),
+        total: allData.length,
+        filtered: filteredData.length,
+        data: filteredData
       };
       
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.style.display = 'none';
       a.href = url;
-      a.download = `catalogue_complet_${new Date().toISOString().slice(0, 10)}.json`;
-      
-      document.body.appendChild(a);
+      a.download = `catalogue_${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
-      document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      showNotification('💾 Catalogue exporté avec succès');
+      showNotification('💾 Données exportées');
     }
 
-    function printCatalog() {
-      window.print();
+    function copyDetails() {
+      const content = document.getElementById('modalBody').textContent;
+      navigator.clipboard.writeText(content).then(() => {
+        showNotification('📋 Détails copiés');
+      });
     }
 
-    function addToPersonalInventory() {
-      showNotification('➕ Fonctionnalité en développement');
-    }
-
-    function copyItemInfo() {
-      showNotification('📋 Informations copiées');
-    }
-
-    // ===== STATISTIQUES =====
-    function updateStatistics() {
-      const pieces = allItems.filter(item => item.category === 'pieces');
-      const gemmes = allItems.filter(item => item.category === 'gemmes');
-      
-      // Statistiques générales
-      document.getElementById('totalItems').textContent = allItems.length;
-      document.getElementById('totalMonnaies').textContent = pieces.length;
-      document.getElementById('totalGemmes').textContent = gemmes.length;
-      document.getElementById('maxValue').textContent = Math.max(...allItems.map(i => i.value)).toFixed(2);
-      
-      // Statistiques des monnaies
-      const piecesValues = pieces.map(p => p.value);
-      document.getElementById('statMonnaiesCount').textContent = pieces.length;
-      document.getElementById('statMonnaiesAvg').textContent = (piecesValues.reduce((a, b) => a + b, 0) / piecesValues.length).toFixed(4);
-      document.getElementById('statMonnaiesMedian').textContent = getMedian(piecesValues).toFixed(4);
-      
-      const maxPiece = pieces.reduce((max, p) => p.value > max.value ? p : max, pieces[0]);
-      document.getElementById('statMonnaiesMax').textContent = maxPiece ? maxPiece.name : '-';
-      
-      // Statistiques des gemmes
-      const gemmesValues = gemmes.map(g => g.value);
-      document.getElementById('statGemmesCount').textContent = gemmes.length;
-      document.getElementById('statGemmesAvg').textContent = (gemmesValues.reduce((a, b) => a + b, 0) / gemmesValues.length).toFixed(2);
-      document.getElementById('statGemmesMedian').textContent = getMedian(gemmesValues).toFixed(2);
-      
-      const maxGemme = gemmes.reduce((max, g) => g.value > max.value ? g : max, gemmes[0]);
-      document.getElementById('statGemmesMax').textContent = maxGemme ? maxGemme.name : '-';
-      
-      // Distribution par valeur
-      const allValues = allItems.map(i => i.value);
-      document.getElementById('statLow').textContent = allValues.filter(v => v < 1).length;
-      document.getElementById('statMedium').textContent = allValues.filter(v => v >= 1 && v < 10).length;
-      document.getElementById('statHigh').textContent = allValues.filter(v => v >= 10 && v < 50).length;
-      document.getElementById('statVeryHigh').textContent = allValues.filter(v => v >= 50).length;
-      
-      // Statut d'utilisation
-      document.getElementById('visibleItems').textContent = filteredData.length;
-      document.getElementById('exportStatus').textContent = 'Disponible';
-    }
-
-    function getMedian(values) {
-      const sorted = [...values].sort((a, b) => a - b);
-      const mid = Math.floor(sorted.length / 2);
-      return sorted.length % 2 === 0 
-        ? (sorted[mid - 1] + sorted[mid]) / 2 
-        : sorted[mid];
-    }
-
-    // ===== NOTIFICATIONS =====
     function showNotification(message) {
       const notification = document.createElement('div');
+      notification.className = 'notification';
       notification.textContent = message;
-      notification.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 10000;
-        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
-        color: white; padding: 15px 25px; border-radius: 8px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        font-family: "Quattrocento Sans", Arial, sans-serif;
-        font-weight: bold; font-size: 14px;
-        border: 2px solid #228B22;
-        animation: slideIn 0.3s ease;
-      `;
-      
       document.body.appendChild(notification);
       
       setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
+        notification.classList.add('show');
+      }, 100);
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);
       }, 3000);
     }
 
     // ===== EXPOSITION DES FONCTIONS =====
-    window.switchCatalogTab = switchCatalogTab;
-    window.applyFilters = applyFilters;
-    window.clearFilters = clearFilters;
-    window.showItemDetail = showItemDetail;
-    window.closeItemDetail = closeItemDetail;
-    window.generateComparison = generateComparison;
-    window.exportCatalog = exportCatalog;
-    window.printCatalog = printCatalog;
-    window.addToPersonalInventory = addToPersonalInventory;
-    window.copyItemInfo = copyItemInfo;
+    window.setView = setView;
+    window.toggleAdvanced = toggleAdvanced;
+    window.resetFilters = resetFilters;
+    window.showDetail = showDetail;
+    window.closeDetail = closeDetail;
+    window.exportData = exportData;
+    window.copyDetails = copyDetails;
   </script>
 
-  <!-- Styles supplémentaires pour la liste -->
+  <!-- Styles optimisés -->
   <style>
-    /* Statistiques rapides */
-    .quick-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
+    /* Variables CSS optimisées */
+    :root {
+      --primary-color: #2C5F2D;
+      --secondary-color: #97BC62;
+      --accent-color: #D4A574;
+      --text-color: #2F1B14;
+      --bg-color: #FAF9F7;
+      --card-bg: #FFFFFF;
+      --border-color: #E5E5E5;
+      --shadow: 0 2px 8px rgba(0,0,0,0.1);
+      --shadow-hover: 0 4px 16px rgba(0,0,0,0.15);
+      --radius: 8px;
+      --transition: all 0.3s ease;
     }
 
-    .stat-item {
-      background: linear-gradient(135deg, var(--accent-gold) 0%, #F4E07A 100%);
-      padding: 15px;
-      border-radius: var(--border-radius);
+    /* Reset et base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    /* Layout principal */
+    .content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    /* En-tête */
+    .page-header {
       text-align: center;
-      border: 2px solid var(--accent-gold);
-      color: var(--primary-dark);
+      margin-bottom: 2rem;
+      padding: 2rem 0;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
 
-    .stat-number {
-      display: block;
-      font-size: 1.8rem;
+    .page-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* Contrôles et stats */
+    .controls-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .controls-header h2 {
+      color: var(--primary-color);
+      font-size: 1.5rem;
+    }
+
+    .controls-right {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-action {
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--accent-color);
+      color: white;
       font-weight: bold;
-      font-family: var(--font-title);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.9rem;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .btn-secondary {
+      background: var(--border-color);
+      color: var(--text-color);
+    }
+
+    /* Statistiques */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
     }
 
     .stat-label {
       font-size: 0.9rem;
+      color: var(--text-color);
+      opacity: 0.7;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      opacity: 0.8;
+    }
+
+    /* Panneau de recherche */
+    .search-panel {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .search-main {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .search-input-main {
+      width: 100%;
+      padding: 1rem;
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius);
+      font-size: 1.1rem;
+      transition: var(--transition);
+    }
+
+    .search-input-main:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(151, 188, 98, 0.1);
+    }
+
+    .filters-compact {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .filter-select, .filter-input {
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      background: white;
+      font-size: 0.9rem;
+    }
+
+    .btn-filter {
+      padding: 0.75rem 1.5rem;
+      border: 1px solid var(--secondary-color);
+      background: white;
+      color: var(--secondary-color);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: bold;
+    }
+
+    .btn-filter:hover {
+      background: var(--secondary-color);
+      color: white;
     }
 
     /* Filtres avancés */
-    .advanced-filters {
-      background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--content-bg) 100%);
-      padding: 25px;
-      border-radius: var(--border-radius);
+    .advanced-panel {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      margin-top: 1rem;
       border: 1px solid var(--border-color);
     }
 
-    .filter-row {
+    .advanced-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    .search-row {
-      display: flex;
-      gap: 15px;
-      align-items: end;
-    }
-
-    .search-container {
-      flex: 1;
-      display: flex;
-      gap: 15px;
-      align-items: end;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
     }
 
     .filter-group {
@@ -985,282 +941,599 @@ const content = document.getElementById('itemDetailContent');
     }
 
     .filter-group label {
-      margin-bottom: 8px;
-      font-family: var(--font-title);
-      color: var(--primary-dark);
-      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
     }
 
-    /* Badges et indicateurs */
-    .category-badge {
-      padding: 4px 8px;
+    .range-inputs {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .range-input {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+    }
+
+    /* En-tête des résultats */
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .results-header h2 {
+      color: var(--primary-color);
+    }
+
+    .view-controls {
+      display: flex;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .view-btn {
+      padding: 0.75rem 1rem;
+      border: none;
+      background: white;
+      cursor: pointer;
+      transition: var(--transition);
+      border-right: 1px solid var(--border-color);
+    }
+
+    .view-btn:last-child {
+      border-right: none;
+    }
+
+    .view-btn.active {
+      background: var(--secondary-color);
+      color: white;
+    }
+
+    .view-btn:hover:not(.active) {
+      background: #f8f9fa;
+    }
+
+    /* Vue en cartes */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .item-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: var(--transition);
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .item-card.pieces {
+      border-left-color: #FFB347;
+    }
+
+    .item-card.gemmes {
+      border-left-color: #9370DB;
+    }
+
+    .item-card.poids {
+      border-left-color: #20B2AA;
+    }
+
+    .card-header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      color: var(--primary-color);
+      margin-bottom: 0.25rem;
+    }
+
+    .card-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-color);
+      opacity: 0.7;
+      font-style: italic;
+      margin-bottom: 0.5rem;
+    }
+
+    .category-tag {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
       border-radius: 12px;
       font-size: 0.75rem;
       font-weight: bold;
       text-transform: uppercase;
-      letter-spacing: 0.3px;
     }
 
-    .category-badge.pieces {
+    .category-tag.pieces {
       background: #FFE4B5;
-      color: #8B4513;
+      color: #D2691E;
     }
 
-    .category-badge.gemmes {
+    .category-tag.gemmes {
       background: #E6E6FA;
       color: #4B0082;
     }
 
+    .category-tag.poids {
+      background: #E0F6FF;
+      color: #008B8B;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .card-value {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .value-number {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .value-unit {
+      font-size: 0.9rem;
+      color: var(--text-color);
+      opacity: 0.7;
+      margin-left: 0.25rem;
+    }
+
+    .card-details {
+      space: 0.5rem;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.25rem 0;
+    }
+
+    .detail-label {
+      font-weight: 500;
+      color: var(--text-color);
+      opacity: 0.8;
+    }
+
+    .detail-value {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
     .rarity-badge {
-      padding: 3px 8px;
-      border-radius: 10px;
-      font-size: 0.7rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
       font-weight: bold;
       text-transform: uppercase;
     }
 
-    .rarity-badge.très-rare { background: #FFD700; color: #8B4513; }
+    .rarity-badge.légendaire { background: #FF6B6B; color: white; }
+    .rarity-badge.très-rare { background: #FFD93D; color: #8B4513; }
     .rarity-badge.rare { background: #DDA0DD; color: #4B0082; }
     .rarity-badge.peu-commune { background: #98FB98; color: #006400; }
     .rarity-badge.commune { background: #F0F8FF; color: #4682B4; }
     .rarity-badge.fréquente { background: #F5F5F5; color: #696969; }
-    .rarity-badge.basique { background: #F5F5F5; color: #696969; }
+    .rarity-badge.commun { background: #F5F5F5; color: #696969; }
 
-    .usage-badge {
-      padding: 3px 8px;
-      border-radius: 10px;
-      font-size: 0.7rem;
+    .card-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+    }
+
+    .btn-detail {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: var(--secondary-color);
+      color: white;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: var(--transition);
       font-weight: bold;
     }
 
-    .usage-badge.fréquent { background: #90EE90; color: #006400; }
-    .usage-badge.occasionnel { background: #FFE4B5; color: #FF8C00; }
-    .usage-badge.rare { background: #FFB6C1; color: #DC143C; }
-
-    .family-badge, .color-badge {
-      padding: 3px 8px;
-      border-radius: 10px;
-      font-size: 0.7rem;
-      background: #F0F8FF;
-      color: #4682B4;
-      font-weight: bold;
+    .btn-detail:hover {
+      background: var(--primary-color);
     }
 
-    /* Boutons petits */
-    .btn-small {
-      padding: 6px 10px;
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
       font-size: 0.8rem;
-      min-height: 32px;
     }
 
-    /* Résultats et compteurs */
-    .results-count {
-      font-style: italic;
-      color: var(--primary-dark);
-      font-family: var(--font-ui);
+    .btn-xs {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.75rem;
     }
 
-    /* Comparaison et graphiques */
-    .comparison-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 25px;
-    }
-
-    .comparison-section {
-      background: var(--content-bg);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
+    /* Vue tableau */
+    .table-container {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      overflow: hidden;
       box-shadow: var(--shadow);
     }
 
-    .comparison-section h3 {
-      margin-top: 0;
-      color: var(--primary-bg);
-      border-bottom: 2px solid var(--accent-gold);
-      padding-bottom: 10px;
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
     }
 
-    /* Graphique simple */
-    .chart-container {
-      margin-top: 15px;
-    }
-
-    .chart-bar {
-      margin: 10px 0;
-    }
-
-    .bar-label {
+    .results-table th {
+      background: var(--primary-color);
+      color: white;
+      padding: 1rem;
+      text-align: left;
       font-weight: bold;
-      margin-bottom: 5px;
-      color: var(--primary-dark);
     }
 
-    .bar-container {
-      position: relative;
-      height: 25px;
-      background: #f0f0f0;
-      border-radius: 4px;
+    .results-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .results-table tr:hover {
+      background: #f8f9fa;
+    }
+
+    .text-muted {
+      color: var(--text-color);
+      opacity: 0.6;
+      font-style: italic;
+    }
+
+    /* Vue compacte */
+    .compact-list {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       overflow: hidden;
     }
 
-    .bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent-gold) 0%, #F4E07A 100%);
-      transition: width 0.5s ease;
+    .compact-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-color);
+      transition: var(--transition);
     }
 
-    .bar-value {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-weight: bold;
-      color: var(--primary-dark);
-      font-size: 0.8rem;
+    .compact-item:hover {
+      background: #f8f9fa;
     }
 
-    /* Top items */
-    .top-items {
-      margin-top: 15px;
+    .compact-item:last-child {
+      border-bottom: none;
     }
 
-    .top-item {
+    .compact-main {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      margin: 5px 0;
-      background: #f8f8f8;
-      border-radius: 6px;
-      border-left: 3px solid var(--accent-gold);
-    }
-
-    .top-item .rank {
-      font-weight: bold;
-      color: var(--accent-gold);
-      min-width: 30px;
-    }
-
-    .top-item .name {
+      gap: 1rem;
       flex: 1;
+    }
+
+    .compact-name {
       font-weight: bold;
-      color: var(--primary-dark);
+      color: var(--primary-color);
     }
 
-    .top-item .value {
+    .compact-subtitle {
+      color: var(--text-color);
+      opacity: 0.7;
+      font-style: italic;
+    }
+
+    .compact-value {
       font-weight: bold;
-      color: var(--primary-bg);
+      color: var(--accent-color);
     }
 
-    /* Équivalences */
-    .equivalence-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .equivalence-item {
+    /* États vides et chargement */
+    .empty-state {
       text-align: center;
-      padding: 10px;
-      background: #f8f8f8;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
+      padding: 3rem;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
     }
 
-    .eq-quantity {
-      display: block;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--accent-gold);
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
     }
 
-    .eq-name {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--primary-dark);
-      margin-top: 5px;
+    .empty-state h3 {
+      color: var(--primary-color);
+      margin-bottom: 0.5rem;
     }
 
-    /* Modal de détails */
+    .empty-state p {
+      color: var(--text-color);
+      opacity: 0.7;
+      margin-bottom: 1.5rem;
+    }
+
+    .loading-indicator {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border-color);
+      border-top: 4px solid var(--secondary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-hover);
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+      transform: translateY(-20px);
+      transition: var(--transition);
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .modal-header h2 {
+      color: var(--primary-color);
+      margin: 0;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-color);
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+
+    .modal-close:hover {
+      opacity: 1;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding: 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* Détails dans modal */
     .detail-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
+      gap: 1.5rem;
     }
 
     .detail-section {
-      background: #f8f8f8;
-      padding: 15px;
-      border-radius: var(--border-radius);
-      border-left: 3px solid var(--accent-gold);
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: var(--radius);
+      border-left: 4px solid var(--accent-color);
     }
 
     .detail-section h4 {
-      margin-top: 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
     }
 
-    .detail-section p {
-      margin: 8px 0;
-      font-size: 0.9rem;
-    }
-
-    .item-actions {
+    .info-row {
       display: flex;
-      gap: 15px;
-      justify-content: center;
-      margin-top: 25px;
+      justify-content: space-between;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .color-indicator {
+      padding: 0.25rem 0.5rem;
+      background: var(--accent-color);
+      color: white;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    /* Notifications */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--secondary-color);
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-hover);
+      transform: translateX(100%);
+      transition: var(--transition);
+      z-index: 1100;
+      font-weight: bold;
+    }
+
+    .notification.show {
+      transform: translateX(0);
     }
 
     /* Responsive */
     @media (max-width: 768px) {
-      .quick-stats {
+      .content {
+        padding: 10px;
+      }
+
+      .page-header h1 {
+        font-size: 2rem;
+      }
+
+      .controls-header {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .stats-grid {
         grid-template-columns: repeat(2, 1fr);
       }
-      
-      .filter-row {
+
+      .filters-compact {
         grid-template-columns: 1fr;
       }
-      
-      .search-row {
+
+      .results-header {
         flex-direction: column;
-        align-items: stretch;
+        gap: 1rem;
       }
-      
-      .search-container {
-        flex-direction: column;
-      }
-      
-      .comparison-container {
+
+      .cards-grid {
         grid-template-columns: 1fr;
       }
-      
-      .equivalence-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      
-      .detail-grid {
+
+      .advanced-grid {
         grid-template-columns: 1fr;
       }
-      
-      .item-actions {
+
+      .modal-content {
+        width: 95%;
+        margin: 20px;
+      }
+
+      .modal-footer {
         flex-direction: column;
       }
     }
 
-    /* Animation pour les notifications */
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .view-controls {
+        flex-direction: column;
+      }
+
+      .view-btn {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .view-btn:last-child {
+        border-bottom: none;
+      }
     }
-    
-    @keyframes slideOut {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Amélioration de l'accessibilité */
+    .btn-action:focus,
+    .btn-detail:focus,
+    .btn-filter:focus,
+    .view-btn:focus {
+      outline: 2px solid var(--secondary-color);
+      outline-offset: 2px;
+    }
+
+    .search-input-main:focus {
+      outline: none;
+    }
+
+    /* Print styles */
+    @media print {
+      .controls-header,
+      .search-panel,
+      .view-controls,
+      .modal-overlay {
+        display: none;
+      }
+
+      .item-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
     }
   </style>
 </body>
