@@ -1,18 +1,12 @@
-// ===== OPTIMIZED NAVIGATION SYSTEM =====
-
-/**
- * Système de navigation dynamique pour desktop et mobile
- */
-
-// ===== CONSTANTES =====
 const NAV_CONFIG = {
   links: [
-    { href: 'index.html', text: 'Accueil', icon: '🏠' },
+    { href: 'index.html', text: 'Domus', icon: '🏠' },
     { href: 'dorusis.html', text: 'Dorusis', icon: '👤' },
-    { href: 'guilde.html', text: 'Guilde', icon: '⚔️' },
-    { href: 'poids.html', text: 'Gestion Poids', mobileText: 'Poids', icon: '🏋️' },
-    { href: 'liste.html', text: 'Liste complète', mobileText: 'Liste', icon: '📋' },
-    { href: 'convertisseur.html', text: 'Convertisseur', icon: '🔄' }
+    { href: 'guilde.html', text: 'Guilda', icon: '⚔️' },
+    { href: 'poids.html', text: 'Pondera', mobileText: 'Poids', icon: '🏋️' },
+    { href: 'liste.html', text: 'Lista', mobileText: 'Liste', icon: '📋' },
+    { href: 'convertisseur.html', text: 'Conversio', mobileText: 'Convert', icon: '🔄' },
+    { href: 'grimoire.html', text: 'Grimoire', icon: '📖' }
   ],
   
   // Pages qui ne doivent pas avoir la sidebar (ex: page d'accueil avec nav custom)
