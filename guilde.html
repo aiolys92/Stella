@@ -50,9 +50,6 @@
           <button class="tab-button" onclick="switchInventoryTab('gemmes')" title="Gemmes précieuses de la guilde">
             💎 Gemmes
           </button>
-          <button class="tab-button" onclick="switchInventoryTab('search')" title="Rechercher dans le trésor de guilde">
-            🔍 Recherche
-          </button>
           <button class="tab-button" onclick="switchInventoryTab('distribution')" title="Distribution entre les membres">
             📊 Distribution
           </button>
@@ -68,6 +65,9 @@
               </button>
               <button onclick="transferFromPersonal('pieces')" class="btn-action btn-transfer">
                 📤 Transfer depuis personnel
+              </button>
+              <button onclick="distributeToMembers('pieces')" class="btn-action btn-load">
+                📊 Distribuer aux Membres
               </button>
             </div>
           </div>
@@ -88,6 +88,16 @@
                 <!-- Lignes générées dynamiquement -->
               </tbody>
             </table>
+            
+            <!-- Section de distribution pour les pièces -->
+            <div id="distributionPieces" class="distribution-section" style="display: none;">
+              <h3>📊 Distribution des Monnaies</h3>
+              <div class="distribution-results">
+                <div class="results-grid" id="distributionGridPieces">
+                  <!-- Généré dynamiquement -->
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -101,6 +111,9 @@
               </button>
               <button onclick="transferFromPersonal('gemmes')" class="btn-action btn-transfer">
                 📤 Transfer depuis personnel
+              </button>
+              <button onclick="distributeToMembers('gemmes')" class="btn-action btn-load">
+                📊 Distribuer aux Membres
               </button>
             </div>
           </div>
@@ -121,35 +134,15 @@
                 <!-- Lignes générées dynamiquement -->
               </tbody>
             </table>
-          </div>
-        </div>
-
-        <!-- Onglet Recherche -->
-        <div id="tab-search" class="tab-content">
-          <div class="tab-header">
-            <h2>🔍 Rechercher dans le Trésor de Guilde</h2>
-          </div>
-          
-          <div class="search-container">
-            <div class="search-form">
-              <div>
-                <label for="searchInput">Rechercher un nom:</label>
-                <input type="text" id="searchInput" class="search-input" 
-                       placeholder="Exemple: Or, Rubis..." 
-                       oninput="performSearch()">
+            
+            <!-- Section de distribution pour les gemmes -->
+            <div id="distributionGemmes" class="distribution-section" style="display: none;">
+              <h3>📊 Distribution des Gemmes</h3>
+              <div class="distribution-results">
+                <div class="results-grid" id="distributionGridGemmes">
+                  <!-- Généré dynamiquement -->
+                </div>
               </div>
-              <button onclick="performSearch()" class="btn-action search-btn">
-                🔍 Rechercher
-              </button>
-              <button onclick="clearSearch()" class="btn-action clear-btn">
-                🗑️ Effacer
-              </button>
-            </div>
-          </div>
-          
-          <div class="search-results" id="searchResults">
-            <div class="no-results">
-              <p>🔍 Tapez le nom de l'objet que vous cherchez dans le trésor de guilde...</p>
             </div>
           </div>
         </div>
@@ -159,39 +152,40 @@
           <div class="tab-header">
             <h2>📊 Distribution du Trésor</h2>
             <div class="tab-actions">
-              <button onclick="calculateEqualDistribution()" class="btn-action btn-load">
-                ⚖️ Distribution Égale
-              </button>
               <button onclick="openContributionModal()" class="btn-action btn-add">
-                📝 Gestion des Contributions
+                📝 Gestion des Membres
               </button>
             </div>
           </div>
           
           <!-- Configuration de la distribution -->
           <div class="distribution-config">
-            <h3>⚙️ Configuration des Distributions</h3>
+            <h3>⚙️ Configuration des Membres</h3>
             <div class="config-form">
               <div class="input-group">
                 <label for="memberCount">Nombre de Membres:</label>
-                <input type="number" id="memberCount" value="4" min="1" max="20" onchange="updateDistribution()">
+                <input type="number" id="memberCount" value="4" min="1" max="20" onchange="updateAllDistributions()">
               </div>
-              <div class="input-group">
-                <label for="distributionType">Type de Distribution:</label>
-                <select id="distributionType" onchange="updateDistribution()">
-                  <option value="equal">Égale (Parts égales)</option>
-                  <option value="weighted">Pondérée (Par contribution)</option>
-                  <option value="class">Par Classes (Par classe de personnage)</option>
-                </select>
+              <div class="members-preview">
+                <h4>Membres Actuels:</h4>
+                <div id="membersPreview">
+                  <!-- Liste des membres -->
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Résultats de distribution -->
+          <!-- Résultats de distribution générale -->
           <div class="distribution-results">
-            <h3>📈 Résultats de Distribution</h3>
-            <div class="results-grid" id="distributionGrid">
-              <!-- Généré dynamiquement -->
+            <h3>📈 Distribution Totale du Trésor</h3>
+            <div class="total-distribution">
+              <div class="total-summary">
+                <p><strong>Valeur totale à distribuer:</strong> <span id="totalToDistribute">0</span> PM</p>
+                <p><strong>Par membre (égal):</strong> <span id="perMemberTotal">0</span> PM</p>
+              </div>
+              <div class="results-grid" id="distributionGridTotal">
+                <!-- Généré dynamiquement -->
+              </div>
             </div>
           </div>
         </div>
@@ -309,12 +303,12 @@
     <div id="contributionModal" class="popin-overlay" onclick="closeContributionModal()">
       <div class="popin-content" onclick="event.stopPropagation()">
         <div class="popin-header">
-          <h2>📝 Gestion des Contributions</h2>
+          <h2>📝 Gestion des Membres</h2>
           <button onclick="closeContributionModal()" class="popin-close">✕</button>
         </div>
         
         <div class="popin-form">
-          <h3>Membres et leurs Contributions</h3>
+          <h3>Membres de la Guilde</h3>
           <div id="membersList">
             <!-- Généré dynamiquement -->
           </div>
@@ -324,7 +318,7 @@
               ➕ Ajouter un Membre
             </button>
             <button onclick="saveContributions()" class="btn-action btn-save">
-              💾 Sauvegarder les Contributions
+              💾 Sauvegarder les Membres
             </button>
           </div>
         </div>
@@ -361,118 +355,79 @@
         tabContent.classList.add('active');
         currentInventoryTab = tabName;
         
-        if (tabName === 'search') {
-          document.getElementById('searchInput').focus();
-        } else if (tabName === 'distribution') {
-          updateDistribution();
+        if (tabName === 'distribution') {
+          updateAllDistributions();
+          updateMembersPreview();
         }
       }
     }
 
-    // ===== FONCTIONS DE RECHERCHE =====
-    function performSearch() {
-      const query = document.getElementById('searchInput').value.toLowerCase().trim();
-      const resultsContainer = document.getElementById('searchResults');
+    // ===== DISTRIBUTION DANS LES ONGLETS MONNAIES/GEMMES =====
+    function distributeToMembers(type) {
+      const distributionSection = document.getElementById(`distribution${type.charAt(0).toUpperCase() + type.slice(1)}`);
+      const grid = document.getElementById(`distributionGrid${type.charAt(0).toUpperCase() + type.slice(1)}`);
       
-      if (!query) {
-        resultsContainer.innerHTML = '<div class="no-results"><p>🔍 Tapez le nom de l\'objet que vous cherchez dans le trésor de guilde...</p></div>';
+      if (distributionSection.style.display === 'none') {
+        // Afficher la distribution
+        distributionSection.style.display = 'block';
+        calculateDistributionForType(type);
+        showNotification(`📊 Distribution des ${type} calculée`);
+      } else {
+        // Masquer la distribution
+        distributionSection.style.display = 'none';
+      }
+    }
+
+    function calculateDistributionForType(type) {
+      const grid = document.getElementById(`distributionGrid${type.charAt(0).toUpperCase() + type.slice(1)}`);
+      const tableId = type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes';
+      
+      // Calculer la valeur totale de ce type
+      let totalValue = 0;
+      document.querySelectorAll(`#${tableId} .total`).forEach(cell => {
+        totalValue += parseFloat(cell.textContent) || 0;
+      });
+      
+      if (totalValue === 0) {
+        grid.innerHTML = '<p class="no-results">Aucun trésor à distribuer</p>';
         return;
       }
       
-      const results = [];
+      // Distribution égale entre les membres
+      const memberCount = guildMembers.length;
+      const sharePerMember = totalValue / memberCount;
       
-      // Rechercher dans les pièces de l'inventaire guilde
-      document.querySelectorAll('#inventaireTablePieces tbody tr').forEach(row => {
-        const nameCell = row.cells[0].querySelector('select');
-        if (nameCell && nameCell.value.toLowerCase().includes(query)) {
-          const quantityCell = row.cells[1].querySelector('input');
-          results.push({
-            nom: nameCell.value,
-            type: 'pieces',
-            quantite: parseFloat(quantityCell.value) || 0,
-            source: 'Inventaire Guilde'
-          });
-        }
-      });
-      
-      // Rechercher dans les gemmes de l'inventaire guilde
-      document.querySelectorAll('#inventaireTableGemmes tbody tr').forEach(row => {
-        const nameCell = row.cells[0].querySelector('select');
-        if (nameCell && nameCell.value.toLowerCase().includes(query)) {
-          const quantityCell = row.cells[1].querySelector('input');
-          results.push({
-            nom: nameCell.value,
-            type: 'gemmes',
-            quantite: parseFloat(quantityCell.value) || 0,
-            source: 'Inventaire Guilde'
-          });
-        }
-      });
-      
-      // Rechercher dans les objets disponibles
-      Object.entries(window.monnaies.pieces).forEach(([nom, valeur]) => {
-        if (nom.toLowerCase().includes(query)) {
-          results.push({
-            nom: nom,
-            valeur: valeur,
-            categorie: 'Monnaies',
-            type: 'pieces',
-            source: 'Disponible'
-          });
-        }
-      });
-      
-      Object.entries(window.monnaies.gemmes).forEach(([nom, valeur]) => {
-        if (nom.toLowerCase().includes(query)) {
-          results.push({
-            nom: nom,
-            valeur: valeur,
-            categorie: 'Gemmes',
-            type: 'gemmes',
-            source: 'Disponible'
-          });
-        }
-      });
-      
-      displaySearchResults(results, query);
-    }
-    
-    function displaySearchResults(results, query) {
-      const container = document.getElementById('searchResults');
-      
-      if (results.length === 0) {
-        container.innerHTML = `
-          <div class="no-results">
-            <p>❌ Aucun résultat pour "${query}" dans le trésor de guilde</p>
-            <p><em>Essayez une autre recherche...</em></p>
-          </div>
+      grid.innerHTML = '';
+      guildMembers.forEach(member => {
+        const card = document.createElement('div');
+        card.className = 'distribution-card';
+        card.innerHTML = `
+          <h4>${member.name}</h4>
+          <div class="share-amount">${sharePerMember.toFixed(2)} PM</div>
+          <div class="share-percentage">${(100 / memberCount).toFixed(1)}%</div>
         `;
-        return;
-      }
-      
-      const html = results.map(item => `
-        <div class="result-item">
-          <div class="result-header">
-            <span class="result-name">${item.nom}</span>
-            <span class="result-category">${item.categorie || item.type}</span>
-          </div>
-          <div class="result-value">
-            ${item.quantite ? `Quantité en guilde: ${item.quantite}` : ''}
-            ${item.valeur ? `Valeur: ${item.valeur} PM` : ''}
-          </div>
-          <div class="result-source">Source: ${item.source}</div>
-        </div>
-      `).join('');
-      
-      container.innerHTML = `
-        <h3>📋 Résultats pour "${query}" (${results.length})</h3>
-        ${html}
-      `;
+        grid.appendChild(card);
+      });
     }
-    
-    function clearSearch() {
-      document.getElementById('searchInput').value = '';
-      document.getElementById('searchResults').innerHTML = '<div class="no-results"><p>🔍 Tapez le nom de l\'objet que vous cherchez dans le trésor de guilde...</p></div>';
+
+    // ===== DISTRIBUTION GÉNÉRALE =====
+    function updateAllDistributions() {
+      updateDistribution();
+      
+      // Mettre à jour les distributions dans les onglets monnaies/gemmes si elles sont visibles
+      if (document.getElementById('distributionPieces').style.display !== 'none') {
+        calculateDistributionForType('pieces');
+      }
+      if (document.getElementById('distributionGemmes').style.display !== 'none') {
+        calculateDistributionForType('gemmes');
+      }
+    }
+
+    function updateMembersPreview() {
+      const preview = document.getElementById('membersPreview');
+      preview.innerHTML = guildMembers.map(member => 
+        `<span class="member-tag">${member.name} (${member.class})</span>`
+      ).join('');
     }
 
     // ===== GESTION DES FILTRES POUR LA LISTE =====
@@ -514,10 +469,13 @@
     // ===== DISTRIBUTION DU TRÉSOR =====
     function updateDistribution() {
       const memberCount = parseInt(document.getElementById('memberCount').value) || 4;
-      const distributionType = document.getElementById('distributionType').value;
       const totalValue = parseFloat(document.getElementById('totalPieces').textContent) || 0;
       
-      const grid = document.getElementById('distributionGrid');
+      // Mettre à jour les informations générales
+      document.getElementById('totalToDistribute').textContent = totalValue.toFixed(2);
+      document.getElementById('perMemberTotal').textContent = (totalValue / memberCount).toFixed(2);
+      
+      const grid = document.getElementById('distributionGridTotal');
       grid.innerHTML = '';
       
       if (totalValue === 0) {
@@ -525,67 +483,31 @@
         return;
       }
       
-      let distributions = [];
+      // Distribution égale entre les membres
+      const equalShare = totalValue / memberCount;
       
-      switch (distributionType) {
-        case 'equal':
-          const equalShare = totalValue / memberCount;
-          for (let i = 1; i <= memberCount; i++) {
-            distributions.push({
-              member: `Membre ${i}`,
-              share: equalShare,
-              percentage: 100 / memberCount
-            });
-          }
-          break;
-          
-        case 'weighted':
-          const totalContribution = guildMembers.reduce((sum, member) => sum + member.contribution, 0);
-          guildMembers.forEach(member => {
-            distributions.push({
-              member: member.name,
-              share: (member.contribution / totalContribution) * totalValue,
-              percentage: (member.contribution / totalContribution) * 100
-            });
-          });
-          break;
-          
-        case 'class':
-          // Distribution par classe avec bonus/malus
-          const classMultipliers = {
-            'Guerrier': 1.1,
-            'Mage': 1.0,
-            'Voleur': 0.9,
-            'Prêtre': 1.0
-          };
-          const totalMultiplied = guildMembers.reduce((sum, member) => sum + (classMultipliers[member.class] || 1), 0);
-          guildMembers.forEach(member => {
-            const multiplier = classMultipliers[member.class] || 1;
-            distributions.push({
-              member: `${member.name} (${member.class})`,
-              share: (multiplier / totalMultiplied) * totalValue,
-              percentage: (multiplier / totalMultiplied) * 100
-            });
-          });
-          break;
-      }
-      
-      distributions.forEach(dist => {
+      guildMembers.slice(0, memberCount).forEach((member, index) => {
         const card = document.createElement('div');
         card.className = 'distribution-card';
         card.innerHTML = `
-          <h4>${dist.member}</h4>
-          <div class="share-amount">${dist.share.toFixed(2)} PM</div>
-          <div class="share-percentage">${dist.percentage.toFixed(1)}%</div>
+          <h4>${member.name}</h4>
+          <div class="share-amount">${equalShare.toFixed(2)} PM</div>
+          <div class="share-percentage">${(100 / memberCount).toFixed(1)}%</div>
         `;
         grid.appendChild(card);
       });
-    }
-
-    function calculateEqualDistribution() {
-      document.getElementById('distributionType').value = 'equal';
-      updateDistribution();
-      showNotification('⚖️ Distribution égale calculée');
+      
+      // Si on a moins de membres configurés que le nombre demandé, ajouter des membres génériques
+      for (let i = guildMembers.length; i < memberCount; i++) {
+        const card = document.createElement('div');
+        card.className = 'distribution-card';
+        card.innerHTML = `
+          <h4>Membre ${i + 1}</h4>
+          <div class="share-amount">${equalShare.toFixed(2)} PM</div>
+          <div class="share-percentage">${(100 / memberCount).toFixed(1)}%</div>
+        `;
+        grid.appendChild(card);
+      }
     }
 
     // ===== GESTION DES CONTRIBUTIONS =====
@@ -606,6 +528,671 @@
         const memberDiv = document.createElement('div');
         memberDiv.className = 'member-contribution';
         memberDiv.innerHTML = `
+          <div class="member-info">
+            <input type="text" value="${member.name}" onchange="updateMemberName(${index}, this.value)" placeholder="Nom du membre">
+            <select onchange="updateMemberClass(${index}, this.value)">
+              <option value="Guerrier" ${member.class === 'Guerrier' ? 'selected' : ''}>Guerrier</option>
+              <option value="Mage" ${member.class === 'Mage' ? 'selected' : ''}>Mage</option>
+              <option value="Voleur" ${member.class === 'Voleur' ? 'selected' : ''}>Voleur</option>
+              <option value="Prêtre" ${member.class === 'Prêtre' ? 'selected' : ''}>Prêtre</option>
+            </select>
+            <button onclick="removeMember(${index})" class="btn-action btn-delete">🗑️</button>
+          </div>
+        `;
+        membersList.appendChild(memberDiv);
+      });
+    }
+
+    function addNewMember() {
+      guildMembers.push({
+        name: 'Nouveau Membre',
+        contribution: 25,
+        class: 'Guerrier'
+      });
+      populateMembersList();
+      document.getElementById('memberCount').value = guildMembers.length;
+      updateMembersPreview();
+      updateAllDistributions();
+    }
+
+    function removeMember(index) {
+      guildMembers.splice(index, 1);
+      populateMembersList();
+      document.getElementById('memberCount').value = guildMembers.length;
+      updateMembersPreview();
+      updateAllDistributions();
+    }
+
+    function updateMemberName(index, name) {
+      guildMembers[index].name = name;
+      updateMembersPreview();
+      updateAllDistributions();
+    }
+
+    function updateMemberClass(index, classType) {
+      guildMembers[index].class = classType;
+      updateMembersPreview();
+      updateAllDistributions();
+    }
+
+    function saveContributions() {
+      closeContributionModal();
+      updateAllDistributions();
+      updateMembersPreview();
+      showNotification('💾 Membres sauvegardés');
+    }
+
+    // ===== POPULATION DE LA LISTE DES OBJETS =====
+    function populateObjectsList() {
+      // Peupler la liste des monnaies
+      const listMonetae = document.getElementById('listMonetae');
+      if (listMonetae) {
+        listMonetae.innerHTML = '';
+        Object.entries(window.monnaies.pieces)
+          .sort(([,a], [,b]) => b - a)
+          .forEach(([nom, valeur]) => {
+            const row = listMonetae.insertRow();
+            row.innerHTML = `
+              <td><strong>${nom}</strong></td>
+              <td>${valeur.toFixed(4)}</td>
+            `;
+          });
+      }
+
+      const listGemmae = document.getElementById('listGemmae');
+      if (listGemmae) {
+        listGemmae.innerHTML = '';
+        Object.entries(window.monnaies.gemmes)
+          .sort(([,a], [,b]) => b - a)
+          .forEach(([nom, valeur]) => {
+            const row = listGemmae.insertRow();
+            row.innerHTML = `
+              <td><strong>${nom}</strong></td>
+              <td>${valeur.toFixed(2)}</td>
+            `;
+          });
+      }
+    }
+
+    // ===== STATISTIQUES =====
+    function updateStatistics() {
+      if (!window.monnaies) return;
+      
+      // Statistiques des monnaies
+      const monetaeKeys = Object.keys(window.monnaies.pieces);
+      const monetaeValues = Object.values(window.monnaies.pieces);
+      const avgMonetae = monetaeValues.reduce((a, b) => a + b, 0) / monetaeValues.length;
+      const maxMonetae = Math.max(...monetaeValues);
+      
+      document.getElementById('countMonetae').textContent = monetaeKeys.length;
+      document.getElementById('avgMonetae').textContent = avgMonetae.toFixed(2);
+      document.getElementById('maxMonetae').textContent = maxMonetae.toFixed(2);
+      
+      // Statistiques des gemmes
+      const gemmaeKeys = Object.keys(window.monnaies.gemmes);
+      const gemmaeValues = Object.values(window.monnaies.gemmes);
+      const avgGemmae = gemmaeValues.reduce((a, b) => a + b, 0) / gemmaeValues.length;
+      const maxGemmae = Math.max(...gemmaeValues);
+      
+      document.getElementById('countGemmae').textContent = gemmaeKeys.length;
+      document.getElementById('avgGemmae').textContent = avgGemmae.toFixed(2);
+      document.getElementById('maxGemmae').textContent = maxGemmae.toFixed(2);
+      
+      // Calculs pour l'inventaire actuel
+      const totalItems = document.querySelectorAll('#inventaireTablePieces tbody tr, #inventaireTableGemmes tbody tr').length;
+      const totalValue = parseFloat(document.getElementById('totalPieces').textContent) || 0;
+      
+      document.getElementById('countTotal').textContent = totalItems;
+      document.getElementById('valueTotal').textContent = totalValue.toFixed(2);
+      
+      // Status du trésor de guilde
+      let status = 'Vide';
+      if (totalValue > 5000) status = 'Très riche';
+      else if (totalValue > 2000) status = 'Riche';
+      else if (totalValue > 500) status = 'Modeste';
+      else if (totalValue > 100) status = 'Pauvre';
+      else if (totalValue > 0) status = 'Très pauvre';
+      
+      document.getElementById('statusTotal').textContent = status;
+      
+      // Par membre
+      const memberCount = guildMembers.length;
+      const perMember = memberCount > 0 ? totalValue / memberCount : 0;
+      document.getElementById('perMember').textContent = perMember.toFixed(2);
+      
+      // Distribution des valeurs
+      let monetaeTotal = 0, gemmaeTotal = 0;
+      
+      document.querySelectorAll('#inventaireTablePieces .total').forEach(cell => {
+        monetaeTotal += parseFloat(cell.textContent) || 0;
+      });
+      
+      document.querySelectorAll('#inventaireTableGemmes .total').forEach(cell => {
+        gemmaeTotal += parseFloat(cell.textContent) || 0;
+      });
+      
+      const percentMonetae = totalValue > 0 ? (monetaeTotal / totalValue * 100).toFixed(1) : 0;
+      const percentGemmae = totalValue > 0 ? (gemmaeTotal / totalValue * 100).toFixed(1) : 0;
+      
+      document.getElementById('percentMonetae').textContent = percentMonetae + '%';
+      document.getElementById('percentGemmae').textContent = percentGemmae + '%';
+      
+      // Statistiques de guilde
+      document.getElementById('activeMembers').textContent = memberCount;
+      
+      // Simuler des données de gestion
+      const now = new Date();
+      document.getElementById('lastContribution').textContent = now.toLocaleDateString('fr-FR');
+      
+      // Calculer la croissance (simulée)
+      const growth = Math.random() * 10 - 2; // Entre -2% et +8%
+      document.getElementById('growth').textContent = (growth >= 0 ? '+' : '') + growth.toFixed(1) + '%';
+      
+      // Stabilité basée sur la valeur totale et le nombre de membres
+      let stability = 'Stable';
+      if (totalValue > 1000 && memberCount >= 3) stability = 'Prospère';
+      else if (totalValue < 100 || memberCount < 2) stability = 'Instable';
+      else if (totalValue > 500) stability = 'En croissance';
+      
+      document.getElementById('stability').textContent = stability;
+    }
+
+    // ===== FONCTIONS UTILITAIRES =====
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 10000;
+        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+        color: white; padding: 15px 25px; border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        font-family: "Quattrocento Sans", Arial, sans-serif;
+        font-weight: bold; font-size: 14px;
+        border: 2px solid #228B22;
+        animation: slideIn 0.3s ease;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // ===== INITIALISATION =====
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('⚔️ Inventaire Guilde - Initialisé');
+      
+      // Peupler la liste des objets
+      populateObjectsList();
+      
+      // Mettre à jour les statistiques
+      updateStatistics();
+      
+      // Observer les changements dans les tableaux pour mettre à jour les stats
+      const observer = new MutationObserver(updateStatistics);
+      
+      const tables = document.querySelectorAll('#inventaireTablePieces tbody, #inventaireTableGemmes tbody');
+      tables.forEach(table => {
+        observer.observe(table, { childList: true, subtree: true });
+      });
+      
+      // Observer les changements du total
+      const totalObserver = new MutationObserver(updateStatistics);
+      const totalElement = document.getElementById('totalPieces');
+      if (totalElement) {
+        totalObserver.observe(totalElement, { childList: true, characterData: true, subtree: true });
+      }
+      
+      // Initialiser le nombre de membres et la preview
+      document.getElementById('memberCount').value = guildMembers.length;
+      updateMembersPreview();
+    });
+
+    // ===== EXPOSITION DES FONCTIONS =====
+    window.switchInventoryTab = switchInventoryTab;
+    window.updateStatistics = updateStatistics;
+    window.filtrerParCategorie = filtrerParCategorie;
+    window.rechercherObjets = rechercherObjets;
+    window.transferFromPersonal = transferFromPersonal;
+    window.distributeToMembers = distributeToMembers;
+    window.updateDistribution = updateDistribution;
+    window.updateAllDistributions = updateAllDistributions;
+    window.openContributionModal = openContributionModal;
+    window.closeContributionModal = closeContributionModal;
+    window.addNewMember = addNewMember;
+    window.removeMember = removeMember;
+    window.updateMemberName = updateMemberName;
+    window.updateMemberClass = updateMemberClass;
+    window.saveContributions = saveContributions;
+  </script>
+
+  <!-- Styles supplémentaires pour la guilde -->
+  <style>
+    .section-subtitle {
+      text-align: center;
+      font-style: italic;
+      color: var(--primary-dark);
+      margin-bottom: 20px;
+    }
+
+    .distribution-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--content-bg) 100%);
+      border-radius: var(--border-radius);
+      border: 2px solid var(--accent-gold);
+    }
+
+    .distribution-section h3 {
+      margin: 0 0 20px 0;
+      color: var(--primary-bg);
+      text-align: center;
+      font-family: var(--font-title);
+    }
+
+    .distribution-config {
+      background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--content-bg) 100%);
+      padding: 25px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      margin-bottom: 25px;
+    }
+
+    .config-form {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+      margin-top: 15px;
+      align-items: start;
+    }
+
+    .members-preview {
+      background: var(--content-bg);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+    }
+
+    .members-preview h4 {
+      margin: 0 0 10px 0;
+      color: var(--primary-dark);
+      font-family: var(--font-title);
+    }
+
+    .member-tag {
+      display: inline-block;
+      background: var(--accent-gold);
+      color: var(--primary-dark);
+      padding: 4px 8px;
+      margin: 2px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .total-summary {
+      background: var(--content-bg);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .total-summary p {
+      margin: 8px 0;
+      font-size: 1.1rem;
+    }
+
+    .distribution-results {
+      margin-top: 25px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .distribution-card {
+      background: var(--content-bg);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .distribution-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(47, 27, 20, 0.15);
+      border-color: var(--accent-gold);
+    }
+
+    .distribution-card h4 {
+      margin: 0 0 10px 0;
+      color: var(--primary-bg);
+      font-family: var(--font-title);
+    }
+
+    .share-amount {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-gold);
+      margin: 10px 0;
+    }
+
+    .share-percentage {
+      color: var(--primary-dark);
+      font-style: italic;
+    }
+
+    .member-contribution {
+      background: var(--content-bg);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      margin-bottom: 10px;
+    }
+
+    .member-info {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .member-info input,
+    .member-info select {
+      margin: 0;
+      padding: 8px;
+      font-size: 0.9rem;
+    }
+
+    /* Responsive pour les modaux */
+    @media (max-width: 768px) {
+      .config-form {
+        grid-template-columns: 1fr;
+      }
+      
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .member-info {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      
+      .popin-content {
+        width: 95%;
+        max-height: 95vh;
+      }
+    }
+  </style>
+</body>
+</html>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  <script src="nav.js"></script>
+  <script>
+    // Variables globales pour la page Guilde
+    let currentInventoryTab = 'pieces';
+    let guildMembers = [
+      { name: 'Dorusis', contribution: 25, class: 'Guerrier' },
+      { name: 'Mage Aurelius', contribution: 30, class: 'Mage' },
+      { name: 'Voleur Shadow', contribution: 20, class: 'Voleur' },
+      { name: 'Prêtre Benedictus', contribution: 25, class: 'Prêtre' }
+    ];
+
+    // ===== GESTION DES ONGLETS D'INVENTAIRE =====
+    function switchInventoryTab(tabName) {
+      // Désactiver tous les onglets
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      // Activer l'onglet sélectionné
+      const tabButton = document.querySelector(`[onclick="switchInventoryTab('${tabName}')"]`);
+      const tabContent = document.getElementById(`tab-${tabName}`);
+      
+      if (tabButton && tabContent) {
+        tabButton.classList.add('active');
+        tabContent.classList.add('active');
+        currentInventoryTab = tabName;
+        
+        if (tabName === 'distribution') {
+          updateAllDistributions();
+          updateMembersPreview();
+        }
+      }
+    }
+
+    // ===== DISTRIBUTION DANS LES ONGLETS MONNAIES/GEMMES =====
+    function distributeToMembers(type) {
+      const distributionSection = document.getElementById(`distribution${type.charAt(0).toUpperCase() + type.slice(1)}`);
+      const grid = document.getElementById(`distributionGrid${type.charAt(0).toUpperCase() + type.slice(1)}`);
+      
+      if (distributionSection.style.display === 'none') {
+        // Afficher la distribution
+        distributionSection.style.display = 'block';
+        calculateDistributionForType(type);
+        showNotification(`📊 Distribution des ${type} calculée`);
+      } else {
+        // Masquer la distribution
+        distributionSection.style.display = 'none';
+      }
+    }
+
+    function calculateDistributionForType(type) {
+      const grid = document.getElementById(`distributionGrid${type.charAt(0).toUpperCase() + type.slice(1)}`);
+      const tableId = type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes';
+      
+      // Calculer la valeur totale de ce type
+      let totalValue = 0;
+      document.querySelectorAll(`#${tableId} .total`).forEach(cell => {
+        totalValue += parseFloat(cell.textContent) || 0;
+      });
+      
+      if (totalValue === 0) {
+        grid.innerHTML = '<p class="no-results">Aucun trésor à distribuer</p>';
+        return;
+      }
+      
+      // Distribution égale entre les membres
+      const memberCount = guildMembers.length;
+      const sharePerMember = totalValue / memberCount;
+      
+      grid.innerHTML = '';
+      guildMembers.forEach(member => {
+        const card = document.createElement('div');
+        card.className = 'distribution-card';
+        card.innerHTML = `
+          <h4>${member.name}</h4>
+          <div class="share-amount">${sharePerMember.toFixed(2)} PM</div>
+          <div class="share-percentage">25.0%</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // ===== DISTRIBUTION GÉNÉRALE =====
+    function updateAllDistributions() {
+      updateDistribution();
+      
+      // Mettre à jour les distributions dans les onglets monnaies/gemmes si elles sont visibles
+      if (document.getElementById('distributionPieces').style.display !== 'none') {
+        calculateDistributionForType('pieces');
+      }
+      if (document.getElementById('distributionGemmes').style.display !== 'none') {
+        calculateDistributionForType('gemmes');
+      }
+    }
+
+    function updateMembersPreview() {
+      const preview = document.getElementById('membersPreview');
+      preview.innerHTML = guildMembers.map(member => 
+        `<span class="member-tag">${member.name} (${member.class})</span>`
+      ).join('');
+    }
+
+    // ===== GESTION DES FILTRES POUR LA LISTE =====
+    function filtrerParCategorie(categorie) {
+      const sections = document.querySelectorAll('.category-section');
+      sections.forEach(section => {
+        if (categorie === '') {
+          section.style.display = 'block';
+        } else {
+          const isRelevant = (categorie === 'pieces' && section.querySelector('#listMonetae')) ||
+                           (categorie === 'gemmes' && section.querySelector('#listGemmae'));
+          section.style.display = isRelevant ? 'block' : 'none';
+        }
+      });
+    }
+
+    function rechercherObjets(query) {
+      if (!query.trim()) {
+        document.querySelectorAll('#listMonetae tr, #listGemmae tr').forEach(row => {
+          row.style.display = '';
+        });
+        return;
+      }
+
+      const queryLower = query.toLowerCase();
+      
+      document.querySelectorAll('#listMonetae tr, #listGemmae tr').forEach(row => {
+        const name = row.cells[0].textContent.toLowerCase();
+        row.style.display = name.includes(queryLower) ? '' : 'none';
+      });
+    }
+
+    // ===== FONCTIONS DE TRANSFERT =====
+    function transferFromPersonal(type) {
+      showNotification(`📤 Fonction de transfert depuis l'inventaire personnel vers la guilde (${type})`);
+      // À implémenter : transfert depuis l'inventaire de Dorusis vers la guilde
+    }
+
+    // ===== DISTRIBUTION DU TRÉSOR =====
+    function updateDistribution() {
+      const memberCount = parseInt(document.getElementById('memberCount').value) || 4;
+      const totalValue = parseFloat(document.getElementById('totalPieces').textContent) || 0;
+      
+      // Mettre à jour les informations générales
+      document.getElementById('totalToDistribute').textContent = totalValue.toFixed(2);
+      document.getElementById('perMemberTotal').textContent = (totalValue / memberCount).toFixed(2);
+      
+      const grid = document.getElementById('distributionGridTotal');
+      grid.innerHTML = '';
+      
+      if (totalValue === 0) {
+        grid.innerHTML = '<p class="no-results">Aucun trésor à distribuer</p>';
+        return;
+      }
+      
+      // Distribution égale entre les membres
+      const equalShare = totalValue / memberCount;
+      
+      guildMembers.slice(0, memberCount).forEach((member, index) => {
+        const card = document.createElement('div');
+        card.className = 'distribution-card';
+        card.innerHTML = `
+          <h4>${member.name}</h4>
+          <div class="share-amount">${equalShare.toFixed(2)} PM</div>
+          <div class="share-percentage">${(100 / memberCount).toFixed(1)}%</div>
+        `;
+        grid.appendChild(card);
+      });
+      
+      // Si on a moins de membres configurés que le nombre demandé, ajouter des membres génériques
+      for (let i = guildMembers.length; i < memberCount; i++) {
+        const card = document.createElement('div');
+        card.className = 'distribution-card';
+        card.innerHTML = `
+          <h4>Membre ${i + 1}</h4>
+          <div class="share-amount">${equalShare.toFixed(2)} PM</div>
+          <div class="share-percentage">${(100 / memberCount).toFixed(1)}%</div>
+        `;
+        grid.appendChild(card);
+      }
+    }
+
+    // ===== GESTION DES CONTRIBUTIONS =====
+    function openContributionModal() {
+      document.getElementById('contributionModal').classList.add('active');
+      populateMembersList();
+    }
+
+    function closeContributionModal() {
+      document.getElementById('contributionModal').classList.remove('active');
+    }
+
+    function populateMembersList() {
+      const membersList = document.getElementById('membersList');
+      membersList.innerHTML = '';
+      
+      guildMembers.forEach((member, index) => {
+        const memberDiv = document.createElement('div');
+        memberDiv.className = 'member-contribution';
+        memberDiv.innerHTML = `
+          <div class="member-info">
+            <input type="text" value="${member.name}" onchange="updateMemberName(${index}, this.value)" placeholder="Nom du membre">
+            <select onchange="updateMemberClass(${index}, this.value)">
+              <option value="Guerrier" ${member.class === 'Guerrier' ? 'selected' : ''}>Guerrier</option>
+              <option value="Mage" ${member.class === 'Mage' ? 'selected' : ''}>Mage</option>
+              <option value="Voleur" ${member.class === 'Voleur' ? 'selected' : ''}>Voleur</option>
+              <option value="Prêtre" ${member.class === 'Prêtre' ? 'selected' : ''}>Prêtre</option>
+            </select>
+            <button onclick="removeMember(${index})" class="btn-action btn-delete">🗑️</button>
+          </div>
+        `;
+        membersList.appendChild(memberDiv);
+      });
+    }
+
+    function addNewMember() {
+      guildMembers.push({
+        name: 'Nouveau Membre',
+        contribution: 25,
+        class: 'Guerrier'
+      });
+      populateMembersList();
+      document.getElementById('memberCount').value = guildMembers.length;
+      updateMembersPreview();
+      updateAllDistributions();
+    }
+
+    function removeMember(index) {
+      guildMembers.splice(index, 1);
+      populateMembersList();
+      document.getElementById('memberCount').value = guildMembers.length;
+      updateMembersPreview();
+      updateAllDistributions();
+    }
+
+    function updateMemberName(index, name) {
+      guildMembers[index].name = name;
+      updateMembersPreview();
+      updateAllDistributions();
+    }
+
+    function updateMemberClass(index, classType) {
+      guildMembers[index].class = classType;
+      updateMembersPreview();
+      updateAllDistributions();
+    }
+
+    function saveContributions() {
+      closeContributionModal();
+      updateAllDistributions();
+      updateMembersPreview();
+      showNotification('💾 Membres sauvegardés');
+    }Div.innerHTML = `
           <div class="member-info">
             <input type="text" value="${member.name}" onchange="updateMemberName(${index}, this.value)" placeholder="Nom du membre">
             <select onchange="updateMemberClass(${index}, this.value)">
