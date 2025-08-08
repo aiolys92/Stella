@@ -198,6 +198,67 @@
       </div>
     </section>
 
+    <!-- Liste des objets par catégories - CONSULTATION SEULEMENT -->
+    <section class="section">
+      <h2>📋 Liste de Toutes les Monnaies et Gemmes</h2>
+      <p class="section-subtitle"><em>Consultation seulement - Aucune action de suppression</em></p>
+      
+      <!-- Filtres et recherche -->
+      <div class="filters-row">
+        <div class="filter-group">
+          <label for="categoryFilter">Catégorie:</label>
+          <select id="categoryFilter" onchange="filtrerParCategorie(this.value)">
+            <option value="">Toutes les catégories</option>
+            <option value="pieces">Monnaies</option>
+            <option value="gemmes">Gemmes</option>
+          </select>
+        </div>
+        
+        <div class="search-group">
+          <label for="searchObjects">Rechercher:</label>
+          <input type="text" id="searchObjects" placeholder="Nom de l'objet..." 
+                 oninput="rechercherObjets(this.value)">
+        </div>
+      </div>
+      
+      <!-- Conteneur des catégories - LECTURE SEULE -->
+      <div class="categories-container" id="categoriesContainer">
+        <div class="category-section">
+          <h3>🪙 Monnaies Métalliques</h3>
+          <div class="table-container">
+            <table class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="60%">Nom</th>
+                  <th width="40%">Valeur (PM)</th>
+                </tr>
+              </thead>
+              <tbody id="listMonetae">
+                <!-- Généré par JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="category-section">
+          <h3>💎 Gemmes Précieuses</h3>
+          <div class="table-container">
+            <table class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="60%">Nom</th>
+                  <th width="40%">Valeur (PM)</th>
+                </tr>
+              </thead>
+              <tbody id="listGemmae">
+                <!-- Généré par JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Informations sur le trésor de guilde -->
     <section class="section">
       <h2>📊 Statistiques du Trésor de Guilde</h2>
@@ -314,7 +375,7 @@
       const resultsContainer = document.getElementById('searchResults');
       
       if (!query) {
-        resultsContainer.innerHTML = '<div class="no-results"><p>🔍 Scribe nomen rei quam quaeris in thesauro guildae...</p></div>';
+        resultsContainer.innerHTML = '<div class="no-results"><p>🔍 Tapez le nom de l\'objet que vous cherchez dans le trésor de guilde...</p></div>';
         return;
       }
       
@@ -329,7 +390,7 @@
             nom: nameCell.value,
             type: 'pieces',
             quantite: parseFloat(quantityCell.value) || 0,
-            source: 'Inventarium Guildae'
+            source: 'Inventaire Guilde'
           });
         }
       });
@@ -343,7 +404,7 @@
             nom: nameCell.value,
             type: 'gemmes',
             quantite: parseFloat(quantityCell.value) || 0,
-            source: 'Inventarium Guildae'
+            source: 'Inventaire Guilde'
           });
         }
       });
@@ -354,9 +415,9 @@
           results.push({
             nom: nom,
             valeur: valeur,
-            categorie: 'Monetae',
+            categorie: 'Monnaies',
             type: 'pieces',
-            source: 'Disponibilis'
+            source: 'Disponible'
           });
         }
       });
@@ -366,9 +427,9 @@
           results.push({
             nom: nom,
             valeur: valeur,
-            categorie: 'Gemmae',
+            categorie: 'Gemmes',
             type: 'gemmes',
-            source: 'Disponibilis'
+            source: 'Disponible'
           });
         }
       });
@@ -382,8 +443,8 @@
       if (results.length === 0) {
         container.innerHTML = `
           <div class="no-results">
-            <p>❌ Nullum resultatum pro "${query}" in thesauro guildae</p>
-            <p><em>Tenta aliam quaestionem...</em></p>
+            <p>❌ Aucun résultat pour "${query}" dans le trésor de guilde</p>
+            <p><em>Essayez une autre recherche...</em></p>
           </div>
         `;
         return;
@@ -396,22 +457,22 @@
             <span class="result-category">${item.categorie || item.type}</span>
           </div>
           <div class="result-value">
-            ${item.quantite ? `Quantitas in guilda: ${item.quantite}` : ''}
-            ${item.valeur ? `Valor: ${item.valeur} PM` : ''}
+            ${item.quantite ? `Quantité en guilde: ${item.quantite}` : ''}
+            ${item.valeur ? `Valeur: ${item.valeur} PM` : ''}
           </div>
-          <div class="result-source">Fons: ${item.source}</div>
+          <div class="result-source">Source: ${item.source}</div>
         </div>
       `).join('');
       
       container.innerHTML = `
-        <h3>📋 Resultata pro "${query}" (${results.length})</h3>
+        <h3>📋 Résultats pour "${query}" (${results.length})</h3>
         ${html}
       `;
     }
     
     function clearSearch() {
       document.getElementById('searchInput').value = '';
-      document.getElementById('searchResults').innerHTML = '<div class="no-results"><p>🔍 Scribe nomen rei quam quaeris in thesauro guildae...</p></div>';
+      document.getElementById('searchResults').innerHTML = '<div class="no-results"><p>🔍 Tapez le nom de l\'objet que vous cherchez dans le trésor de guilde...</p></div>';
     }
 
     // ===== GESTION DES FILTRES POUR LA LISTE =====
@@ -460,7 +521,7 @@
       grid.innerHTML = '';
       
       if (totalValue === 0) {
-        grid.innerHTML = '<p class="no-results">Nullus thesaurus pro distributione</p>';
+        grid.innerHTML = '<p class="no-results">Aucun trésor à distribuer</p>';
         return;
       }
       
@@ -471,7 +532,7 @@
           const equalShare = totalValue / memberCount;
           for (let i = 1; i <= memberCount; i++) {
             distributions.push({
-              member: `Sodalis ${i}`,
+              member: `Membre ${i}`,
               share: equalShare,
               percentage: 100 / memberCount
             });
@@ -492,10 +553,10 @@
         case 'class':
           // Distribution par classe avec bonus/malus
           const classMultipliers = {
-            'Bellator': 1.1,
-            'Magus': 1.0,
-            'Fur': 0.9,
-            'Clericus': 1.0
+            'Guerrier': 1.1,
+            'Mage': 1.0,
+            'Voleur': 0.9,
+            'Prêtre': 1.0
           };
           const totalMultiplied = guildMembers.reduce((sum, member) => sum + (classMultipliers[member.class] || 1), 0);
           guildMembers.forEach(member => {
@@ -524,7 +585,7 @@
     function calculateEqualDistribution() {
       document.getElementById('distributionType').value = 'equal';
       updateDistribution();
-      showNotification('⚖️ Distributio aequalis calculata');
+      showNotification('⚖️ Distribution égale calculée');
     }
 
     // ===== GESTION DES CONTRIBUTIONS =====
@@ -546,14 +607,14 @@
         memberDiv.className = 'member-contribution';
         memberDiv.innerHTML = `
           <div class="member-info">
-            <input type="text" value="${member.name}" onchange="updateMemberName(${index}, this.value)" placeholder="Nomen sodalis">
+            <input type="text" value="${member.name}" onchange="updateMemberName(${index}, this.value)" placeholder="Nom du membre">
             <select onchange="updateMemberClass(${index}, this.value)">
-              <option value="Bellator" ${member.class === 'Bellator' ? 'selected' : ''}>Bellator</option>
-              <option value="Magus" ${member.class === 'Magus' ? 'selected' : ''}>Magus</option>
-              <option value="Fur" ${member.class === 'Fur' ? 'selected' : ''}>Fur</option>
-              <option value="Clericus" ${member.class === 'Clericus' ? 'selected' : ''}>Clericus</option>
+              <option value="Guerrier" ${member.class === 'Guerrier' ? 'selected' : ''}>Guerrier</option>
+              <option value="Mage" ${member.class === 'Mage' ? 'selected' : ''}>Mage</option>
+              <option value="Voleur" ${member.class === 'Voleur' ? 'selected' : ''}>Voleur</option>
+              <option value="Prêtre" ${member.class === 'Prêtre' ? 'selected' : ''}>Prêtre</option>
             </select>
-            <input type="number" value="${member.contribution}" onchange="updateMemberContribution(${index}, this.value)" min="0" max="100" placeholder="Contributio %">
+            <input type="number" value="${member.contribution}" onchange="updateMemberContribution(${index}, this.value)" min="0" max="100" placeholder="Contribution %">
             <button onclick="removeMember(${index})" class="btn-action btn-delete">🗑️</button>
           </div>
         `;
@@ -563,9 +624,9 @@
 
     function addNewMember() {
       guildMembers.push({
-        name: 'Novus Sodalis',
+        name: 'Nouveau Membre',
         contribution: 0,
-        class: 'Bellator'
+        class: 'Guerrier'
       });
       populateMembersList();
       document.getElementById('memberCount').value = guildMembers.length;
@@ -600,7 +661,7 @@
       
       closeContributionModal();
       updateDistribution();
-      showNotification('💾 Contributiones salvatae et normalizatae');
+      showNotification('💾 Contributions sauvegardées et normalisées');
     }
 
     // ===== POPULATION DE LA LISTE DES OBJETS =====
@@ -667,12 +728,12 @@
       document.getElementById('valueTotal').textContent = totalValue.toFixed(2);
       
       // Status du trésor de guilde
-      let status = 'Vacua';
-      if (totalValue > 5000) status = 'Ditissima';
-      else if (totalValue > 2000) status = 'Dives';
-      else if (totalValue > 500) status = 'Mediocris';
-      else if (totalValue > 100) status = 'Modesta';
-      else if (totalValue > 0) status = 'Paupera';
+      let status = 'Vide';
+      if (totalValue > 5000) status = 'Très riche';
+      else if (totalValue > 2000) status = 'Riche';
+      else if (totalValue > 500) status = 'Modeste';
+      else if (totalValue > 100) status = 'Pauvre';
+      else if (totalValue > 0) status = 'Très pauvre';
       
       document.getElementById('statusTotal').textContent = status;
       
@@ -703,17 +764,17 @@
       
       // Simuler des données de gestion
       const now = new Date();
-      document.getElementById('lastContribution').textContent = now.toLocaleDateString('la');
+      document.getElementById('lastContribution').textContent = now.toLocaleDateString('fr-FR');
       
       // Calculer la croissance (simulée)
       const growth = Math.random() * 10 - 2; // Entre -2% et +8%
       document.getElementById('growth').textContent = (growth >= 0 ? '+' : '') + growth.toFixed(1) + '%';
       
       // Stabilité basée sur la valeur totale et le nombre de membres
-      let stability = 'Stabilis';
-      if (totalValue > 1000 && memberCount >= 3) stability = 'Prosperus';
-      else if (totalValue < 100 || memberCount < 2) stability = 'Instabilis';
-      else if (totalValue > 500) stability = 'Crescens';
+      let stability = 'Stable';
+      if (totalValue > 1000 && memberCount >= 3) stability = 'Prospère';
+      else if (totalValue < 100 || memberCount < 2) stability = 'Instable';
+      else if (totalValue > 500) stability = 'En croissance';
       
       document.getElementById('stability').textContent = stability;
     }
@@ -743,7 +804,7 @@
 
     // ===== INITIALISATION =====
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('⚔️ Inventarium Guildae - Initialisé');
+      console.log('⚔️ Inventaire Guilde - Initialisé');
       
       // Peupler la liste des objets
       populateObjectsList();
