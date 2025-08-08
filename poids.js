@@ -3,6 +3,8 @@
 
 // ===== VARIABLES GLOBALES =====
 let currentTab = 'dorusis'; // Onglet actuel
+const DORUSIS_BASE_WEIGHT = 80; // Poids de base de Dorusis en kg
+const TABS_ORDER = ['dorusis', 'cheval', 'guilde']; // Nouvel ordre des onglets
 
 // ===== 1. GESTION DES ONGLETS =====
 /**
@@ -274,7 +276,126 @@ function updateTotalPoids() {
   }
 }
 
-// ===== 4. GESTION DE LA LISTE DES OBJETS =====
+// ===== 4. FONCTIONS SPÉCIALES DORUSIS/CHEVAL =====
+/**
+ * Calcule le poids total de Dorusis (corps + équipements)
+ * @returns {number} Poids total en kg
+ */
+function calculerPoidsDorusis() {
+  const dorusisTable = document.getElementById('inventaireTableDorusis');
+  if (!dorusisTable) return DORUSIS_BASE_WEIGHT;
+  
+  let poidsEquipements = 0;
+  
+  // Additionner tous les équipements de Dorusis
+  dorusisTable.querySelectorAll('tbody tr').forEach(row => {
+    const totalCell = row.querySelector('.total-weight');
+    if (totalCell && totalCell.textContent !== '-') {
+      const poids = parseFloat(totalCell.textContent.replace(' kg', ''));
+      if (!isNaN(poids)) {
+        poidsEquipements += poids;
+      }
+    }
+  });
+  
+  return DORUSIS_BASE_WEIGHT + poidsEquipements;
+}
+
+/**
+ * Ajoute automatiquement Dorusis avec son équipement au cheval
+ */
+function ajouterDorusisAuCheval() {
+  const poidsTotal = calculerPoidsDorusis();
+  
+  const confirmation = confirm(
+    `🐴 Monter Dorusis sur le cheval ?\n\n` +
+    `👤 Dorusis: ${DORUSIS_BASE_WEIGHT} kg\n` +
+    `🎒 Équipements: ${(poidsTotal - DORUSIS_BASE_WEIGHT).toFixed(1)} kg\n` +
+    `⚖️ Poids total: ${poidsTotal.toFixed(1)} kg`
+  );
+  
+  if (!confirmation) return;
+  
+  // Vérifier si Dorusis est déjà sur le cheval
+  const chevalTable = document.getElementById('inventaireTableCheval');
+  let dorusisRow = null;
+  
+  chevalTable.querySelectorAll('tbody tr').forEach(row => {
+    const objectSelect = row.querySelector('.object-select');
+    if (objectSelect && objectSelect.value.includes('Dorusis')) {
+      dorusisRow = row;
+    }
+  });
+  
+  if (dorusisRow) {
+    // Mettre à jour le poids existant
+    const quantityInput = dorusisRow.querySelector('.quantity-input');
+    quantityInput.value = '1';
+    
+    // Mettre à jour le poids dans les données
+    window.modifierObjetPoids('Dorusis (1.80m, forte musculature)', poidsTotal);
+    
+    updateInventairePoids(dorusisRow.querySelector('.object-select'));
+    showNotification(`🔄 Poids de Dorusis mis à jour: ${poidsTotal.toFixed(1)} kg`);
+  } else {
+    // Ajouter une nouvelle ligne pour Dorusis
+    addInventaireRowPoids('cheval');
+    
+    const chevalTable = document.getElementById('inventaireTableCheval');
+    const lastRow = chevalTable.querySelector('tbody').lastElementChild;
+    
+    if (lastRow) {
+      // Sélectionner la catégorie "Personnages"
+      const categorySelect = lastRow.querySelector('.category-select');
+      categorySelect.value = 'Personnages';
+      updateObjetOptions(categorySelect);
+      
+      // Sélectionner Dorusis
+      setTimeout(() => {
+        const objectSelect = lastRow.querySelector('.object-select');
+        objectSelect.value = 'Dorusis (1.80m, forte musculature)';
+        
+        // Mettre à jour le poids dans les données
+        window.modifierObjetPoids('Dorusis (1.80m, forte musculature)', poidsTotal);
+        
+        updateInventairePoids(objectSelect);
+        
+        // Changer vers l'onglet cheval
+        switchTab('cheval');
+        
+        showNotification(`🐴 Dorusis monté sur le cheval (${poidsTotal.toFixed(1)} kg)`);
+      }, 100);
+    }
+  }
+}
+
+/**
+ * Retire Dorusis du cheval
+ */
+function retirerDorusis() {
+  const chevalTable = document.getElementById('inventaireTableCheval');
+  let dorusisRow = null;
+  
+  chevalTable.querySelectorAll('tbody tr').forEach(row => {
+    const objectSelect = row.querySelector('.object-select');
+    if (objectSelect && objectSelect.value.includes('Dorusis')) {
+      dorusisRow = row;
+    }
+  });
+  
+  if (dorusisRow) {
+    const confirmation = confirm('👤 Faire descendre Dorusis du cheval ?');
+    if (confirmation) {
+      dorusisRow.remove();
+      updateTotalPoids();
+      showNotification('👤 Dorusis est descendu du cheval');
+    }
+  } else {
+    showNotification('❌ Dorusis n\'est pas sur le cheval');
+  }
+}
+
+// ===== 5. GESTION DE LA LISTE DES OBJETS =====
 /**
  * Met à jour la liste complète des objets par catégories
  */
@@ -374,11 +495,11 @@ function rechercherObjets(terme) {
   });
 }
 
-// ===== 6. SAUVEGARDE/CHARGEMENT =====
+// ===== 7. SAUVEGARDE/CHARGEMENT =====
 function saveInventairesPoids() {
   const inventaires = {};
   
-  ['dorusis', 'guilde', 'cheval'].forEach(tab => {
+  TABS_ORDER.forEach(tab => {
     const table = document.querySelector(`#inventaireTable${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
     if (!table) return;
     
@@ -405,6 +526,7 @@ function saveInventairesPoids() {
   const data = {
     inventaires: inventaires,
     objets: window.monnaies.poids,
+    dorusisBaseWeight: DORUSIS_BASE_WEIGHT,
     saveDate: new Date().toISOString(),
     version: "2.0"
   };
@@ -450,9 +572,6 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // Ajouter les styles CSS
-  addPoidsStyles();
-  
   // Initialiser l'interface
   populateSelects();
   updateObjectsList();
@@ -470,50 +589,6 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('✅ Système de poids initialisé !');
 });
 
-// ===== STYLES CSS INTÉGRÉS =====
-function addPoidsStyles() {
-  if (document.getElementById('poids-styles')) return;
-  
-  const style = document.createElement('style');
-  style.id = 'poids-styles';
-  style.textContent = `
-    /* Styles pour la page des poids */
-    .tabs-container { margin: 20px 0; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
-    .tabs-header { display: flex; background: #f8f9fa; }
-    .tab-button { flex: 1; padding: 15px; border: none; background: transparent; cursor: pointer; transition: all 0.3s; }
-    .tab-button.active { background: #2f1b0c; color: white; }
-    .tab-content { display: none; padding: 20px; }
-    .tab-content.active { display: block; animation: fadeIn 0.3s; }
-    .tab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    
-    .inventory-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-    .inventory-table th, .inventory-table td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    .inventory-table th { background: #2f1b0c; color: white; }
-    
-    .category-select, .object-select { width: 100%; padding: 5px; }
-    .quantity-input, .weight-input { width: 80px; padding: 5px; text-align: center; }
-    
-    .checkbox-label { display: flex; align-items: center; gap: 5px; }
-    .carried-checkbox { margin: 0; }
-    
-    .btn-delete, .btn-duplicate { padding: 5px 8px; margin: 0 2px; border: none; border-radius: 3px; cursor: pointer; }
-    .btn-delete { background: #dc3545; color: white; }
-    .btn-duplicate { background: #007bff; color: white; }
-    .btn-add-row { background: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; margin: 10px 0; }
-    
-    .category-section { margin: 20px 0; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
-    .category-title { background: linear-gradient(135deg, #2f1b0c, #3f2b1c); color: white; margin: 0; padding: 15px; }
-    .objects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 20px; }
-    .object-card { border: 1px solid #eee; padding: 15px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
-    
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-    @keyframes slideOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
-  `;
-  
-  document.head.appendChild(style);
-}
-
 // ===== EXPOSITION DES FONCTIONS GLOBALES =====
 window.switchTab = switchTab;
 window.ajouterNouvelObjet = ajouterNouvelObjet;
@@ -526,3 +601,9 @@ window.supprimerObjet = supprimerObjet;
 window.modifierPoids = modifierPoids;
 window.filtrerParCategorie = filtrerParCategorie;
 window.rechercherObjets = rechercherObjets;
+window.ajouterDorusisAuCheval = ajouterDorusisAuCheval;
+window.retirerDorusis = retirerDorusis;
+window.calculerPoidsDorusis = calculerPoidsDorusis;
+window.ouvrirPopinAjout = ouvrirPopinAjout;
+window.fermerPopinAjout = fermerPopinAjout;
+window.ajouterNouvelObjetPopin = ajouterNouvelObjetPopin;
