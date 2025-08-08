@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Convertisseur Monetarum</title>
+  <title>Convertisseur de Monnaies</title>
   <meta name="description" content="Convertisseur de monnaies et gemmes">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -11,19 +11,19 @@
   <div class="content fade-in">
     <!-- En-tête de la page -->
     <header class="page-header">
-      <h1>🔄 CONVERTISSEUR MONETARUM 🔄</h1>
-      <p class="page-subtitle">Transformatio Inter Diversas Monetas et Gemmas</p>
+      <h1>🔄 CONVERTISSEUR DE MONNAIES 🔄</h1>
+      <p class="page-subtitle">Transformation entre différentes monnaies et gemmes</p>
     </header>
 
     <!-- Interface de conversion -->
     <section class="section">
       <div class="controls-header">
         <div class="controls-left">
-          <h2>⚖️ Conversio Instantanea</h2>
+          <h2>⚖️ Conversion Instantanée</h2>
         </div>
         <div class="controls-right">
           <button onclick="resetConverter()" class="btn-action btn-delete">
-            🗑️ Purgare
+            🗑️ Réinitialiser
           </button>
         </div>
       </div>
@@ -31,14 +31,14 @@
       <!-- Formulaire de conversion -->
       <div class="conversion-form">
         <div class="input-group">
-          <label for="convCurrency">Moneta/Gemma Electa:</label>
+          <label for="convCurrency">Monnaie/Gemme sélectionnée:</label>
           <select id="convCurrency" onchange="convertAll()">
             <!-- Options générées dynamiquement -->
           </select>
         </div>
         
         <div class="input-group">
-          <label for="convQty">Quantitas:</label>
+          <label for="convQty">Quantité:</label>
           <input type="number" id="convQty" value="1" min="0" step="0.01" oninput="convertAll()">
         </div>
       </div>
@@ -46,18 +46,18 @@
 
     <!-- Résultats de conversion -->
     <section class="section">
-      <h2>📊 Resultata Conversionis</h2>
+      <h2>📊 Résultats de Conversion</h2>
       
       <!-- Conversion vers monnaies de base -->
       <div class="conversion-results">
-        <h3>🪙 Conversio ad Monetas Principales</h3>
+        <h3>🪙 Conversion vers Monnaies Principales</h3>
         <div class="table-container">
           <table id="convResultsTable" class="inventory-table">
             <thead>
               <tr>
-                <th width="40%">Denominatio</th>
-                <th width="30%">Valor Unitarius</th>
-                <th width="30%">Aequivalens</th>
+                <th width="40%">Dénomination</th>
+                <th width="30%">Valeur Unitaire</th>
+                <th width="30%">Équivalent</th>
               </tr>
             </thead>
             <tbody id="convResults">
@@ -69,12 +69,12 @@
 
       <!-- Informations sur la devise sélectionnée -->
       <div class="currency-info" id="currencyInfo">
-        <h3>ℹ️ Informatio de Moneta Electa</h3>
+        <h3>ℹ️ Informations sur la Monnaie Sélectionnée</h3>
         <div class="info-content">
-          <p><strong>Nomen:</strong> <span id="selectedName">-</span></p>
-          <p><strong>Categoria:</strong> <span id="selectedCategory">-</span></p>
-          <p><strong>Valor in PM:</strong> <span id="selectedValue">-</span></p>
-          <p><strong>Raritas:</strong> <span id="selectedRarity">-</span></p>
+          <p><strong>Nom:</strong> <span id="selectedName">-</span></p>
+          <p><strong>Catégorie:</strong> <span id="selectedCategory">-</span></p>
+          <p><strong>Valeur en PM:</strong> <span id="selectedValue">-</span></p>
+          <p><strong>Rareté:</strong> <span id="selectedRarity">-</span></p>
         </div>
       </div>
     </section>
@@ -84,26 +84,26 @@
       <div class="tabs-container">
         <div class="tabs-header">
           <button class="tab-button active" onclick="switchReferenceTab('pieces')" title="Monnaies métalliques">
-            🪙 Monetae
+            🪙 Monnaies
           </button>
           <button class="tab-button" onclick="switchReferenceTab('gemmes')" title="Gemmes précieuses">
-            💎 Gemmae
+            💎 Gemmes
           </button>
         </div>
 
         <!-- Tableau des pièces -->
         <div id="ref-pieces" class="tab-content active">
           <div class="tab-header">
-            <h2>🪙 Monetae Metallicae - Tabula Referentiae</h2>
+            <h2>🪙 Monnaies Métalliques - Tableau de Référence</h2>
           </div>
           
           <div class="table-container">
             <table class="inventory-table">
               <thead>
                 <tr>
-                  <th width="50%">Nomen</th>
-                  <th width="25%">Valor (PM)</th>
-                  <th width="25%">Ratio ad Aurum</th>
+                  <th width="50%">Nom</th>
+                  <th width="25%">Valeur (PM)</th>
+                  <th width="25%">Ratio à l'Or</th>
                 </tr>
               </thead>
               <tbody id="piecesReference">
@@ -116,16 +116,16 @@
         <!-- Tableau des gemmes -->
         <div id="ref-gemmes" class="tab-content">
           <div class="tab-header">
-            <h2>💎 Gemmae Pretiosae - Tabula Referentiae</h2>
+            <h2>💎 Gemmes Précieuses - Tableau de Référence</h2>
           </div>
           
           <div class="table-container">
             <table class="inventory-table">
               <thead>
                 <tr>
-                  <th width="50%">Nomen</th>
-                  <th width="25%">Valor (PM)</th>
-                  <th width="25%">Raritas</th>
+                  <th width="50%">Nom</th>
+                  <th width="25%">Valeur (PM)</th>
+                  <th width="25%">Rareté</th>
                 </tr>
               </thead>
               <tbody id="gemmesReference">
@@ -139,7 +139,7 @@
 
     <!-- Calculateur avancé -->
     <section class="section">
-      <h2>🧮 Calculator Avancé</h2>
+      <h2>🧮 Calculateur Avancé</h2>
       <div class="advanced-calculator">
         <div class="calc-input">
           <label for="calcFrom">De:</label>
@@ -152,7 +152,7 @@
         <div class="calc-arrow">⇄</div>
         
         <div class="calc-input">
-          <label for="calcTo">Ad:</label>
+          <label for="calcTo">Vers:</label>
           <select id="calcTo" onchange="advancedCalculation()">
             <!-- Options générées dynamiquement -->
           </select>
@@ -161,10 +161,10 @@
       </div>
       
       <div class="calc-result" id="calcResult">
-        <p>Selecte monetas pro calculatione...</p>
+        <p>Sélectionnez les monnaies pour le calcul...</p>
       </div>
     </section>
-  </div>
+  </div></div>
 
   <!-- Scripts -->
   <script src="data.js"></script>
