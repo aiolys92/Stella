@@ -1,4 +1,42 @@
-<!DOCTYPE html>
+const content = document.getElementById('itemDetailContent');
+      content.innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-section">
+            <h4>Informations Générales</h4>
+            <p><strong>Nom:</strong> ${item.name}</p>
+            ${item.surnom ? `<p><strong>Surnom:</strong> ${item.surnom}</p>` : ''}
+            <p><strong>Catégorie:</strong> ${item.categoryLabel}</p>
+            <p><strong>Type:</strong> ${item.type}</p>
+            <p><strong>Rareté:</strong> ${item.rarity}</p>
+            ${item.durete ? `<p><strong>Dureté:</strong> ${item.durete}</p>` : ''}
+          </div>
+          
+          <div class="detail-section">
+            <h4>Valeur et Équivalences</h4>
+            <p><strong>Valeur:</strong> ${item.value.toFixed(item.category === 'pieces' ? 4 : 2)} PM</p>
+            <p><strong>En Or:</strong> ${(item.value / (window.monnaies.pieces['Or'] || 1)).toFixed(2)} pièces</p>
+            <p><strong>En Argent:</strong> ${(item.value / (window.monnaies.pieces['Argent'] || 1)).toFixed(2)} pièces</p>
+            ${item.category === 'pieces' && item.usage ? `<p><strong>Usage:</strong> ${item.usage}</p>` : ''}
+          </div>
+          
+          ${item.category === 'gemmes' ? `
+          <div class="detail-section">
+            <h4>Propriétés Mystiques</h4>
+            ${item.zodiac ? `<p><strong>Liens Zodiacaux:</strong> ${item.zodiac}</p>` : ''}
+            ${item.divin ? `<p><strong>Liens Divins:</strong> ${item.divin}</p>` : ''}
+            ${item.symbolique ? `<p><strong>Symbolique:</strong> ${item.symbolique}</p>` : ''}
+            ${item.notes ? `<p><strong>Notes:</strong> ${item.notes}</p>` : ''}
+          </div>
+          ` : ''}
+          
+          <div class="detail-section">
+            <h4>Statistiques</h4>
+            <p><strong>Rang par valeur:</strong> ${getRankByValue(item)} / ${allItems.length}</p>
+            <p><strong>Percentile:</strong> ${getPercentile(item)}%</p>
+            <p><strong>Usage recommandé:</strong> ${getRecommendedUsage(item)}</p>
+          </div>
+        </div>
+      `;<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="utf-8">
@@ -190,7 +228,7 @@
                   <th width="35%">Nom</th>
                   <th width="25%">Valeur (PM)</th>
                   <th width="20%">Rareté</th>
-                  <th width="20%">Famille</th>
+                  <th width="20%">Couleur</th>
                 </tr>
               </thead>
               <tbody id="gemmesTableBody">
@@ -334,6 +372,49 @@
     function initializeData() {
       allItems = [];
       
+      // Base de données des gemmes avec vraies informations
+      const gemmeInfo = {
+        'Rubis': { surnom: 'Escarboucle', couleur: 'Rouge', zodiac: 'Sirène/Ecrevisse', divin: 'Perun, Gibil', symbolique: 'Volonté, Courage', durete: 9, notes: 'Pierre de protection' },
+        'Emeraude': { surnom: 'Turanite', couleur: 'Vert', zodiac: 'Cerf/Tortue', divin: 'Turan, Arcton', symbolique: 'Renaissance, Sagesse', durete: 8, notes: 'Pierre de fortification' },
+        'Saphir': { surnom: 'Werunite', couleur: 'Bleu', zodiac: 'Nuage/Tortue/Phénix/Epée/Dauphins', divin: 'Weru, Tannun, Shua', symbolique: 'Justice, Pureté, Liberté', durete: 9, notes: 'Pierre céleste' },
+        'Diamant': { surnom: 'Pierre des fous', couleur: 'Incolore', zodiac: 'Paon/Licorne/Ourlarque', divin: 'Usil, Atonar, Laran', symbolique: 'Invincible, Constance', durete: 10, notes: 'Protège contre la folie' },
+        'Topaze': { surnom: '', couleur: 'Jaune/Bleu/Rose', zodiac: 'Sirène/Phénix/Papillon/Ecrevisse/Tortue/Dauphins/Cerf/Epée', divin: 'Tannun', symbolique: 'Gaité, Energie', durete: 8, notes: 'Pierre de soin' },
+        'Aigue-Marine': { surnom: 'Llyrite', couleur: 'Bleu pâle', zodiac: 'Dauphins/Tortue/Sirène/Nuage/Ourlarque/Epée/Papillon/Epée', divin: 'Llyr, Tannun, Ulfer', symbolique: 'Sensibilité, Persévérance', durete: 8, notes: 'Protège les marins' },
+        'Améthyste': { surnom: 'Pérunite', couleur: 'Violet', zodiac: 'Phénix/Ourlarque/Licorne/Epée/Sirène/Nuage/Dauphins/Cerf', divin: 'Perun, Arcton, Ninmah', symbolique: 'Sagesse, Equilibre', durete: 7, notes: 'Pierre d\'apaisement, protège des poisons' },
+        'Grenat': { surnom: 'Usilite', couleur: 'Rouge/Pourpre/Violet', zodiac: 'Ourlarque/Sirène/Tortue/Phénix/Epée', divin: 'Usil', symbolique: 'Force, Charisme', durete: 7, notes: 'Pierre d\'armure, Pierre de lumière' },
+        'Péridot': { surnom: 'Turmite', couleur: 'Vert', zodiac: 'Tortue/Cerf/Paon/Epée/Sirène/Ourlarque', divin: 'Turina', symbolique: 'Equilibre, Fidélité, Chance', durete: 7, notes: 'Pierre de la paladin Pierre de protection' },
+        'Cyanite': { surnom: '', couleur: 'Bleu', zodiac: 'Epée/Ourlarque/Tortue/Phénix/Dauphins/Cerf/Licorne', divin: 'Shua', symbolique: 'Dextérité, Paix', durete: '4-6+', notes: 'Sort de boussole' },
+        'Citrine': { surnom: '', couleur: 'Jaune', zodiac: 'Papillon/Paon/Ourlarque/Nuage/Sirène/Epée', divin: 'Thalma, Arcton', symbolique: 'Vitalité, Joie, Arts', durete: 7, notes: 'Pierre de lumière, protection contre le vent' },
+        'Pierre de Lune': { surnom: 'Tilvrite', couleur: 'Lait et reflets bleus', zodiac: 'Ecrevisse/Papillon/Dauphins/Epée/Sirène/Tortue/Nuage/Ourlarque', divin: 'Tilvir, Darona', symbolique: 'Imagination, Pureté', durete: '6+', notes: '"Œil de poisson", Pierre de pluie' },
+        'Pierre de Soleil': { surnom: 'Atonarite', couleur: 'Doré pailleté', zodiac: 'Paon/Sirène/Licorne', divin: 'Atonar, Palustris', symbolique: 'Richesse, Jouvence', durete: '6+', notes: 'Pierre d\'orientation, Pierre de lumière' },
+        'Tourmaline': { surnom: '', couleur: 'Rose/Vert/Bleu/Noir', zodiac: 'Tortue/Ourlarque/Papillon/Tortue/Cerf/Ecrevisse', divin: 'Turan', symbolique: 'Quiétude, Protection', durete: '7+', notes: 'Pierre électrique, Pierre de bouclier' },
+        'Aventurine': { surnom: 'Pierre du destin', couleur: 'Vert', zodiac: 'Cerf/Papillon/Phénix/Epée/Ecrevisse', divin: 'Usil, Narax', symbolique: 'Harmonie, Prospérité', durete: '6+', notes: 'Pierre de chance' },
+        'Turquoise': { surnom: 'Pierre des dieux', couleur: 'Bleu-vert', zodiac: 'Phénix/Nuage/Dauphins/Cerf/Sirène/Epée/Tortue', divin: 'Perun, Thalma, Weru', symbolique: 'Communication, Energie', durete: '5+', notes: 'Pierre de piété, Protège les voyageurs' },
+        'Œil de loup (Chrysobéryl)': { surnom: 'Ulférite', couleur: 'Jaune-doré', zodiac: 'Tortue/Epée', divin: 'Ulfer', symbolique: 'Sang-froid, Abondance', durete: '8+', notes: 'Protège les survivants' },
+        'Œil de taureau (Quartz brun)': { surnom: '', couleur: 'Jaune-rouge', zodiac: 'Cerf', divin: 'Turan, Ulfer, Ninmah', symbolique: 'Courage, Fermeté', durete: 7, notes: 'Apporte le succès et aux sports' },
+        'Œil de tigre (Quartz brun)': { surnom: '', couleur: 'Orange', zodiac: 'Paon/Papillon/Ecrevisse/Epée/Tortue/Licorne/Cerf/Papillon', divin: 'Narax, Arcton, Weru, Laran', symbolique: 'Liberté, Largesse', durete: 7, notes: 'Protège les guerriers' },
+        'Œil de faucon (Quartz bleu)': { surnom: '', couleur: 'Gris-bleu', zodiac: 'Papillon/Nuage/Ourlarque/', divin: 'Thalma, Palustris, Narax', symbolique: 'Empathie, Evolution', durete: 7, notes: 'Pierre de vision, Pierre de protection' },
+        'Quartz fumé': { surnom: '', couleur: 'Brun', zodiac: 'Ourlarque/Sirène/Tortue/Epée/Phénix', divin: 'Usil, Voltumna, Narax', symbolique: 'Eveil, Volonté', durete: 7, notes: 'Pierre de protection, Pierre de clairvoyance' },
+        'Rhodite (Quartz rose)': { surnom: 'Pierre du cœur', couleur: 'Rose', zodiac: 'Cerf/Epée/Nuage/Ourlarque', divin: 'Turan, Tannun', symbolique: 'Calme, Tendresse', durete: 7, notes: 'Pierre d\'amour, Pierre de beauté' },
+        'Cristal (Quartz incolore)': { surnom: '', couleur: 'Incolore', zodiac: 'Ourlarque', divin: 'Usil, Darona, Palustris', symbolique: 'Clairvoyance, Méditatif', durete: 7, notes: 'Amplificateur' },
+        'Lapis Lazuli': { surnom: 'Pierre de vérité', couleur: 'Bleu', zodiac: 'Nuage/Licorne/Papillon/Paon/Epée/Tortue/Phénix/Dauphins/Cerf', divin: 'Weru, Ulfer', symbolique: 'Honnêteté, Intuition', durete: '5+', notes: 'Pierre d\'amitié' },
+        'Jais (Jaspe noir)': { surnom: '', couleur: 'Noir', zodiac: 'Ourlarque/Paon/Tortue', divin: 'Llyr, Voltumna, Guyona', symbolique: 'Durisme, Maîtrise', durete: '6-', notes: 'Pierre des ténèbres, Pierre des secrets' },
+        'Onyxline (Jaspe rouge)': { surnom: 'Corne', couleur: 'Rouge/Orange', zodiac: 'Sirène/Cerf/Tortue/Ecrevisse/Licorne/Paon/Epée', divin: 'Gibil, Arcton', symbolique: 'Vitalité, Initiative', durete: '6+', notes: 'Pierre de résilience' },
+        'Chrysoprase (Jaspe vert)': { surnom: '', couleur: 'Vert', zodiac: 'Cerf/Epée/Ecrevisse', divin: 'Guyona', symbolique: 'Compassion, Clairvoyance', durete: '6+', notes: 'Pierre de sceau, protège du venin, Invisibilité' },
+        'Sardoine (Jaspe brun)': { surnom: '', couleur: 'Brun-fauve', zodiac: 'Licorne/Tortue/Cerf/sirène', divin: 'Laran, Usil, Suvix', symbolique: 'Protection, Courage', durete: '6+', notes: 'Pierre de guérison' },
+        'Agate (Jaspe multicolore)': { surnom: 'Aurore', couleur: 'Marron/Bleu/Blanc/Rouge', zodiac: 'Papillon/Cerf/Dauphins/Ecrevisse/Epée/Nuage', divin: 'Thalma, Ulfer', symbolique: 'Curiosité, Adaptabilité', durete: '6+', notes: 'Pierre de bonheur, Pierre de paix' },
+        'Obsidienne': { surnom: '', couleur: 'Multicolore', zodiac: 'Epée/Tortue/Ecrevisse/Sirène/Papillon/Paon/Phénix/Nuage', divin: 'Atonar, Turan, Shua', symbolique: 'Espoir, Beauté, Arts', durete: 6, notes: 'Pierre de prémonition' },
+        'Serpentine': { surnom: 'Laranite', couleur: 'Vert', zodiac: 'Sirène/Epée/Phénix/Ourlarque', divin: 'Laran, Usil, Voltumna', symbolique: 'Introspection, Occultisme', durete: '5+', notes: 'Pierre de siège, Pierre de sceaux, combustible' },
+        'Malachite': { surnom: '', couleur: 'Vert écaillé', zodiac: 'Tortue/Papillon/Sirène/Dauphins', divin: 'Guyona, Llyr', symbolique: 'Guérison, Force', durete: '2+ à 4', notes: 'Pierre de sceau, talisman, Pierre des rêves' },
+        'Hématite': { surnom: '', couleur: 'Vert sombre', zodiac: 'Paon/Sirène/Phénix/Epée', divin: 'Tannun', symbolique: 'Protection, Jouvence', durete: 4, notes: 'Protège les voyageurs et enfants, Pierre de fer' },
+        'Perle': { surnom: 'Larmes de Llyr', couleur: 'Blanc/Rose/Bleu/Noir', zodiac: 'Ecrevisse/Papillon/Epée/Dauphins', divin: 'Tilvir, Perun, Turan, Darona', symbolique: 'Douceur, Pureté', durete: 3, notes: 'Parreux, pigment rouge' },
+        'Ambre': { surnom: 'Larmes d\'Atona', couleur: 'Orange', zodiac: 'Paon/Cerf/Papillon/Ecrevisse/Tortue', divin: 'Atonar', symbolique: 'Sérénité, Sagesse', durete: '2+', notes: 'Pierre électrique, combustible' },
+        'Corail': { surnom: 'Sang de basaltik', couleur: 'Blanc/Jaune/Orange/Rouge/', zodiac: 'Dauphins/Cerf/Ecrevisse', divin: 'Llyr, Ninmah, Guyona', symbolique: 'Vigueur, Fertilité', durete: '3+', notes: 'Pierre de protection, Pierre magique' },
+        'Jais': { surnom: 'Thanrite', couleur: 'Noir', zodiac: 'Ourlarque/Ecrevisse/Nuage', divin: 'Voltumna, Suvix', symbolique: 'Richesse, Spiritualité', durete: '2-4', notes: 'Pierre de protection, Pierre de deuil, combustible' },
+        'Nacre': { surnom: '', couleur: 'Nacre', zodiac: 'Ecrevisse/Sirène/Nuage', divin: 'Tilvir, Llyr, Ninmah', symbolique: 'Douceur, Intuition', durete: '2-4', notes: 'Pierre d\'apaisement' },
+        'Ecaille': { surnom: '', couleur: 'Vert/Brun/Blanc', zodiac: 'Tortue/Ecrevisse/Sirène/Dauphins', divin: 'Thalma, Llyr, Tannun', symbolique: 'Longévité, Sagesse', durete: '2+', notes: 'Pierre d\'endurance' }
+      };
+      
       // Ajouter les monnaies
       Object.entries(window.monnaies.pieces).forEach(([name, value]) => {
         allItems.push({
@@ -341,20 +422,32 @@
           value: value,
           category: 'pieces',
           categoryLabel: 'Monnaie',
-          rarity: getRarity(value),
-          type: 'Métallique'
+          rarity: getMonnaieRarity(value),
+          type: 'Métallique',
+          usage: getUsageFrequency(name)
         });
       });
       
-      // Ajouter les gemmes
+      // Ajouter les gemmes avec vraies informations
       Object.entries(window.monnaies.gemmes).forEach(([name, value]) => {
+        const info = gemmeInfo[name] || { 
+          surnom: '', couleur: 'Inconnue', zodiac: '', divin: '', 
+          symbolique: '', durete: 0, notes: '' 
+        };
+        
         allItems.push({
           name: name,
           value: value,
           category: 'gemmes',
           categoryLabel: 'Gemme',
-          rarity: getRarity(value),
-          type: getGemFamily(name)
+          rarity: getGemmeRarity(value),
+          type: info.couleur,
+          surnom: info.surnom,
+          zodiac: info.zodiac,
+          divin: info.divin,
+          symbolique: info.symbolique,
+          durete: info.durete,
+          notes: info.notes
         });
       });
       
@@ -395,11 +488,17 @@
       
       filteredData.forEach(item => {
         const row = tbody.insertRow();
+        
+        // Colonne nom avec surnom si disponible
+        const nameCell = item.surnom ? 
+          `<strong>${item.name}</strong><br><small><em>${item.surnom}</em></small>` : 
+          `<strong>${item.name}</strong>`;
+        
         row.innerHTML = `
-          <td><strong>${item.name}</strong></td>
+          <td>${nameCell}</td>
           <td><span class="category-badge ${item.category}">${item.categoryLabel}</span></td>
           <td>${item.value.toFixed(item.category === 'pieces' ? 4 : 2)}</td>
-          <td><span class="rarity-badge ${item.rarity.toLowerCase()}">${item.rarity}</span></td>
+          <td><span class="rarity-badge ${item.rarity.toLowerCase().replace(' ', '-')}">${item.rarity}</span></td>
           <td>
             <button onclick="showItemDetail('${item.name}', '${item.category}')" class="btn-action btn-load btn-small">
               👁️
@@ -421,7 +520,8 @@
       
       pieces.forEach(([name, value]) => {
         const ratio = (value / goldValue).toFixed(2);
-        const usage = getUsageFrequency(name);
+        const pieceData = allItems.find(item => item.name === name && item.category === 'pieces');
+        const usage = pieceData ? pieceData.usage : 'Rare';
         
         const row = tbody.insertRow();
         row.innerHTML = `
@@ -443,15 +543,20 @@
         .sort(([,a], [,b]) => b - a);
       
       gemmes.forEach(([name, value]) => {
-        const rarity = getRarity(value);
-        const family = getGemFamily(name);
+        const gemmeData = allItems.find(item => item.name === name && item.category === 'gemmes');
+        const rarity = gemmeData ? gemmeData.rarity : 'Commune';
+        const couleur = gemmeData ? gemmeData.type : 'Inconnue';
+        
+        const nameWithSurname = gemmeData && gemmeData.surnom ? 
+          `<strong>${name}</strong><br><small><em>${gemmeData.surnom}</em></small>` : 
+          `<strong>${name}</strong>`;
         
         const row = tbody.insertRow();
         row.innerHTML = `
-          <td><strong>${name}</strong></td>
+          <td>${nameWithSurname}</td>
           <td>${value.toFixed(2)}</td>
-          <td><span class="rarity-badge ${rarity.toLowerCase()}">${rarity}</span></td>
-          <td><span class="family-badge">${family}</span></td>
+          <td><span class="rarity-badge ${rarity.toLowerCase().replace(' ', '-')}">${rarity}</span></td>
+          <td><span class="color-badge">${couleur}</span></td>
         `;
       });
       
@@ -528,36 +633,29 @@
     }
 
     // ===== FONCTIONS UTILITAIRES =====
-    function getRarity(value) {
-      if (value > 50) return 'Légendaire';
-      if (value > 10) return 'Rare';
-      if (value > 5) return 'Peu commune';
-      if (value > 1) return 'Commune';
+    function getMonnaieRarity(value) {
+      if (value > 2) return 'Très rare';
+      if (value > 1) return 'Rare';
+      if (value > 0.1) return 'Commune';
+      if (value > 0.01) return 'Fréquente';
       return 'Basique';
     }
 
-    function getGemFamily(name) {
-      const families = {
-        'Rubis': 'Corindon', 'Saphir': 'Corindon',
-        'Émeraude': 'Béryl', 'Aigue-Marine': 'Béryl',
-        'Diamant': 'Carbone', 'Améthyste': 'Quartz',
-        'Citrine': 'Quartz', 'Quartz': 'Quartz',
-        'Topaze': 'Silicate', 'Grenat': 'Silicate',
-        'Turquoise': 'Phosphate', 'Lapis Lazuli': 'Silicate'
-      };
-      
-      for (const [gem, family] of Object.entries(families)) {
-        if (name.includes(gem)) return family;
-      }
-      return 'Autre';
+    function getGemmeRarity(value) {
+      if (value > 80) return 'Légendaire';
+      if (value > 50) return 'Très rare';
+      if (value > 20) return 'Rare';
+      if (value > 5) return 'Peu commune';
+      if (value > 1) return 'Commune';
+      return 'Fréquente';
     }
 
     function getUsageFrequency(name) {
-      const common = ['Or', 'Argent', 'Cuivre'];
-      const uncommon = ['Platine', 'Électrum'];
+      const frequent = ['Or', 'Argent', 'Fer'];
+      const occasionnel = ['Platine', 'Électrum', 'Cuivre'];
       
-      if (common.includes(name)) return 'Fréquent';
-      if (uncommon.includes(name)) return 'Occasionnel';
+      if (frequent.includes(name)) return 'Fréquent';
+      if (occasionnel.includes(name)) return 'Occasionnel';
       return 'Rare';
     }
 
@@ -921,10 +1019,11 @@
       text-transform: uppercase;
     }
 
-    .rarity-badge.légendaire { background: #FFD700; color: #8B4513; }
+    .rarity-badge.très-rare { background: #FFD700; color: #8B4513; }
     .rarity-badge.rare { background: #DDA0DD; color: #4B0082; }
-    .rarity-badge.peu.commune { background: #98FB98; color: #006400; }
+    .rarity-badge.peu-commune { background: #98FB98; color: #006400; }
     .rarity-badge.commune { background: #F0F8FF; color: #4682B4; }
+    .rarity-badge.fréquente { background: #F5F5F5; color: #696969; }
     .rarity-badge.basique { background: #F5F5F5; color: #696969; }
 
     .usage-badge {
@@ -938,7 +1037,7 @@
     .usage-badge.occasionnel { background: #FFE4B5; color: #FF8C00; }
     .usage-badge.rare { background: #FFB6C1; color: #DC143C; }
 
-    .family-badge {
+    .family-badge, .color-badge {
       padding: 3px 8px;
       border-radius: 10px;
       font-size: 0.7rem;
