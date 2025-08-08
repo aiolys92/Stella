@@ -3,129 +3,148 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gestionnaire de Monnaies - Accueil</title>
-  <meta name="description" content="Gestionnaire d'inventaire pour monnaies et gemmes - Dorusis et Guilde">
+  <title>Inventarium Magicus - Gestionnaire des Trésors</title>
+  <meta name="description" content="Système de gestion des monnaies, gemmes et équipements pour aventuriers">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="content fade-in">
-    <!-- Navigation principale intégrée -->
-    <nav class="main-nav">
-      <h2>Navigation</h2>
-      <div class="nav-grid">
-        <a href="index.html" class="nav-card active" aria-current="page">
-          <span class="nav-icon">🏠</span>
-          <span class="nav-text">Accueil</span>
+    <!-- En-tête principal -->
+    <header class="page-header">
+      <h1>⚜ INVENTARIUM MAGICUS ⚜</h1>
+      <p class="page-subtitle">Gestio Monetarum et Gemmarium pro Adventuratoribus</p>
+    </header>
+
+    <!-- Navigation principale -->
+    <section class="section">
+      <h2>🗺️ Navigationis Principalis</h2>
+      <div class="main-nav-grid">
+        <a href="dorusis.html" class="nav-card primary">
+          <div class="nav-icon">👤</div>
+          <div class="nav-content">
+            <h3>Inventarium Dorusis</h3>
+            <p>Thesaurus personalis militis fortis</p>
+          </div>
         </a>
-        <a href="dorusis.html" class="nav-card">
-          <span class="nav-icon">👤</span>
-          <span class="nav-text">Dorusis</span>
+        
+        <a href="guilde.html" class="nav-card secondary">
+          <div class="nav-icon">⚔️</div>
+          <div class="nav-content">
+            <h3>Inventarium Guildae</h3>
+            <p>Thesaurus communis sodalitatis</p>
+          </div>
         </a>
-        <a href="guilde.html" class="nav-card">
-          <span class="nav-icon">⚔️</span>
-          <span class="nav-text">Guilde</span>
+        
+        <a href="poids.html" class="nav-card tertiary">
+          <div class="nav-icon">🏋️</div>
+          <div class="nav-content">
+            <h3>Gestio Ponderum</h3>
+            <p>Administratio ponderis et sarcinarum</p>
+          </div>
         </a>
-        <a href="poids.html" class="nav-card">
-          <span class="nav-icon">🏋️</span>
-          <span class="nav-text">Gestion Poids</span>
+        
+        <a href="liste.html" class="nav-card quaternary">
+          <div class="nav-icon">📋</div>
+          <div class="nav-content">
+            <h3>Lista Completa</h3>
+            <p>Catalogus omnium monetarum et gemmarum</p>
+          </div>
         </a>
-        <a href="liste.html" class="nav-card">
-          <span class="nav-icon">📋</span>
-          <span class="nav-text">Liste complète</span>
+        
+        <a href="convertisseur.html" class="nav-card quinary">
+          <div class="nav-icon">🔄</div>
+          <div class="nav-content">
+            <h3>Convertisseur</h3>
+            <p>Transformatio inter diversas monetas</p>
+          </div>
         </a>
-        <a href="convertisseur.html" class="nav-card">
-          <span class="nav-icon">🔄</span>
-          <span class="nav-text">Convertisseur</span>
+        
+        <a href="grimoire.html" class="nav-card senary">
+          <div class="nav-icon">📖</div>
+          <div class="nav-content">
+            <h3>Grimoire Magicus</h3>
+            <p>Librum documentorum et legislum</p>
+          </div>
         </a>
       </div>
-    </nav>
+    </section>
 
-    <!-- Contenu principal -->
-    <main class="welcome-section">
-      <header class="welcome-header">
-        <h1>Gestionnaire de Monnaies</h1>
-        <p class="welcome-subtitle">Gérez vos inventaires de pièces et gemmes facilement</p>
-      </header>
-
-      <!-- Actions rapides -->
-      <section class="quick-actions">
-        <h2>Actions Rapides</h2>
-        <div class="action-grid">
-          <a href="dorusis.html" class="action-card primary">
-            <div class="action-icon">👤</div>
-            <div class="action-content">
-              <h3>Inventaire Dorusis</h3>
-              <p>Gérer l'inventaire personnel de Dorusis</p>
-            </div>
-          </a>
-          
-          <a href="guilde.html" class="action-card secondary">
-            <div class="action-icon">⚔️</div>
-            <div class="action-content">
-              <h3>Inventaire Guilde</h3>
-              <p>Gérer l'inventaire collectif de la guilde</p>
-            </div>
-          </a>
-          
-          <a href="poids.html" class="action-card tertiary">
-            <div class="action-icon">🏋️</div>
-            <div class="action-content">
-              <h3>Gestion Poids</h3>
-              <p>Gérer les poids des objets et inventaires</p>
-            </div>
-          </a>
-          
-          <a href="convertisseur.html" class="action-card quaternary">
-            <div class="action-icon">🔄</div>
-            <div class="action-content">
-              <h3>Convertisseur</h3>
-              <p>Convertir entre différentes monnaies</p>
-            </div>
-          </a>
-          
-          <a href="liste.html" class="action-card quaternary">
-            <div class="action-icon">📋</div>
-            <div class="action-content">
-              <h3>Liste Complète</h3>
-              <p>Voir toutes les monnaies et gemmes</p>
-            </div>
-          </a>
+    <!-- Informations sur le système -->
+    <section class="section">
+      <h2>📜 Informatio Systematis</h2>
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>💰 Monetae et Gemmae</h3>
+          <ul>
+            <li><strong>Monetae Metallicae:</strong> Ferrum, Argentum, Aurum, Electrum, Platina</li>
+            <li><strong>Gemmae Pretiosae:</strong> Rubinus, Smaragdus, Sapphirus, Adamas</li>
+            <li><strong>Conversio Automatica:</strong> in PM (Pièce Modèle)</li>
+            <li><strong>Valor Totalis:</strong> Calculatio instantanea</li>
+          </ul>
         </div>
-      </section>
-
-      <!-- Informations utiles -->
-      <section class="info-section">
-        <h2>Informations</h2>
-        <div class="info-grid">
-          <div class="info-card">
-            <h3>💰 Types de Monnaies</h3>
-            <ul>
-              <li>Pièces métalliques (Fer, Argent, Or, etc.)</li>
-              <li>Gemmes précieuses (Rubis, Émeraude, etc.)</li>
-              <li>Conversion automatique en PM (Pièce Modèle)</li>
-            </ul>
-          </div>
-          
-          <div class="info-card">
-            <h3>💾 Sauvegarde</h3>
-            <ul>
-              <li>Export/Import au format JSON</li>
-              <li>Sauvegarde locale automatique</li>
-              <li>Données sécurisées dans le navigateur</li>
-            </ul>
-          </div>
-          
-          <div class="info-card">
-            <h3>📱 Responsive</h3>
-            <ul>
-              <li>Interface adaptée mobile/desktop</li>
-              <li>Navigation optimisée</li>
-              <li>Performance améliorée</li>
-            </ul>
-          </div>
+        
+        <div class="info-card">
+          <h3>⚖️ Gestio Ponderum</h3>
+          <ul>
+            <li><strong>Categoriae Ordinatae:</strong> Arma, Armatura, Instrumenta</li>
+            <li><strong>Pondus Portatum:</strong> Dimidium ponderis quando portatur</li>
+            <li><strong>Calculatio Dorusis:</strong> 80kg + equipamentum automatice</li>
+            <li><strong>Inventaria Multiplex:</strong> Dorusis, Equus, Guilda</li>
+          </ul>
         </div>
-      </section>
-    </main>
+        
+        <div class="info-card">
+          <h3>💾 Conservatio Datorum</h3>
+          <ul>
+            <li><strong>Export/Import:</strong> Formato JSON</li>
+            <li><strong>Conservatio Localis:</strong> In navigatore tuo</li>
+            <li><strong>Securitas:</strong> Data tua privata manent</li>
+            <li><strong>Backup:</strong> Possibilitas salvandi et recuperandi</li>
+          </ul>
+        </div>
+        
+        <div class="info-card">
+          <li><strong>Interface Adaptiva:</strong> Mobile et Desktop</li>
+            <li><strong>Navigatio Optimizata:</strong> Facilis usus</li>
+            <li><strong>Thema Medievale:</strong> Aesthetica fantastica</li>
+            <li><strong>Performance:</strong> Velocitas et stabilitas</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Actions rapides -->
+    <section class="section">
+      <h2>⚡ Actiones Veloces</h2>
+      <div class="quick-actions">
+        <button onclick="window.location.href='dorusis.html'" class="action-btn primary">
+          📦 Aperire Inventarium Dorusis
+        </button>
+        <button onclick="window.location.href='poids.html'" class="action-btn secondary">
+          ⚖️ Gerere Pondera
+        </button>
+        <button onclick="window.location.href='convertisseur.html'" class="action-btn tertiary">
+          🔄 Convertere Monetas
+        </button>
+        <button onclick="window.location.href='grimoire.html'" class="action-btn quaternary">
+          📖 Legere Grimoire
+        </button>
+      </div>
+    </section>
+
+    <!-- Pied de page -->
+    <footer class="section footer">
+      <div class="footer-content">
+        <h3>⚜ Inventarium Magicus ⚜</h3>
+        <p><em>Opus perfectum pro gestione thesaurorum adventuratorum</em></p>
+        <p class="latin-quote">"Pecunia non olet, sed bene administrata prosperat"</p>
+        <div class="footer-links">
+          <span>Versio 2.0</span> • 
+          <span>Anno Domini MMXXV</span> • 
+          <span>Cum amore factum</span>
+        </div>
+      </div>
+    </footer>
   </div>
 
   <!-- Scripts -->
@@ -134,11 +153,15 @@
   <script>
     // Script spécifique à la page d'accueil
     document.addEventListener('DOMContentLoaded', function() {
-      // Animation des cartes d'action au survol
-      const actionCards = document.querySelectorAll('.action-card');
-      actionCards.forEach(card => {
+      console.log('🏰 Inventarium Magicus - Initialisé');
+      
+      // Animation des cartes de navigation
+      const navCards = document.querySelectorAll('.nav-card');
+      navCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        
         card.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-5px) scale(1.02)';
+          this.style.transform = 'translateY(-8px) scale(1.02)';
         });
         
         card.addEventListener('mouseleave', function() {
@@ -146,28 +169,20 @@
         });
       });
 
-      // Statistiques rapides (si des données sont disponibles)
+      // Statistiques des objets disponibles
       if (window.monnaies) {
         const piecesCount = Object.keys(window.monnaies.pieces).length;
         const gemmesCount = Object.keys(window.monnaies.gemmes).length;
+        let poidsCount = 0;
         
-        // Ajouter les stats si un élément existe pour les afficher
-        const statsElement = document.querySelector('.stats-display');
-        if (statsElement) {
-          statsElement.innerHTML = `
-            <div class="stat-item">
-              <span class="stat-number">${piecesCount}</span>
-              <span class="stat-label">Types de pièces</span>
-            </div>
-            <div class="stat-item">
-              <span class="stat-number">${gemmesCount}</span>
-              <span class="stat-label">Types de gemmes</span>
-            </div>
-          `;
+        if (window.monnaies.poids) {
+          Object.values(window.monnaies.poids).forEach(cat => {
+            poidsCount += Object.keys(cat).length;
+          });
         }
+        
+        console.log(`📊 Statistiques: ${piecesCount} pièces, ${gemmesCount} gemmes, ${poidsCount} objets`);
       }
-
-      console.log('Page d\'accueil initialisée');
     });
   </script>
 </body>
