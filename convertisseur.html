@@ -1,47 +1,431 @@
 <!DOCTYPE html>
-<html>
- <head>
-  <meta content="width=device-width, initial-scale=1" name="viewport"/>
-  <meta charset="utf-8"/>
-  <title>
-   Convertisseur
-  </title>
-  <link href="style.css" rel="stylesheet"/>
- </head>
- <body>
-  <div class="content">
-   <h2>
-    Convertisseur Monétaire
-   </h2>
-   <label>
-    Devise:
-    <select id="convCurrency">
-    </select>
-   </label>
-   <label>
-    Quantité:
-    <input id="convQty" type="number" value="1"/>
-   </label>
-   <table id="convResultsTable">
-    <thead>
-     <tr>
-      <th>
-       Denomination
-      </th>
-      <th>
-       Equivalent en unité
-      </th>
-     </tr>
-    </thead>
-    <tbody id="convResults">
-    </tbody>
-   </table>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Convertisseur Monetarum</title>
+  <meta name="description" content="Convertisseur de monnaies et gemmes">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="content fade-in">
+    <!-- En-tête de la page -->
+    <header class="page-header">
+      <h1>🔄 CONVERTISSEUR MONETARUM 🔄</h1>
+      <p class="page-subtitle">Transformatio Inter Diversas Monetas et Gemmas</p>
+    </header>
+
+    <!-- Interface de conversion -->
+    <section class="section">
+      <div class="controls-header">
+        <div class="controls-left">
+          <h2>⚖️ Conversio Instantanea</h2>
+        </div>
+        <div class="controls-right">
+          <button onclick="resetConverter()" class="btn-action btn-delete">
+            🗑️ Purgare
+          </button>
+        </div>
+      </div>
+
+      <!-- Formulaire de conversion -->
+      <div class="conversion-form">
+        <div class="input-group">
+          <label for="convCurrency">Moneta/Gemma Electa:</label>
+          <select id="convCurrency" onchange="convertAll()">
+            <!-- Options générées dynamiquement -->
+          </select>
+        </div>
+        
+        <div class="input-group">
+          <label for="convQty">Quantitas:</label>
+          <input type="number" id="convQty" value="1" min="0" step="0.01" oninput="convertAll()">
+        </div>
+      </div>
+    </section>
+
+    <!-- Résultats de conversion -->
+    <section class="section">
+      <h2>📊 Resultata Conversionis</h2>
+      
+      <!-- Conversion vers monnaies de base -->
+      <div class="conversion-results">
+        <h3>🪙 Conversio ad Monetas Principales</h3>
+        <div class="table-container">
+          <table id="convResultsTable" class="inventory-table">
+            <thead>
+              <tr>
+                <th width="40%">Denominatio</th>
+                <th width="30%">Valor Unitarius</th>
+                <th width="30%">Aequivalens</th>
+              </tr>
+            </thead>
+            <tbody id="convResults">
+              <!-- Résultats générés dynamiquement -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Informations sur la devise sélectionnée -->
+      <div class="currency-info" id="currencyInfo">
+        <h3>ℹ️ Informatio de Moneta Electa</h3>
+        <div class="info-content">
+          <p><strong>Nomen:</strong> <span id="selectedName">-</span></p>
+          <p><strong>Categoria:</strong> <span id="selectedCategory">-</span></p>
+          <p><strong>Valor in PM:</strong> <span id="selectedValue">-</span></p>
+          <p><strong>Raritas:</strong> <span id="selectedRarity">-</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tableaux de référence -->
+    <section class="section">
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button class="tab-button active" onclick="switchReferenceTab('pieces')" title="Monnaies métalliques">
+            🪙 Monetae
+          </button>
+          <button class="tab-button" onclick="switchReferenceTab('gemmes')" title="Gemmes précieuses">
+            💎 Gemmae
+          </button>
+        </div>
+
+        <!-- Tableau des pièces -->
+        <div id="ref-pieces" class="tab-content active">
+          <div class="tab-header">
+            <h2>🪙 Monetae Metallicae - Tabula Referentiae</h2>
+          </div>
+          
+          <div class="table-container">
+            <table class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="50%">Nomen</th>
+                  <th width="25%">Valor (PM)</th>
+                  <th width="25%">Ratio ad Aurum</th>
+                </tr>
+              </thead>
+              <tbody id="piecesReference">
+                <!-- Généré dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tableau des gemmes -->
+        <div id="ref-gemmes" class="tab-content">
+          <div class="tab-header">
+            <h2>💎 Gemmae Pretiosae - Tabula Referentiae</h2>
+          </div>
+          
+          <div class="table-container">
+            <table class="inventory-table">
+              <thead>
+                <tr>
+                  <th width="50%">Nomen</th>
+                  <th width="25%">Valor (PM)</th>
+                  <th width="25%">Raritas</th>
+                </tr>
+              </thead>
+              <tbody id="gemmesReference">
+                <!-- Généré dynamiquement -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Calculateur avancé -->
+    <section class="section">
+      <h2>🧮 Calculator Avancé</h2>
+      <div class="advanced-calculator">
+        <div class="calc-input">
+          <label for="calcFrom">De:</label>
+          <select id="calcFrom" onchange="advancedCalculation()">
+            <!-- Options générées dynamiquement -->
+          </select>
+          <input type="number" id="calcFromQty" value="1" min="0" step="0.01" oninput="advancedCalculation()">
+        </div>
+        
+        <div class="calc-arrow">⇄</div>
+        
+        <div class="calc-input">
+          <label for="calcTo">Ad:</label>
+          <select id="calcTo" onchange="advancedCalculation()">
+            <!-- Options générées dynamiquement -->
+          </select>
+          <input type="number" id="calcToQty" readonly>
+        </div>
+      </div>
+      
+      <div class="calc-result" id="calcResult">
+        <p>Selecte monetas pro calculatione...</p>
+      </div>
+    </section>
   </div>
-  <script src="data.js">
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="nav.js"></script>
+  <script>
+    // Variables globales
+    let currentReferenceTab = 'pieces';
+
+    // ===== INITIALISATION =====
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🔄 Convertisseur Monetarum - Initialisé');
+      
+      populateSelects();
+      populateReferenceTables();
+      convertAll();
+    });
+
+    // ===== POPULATION DES SELECTS =====
+    function populateSelects() {
+      const selects = ['convCurrency', 'calcFrom', 'calcTo'];
+      
+      selects.forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        select.innerHTML = '';
+        
+        // Ajouter les pièces
+        const piecesGroup = document.createElement('optgroup');
+        piecesGroup.label = 'Monetae Metallicae';
+        
+        Object.keys(window.monnaies.pieces).forEach(nom => {
+          const option = document.createElement('option');
+          option.value = nom;
+          option.textContent = nom;
+          option.dataset.category = 'pieces';
+          piecesGroup.appendChild(option);
+        });
+        
+        select.appendChild(piecesGroup);
+        
+        // Ajouter les gemmes
+        const gemmesGroup = document.createElement('optgroup');
+        gemmesGroup.label = 'Gemmae Pretiosae';
+        
+        Object.keys(window.monnaies.gemmes).forEach(nom => {
+          const option = document.createElement('option');
+          option.value = nom;
+          option.textContent = nom;
+          option.dataset.category = 'gemmes';
+          gemmesGroup.appendChild(option);
+        });
+        
+        select.appendChild(gemmesGroup);
+      });
+    }
+
+    // ===== CONVERSION PRINCIPALE =====
+    function convertAll() {
+      const select = document.getElementById('convCurrency');
+      const qtyInput = document.getElementById('convQty');
+      const tbody = document.getElementById('convResults');
+      
+      if (!select || !qtyInput || !tbody) return;
+      
+      const selectedCurrency = select.value;
+      const quantity = parseFloat(qtyInput.value) || 0;
+      
+      if (!selectedCurrency) {
+        tbody.innerHTML = '<tr><td colspan="3">Selecte monetam...</td></tr>';
+        return;
+      }
+      
+      // Obtenir la valeur de base
+      let baseValue = 0;
+      let category = '';
+      
+      if (window.monnaies.pieces[selectedCurrency] !== undefined) {
+        baseValue = window.monnaies.pieces[selectedCurrency] * quantity;
+        category = 'Monetae';
+      } else if (window.monnaies.gemmes[selectedCurrency] !== undefined) {
+        baseValue = window.monnaies.gemmes[selectedCurrency] * quantity;
+        category = 'Gemmae';
+      }
+      
+      // Conversion vers les monnaies principales
+      tbody.innerHTML = '';
+      
+      const mainCurrencies = ['Fer', 'Argent', 'Or', 'Électrum', 'Platine'];
+      
+      mainCurrencies.forEach(currency => {
+        const value = window.monnaies.pieces[currency] || 1;
+        const equivalent = baseValue / value;
+        
+        const row = tbody.insertRow();
+        row.innerHTML = `
+          <td><strong>${currency}</strong></td>
+          <td>${value.toFixed(4)} PM</td>
+          <td>${equivalent.toFixed(2)}</td>
+        `;
+        
+        if (currency === selectedCurrency) {
+          row.style.backgroundColor = 'rgba(218, 165, 32, 0.2)';
+          row.style.fontWeight = 'bold';
+        }
+      });
+      
+      // Mettre à jour les informations sur la devise
+      updateCurrencyInfo(selectedCurrency, category, baseValue / quantity);
+    }
+
+    // ===== INFORMATIONS SUR LA DEVISE =====
+    function updateCurrencyInfo(name, category, value) {
+      document.getElementById('selectedName').textContent = name;
+      document.getElementById('selectedCategory').textContent = category;
+      document.getElementById('selectedValue').textContent = value.toFixed(4) + ' PM';
+      
+      // Calculer la rareté
+      let rarity = 'Communis';
+      if (value > 50) rarity = 'Rarissima';
+      else if (value > 10) rarity = 'Rara';
+      else if (value > 5) rarity = 'Mediocris';
+      else if (value > 1) rarity = 'Frequens';
+      
+      document.getElementById('selectedRarity').textContent = rarity;
+    }
+
+    // ===== GESTION DES ONGLETS DE RÉFÉRENCE =====
+    function switchReferenceTab(tabName) {
+      // Désactiver tous les onglets
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      // Activer l'onglet sélectionné
+      const tabButton = document.querySelector(`[onclick="switchReferenceTab('${tabName}')"]`);
+      const tabContent = document.getElementById(`ref-${tabName}`);
+      
+      if (tabButton && tabContent) {
+        tabButton.classList.add('active');
+        tabContent.classList.add('active');
+        currentReferenceTab = tabName;
+      }
+    }
+
+    // ===== TABLEAUX DE RÉFÉRENCE =====
+    function populateReferenceTables() {
+      // Table des pièces
+      const piecesTable = document.getElementById('piecesReference');
+      if (piecesTable) {
+        const orValue = window.monnaies.pieces['Or'] || 1;
+        
+        Object.entries(window.monnaies.pieces)
+          .sort(([,a], [,b]) => b - a)
+          .forEach(([nom, valeur]) => {
+            const ratio = (valeur / orValue).toFixed(2);
+            const row = piecesTable.insertRow();
+            row.innerHTML = `
+              <td><strong>${nom}</strong></td>
+              <td>${valeur.toFixed(4)}</td>
+              <td>${ratio}×</td>
+            `;
+          });
+      }
+      
+      // Table des gemmes
+      const gemmesTable = document.getElementById('gemmesReference');
+      if (gemmesTable) {
+        Object.entries(window.monnaies.gemmes)
+          .sort(([,a], [,b]) => b - a)
+          .forEach(([nom, valeur]) => {
+            let rarity = 'Communis';
+            if (valeur > 50) rarity = 'Rarissima';
+            else if (valeur > 10) rarity = 'Rara';
+            else if (valeur > 5) rarity = 'Mediocris';
+            else if (valeur > 1) rarity = 'Frequens';
+            
+            const row = gemmesTable.insertRow();
+            row.innerHTML = `
+              <td><strong>${nom}</strong></td>
+              <td>${valeur.toFixed(2)}</td>
+              <td>${rarity}</td>
+            `;
+          });
+      }
+    }
+
+    // ===== CALCULATEUR AVANCÉ =====
+    function advancedCalculation() {
+      const fromSelect = document.getElementById('calcFrom');
+      const toSelect = document.getElementById('calcTo');
+      const fromQty = document.getElementById('calcFromQty');
+      const toQty = document.getElementById('calcToQty');
+      const resultDiv = document.getElementById('calcResult');
+      
+      if (!fromSelect.value || !toSelect.value) {
+        resultDiv.innerHTML = '<p>Selecte ambas monetas...</p>';
+        return;
+      }
+      
+      const fromValue = getItemValue(fromSelect.value);
+      const toValue = getItemValue(toSelect.value);
+      const quantity = parseFloat(fromQty.value) || 0;
+      
+      if (fromValue === 0 || toValue === 0) {
+        resultDiv.innerHTML = '<p>Error: Valor non inventus</p>';
+        return;
+      }
+      
+      const result = (fromValue * quantity) / toValue;
+      toQty.value = result.toFixed(4);
+      
+      resultDiv.innerHTML = `
+        <p><strong>${quantity} ${fromSelect.value}</strong> = <strong>${result.toFixed(4)} ${toSelect.value}</strong></p>
+        <p><em>Ratio: 1 ${fromSelect.value} = ${(fromValue/toValue).toFixed(4)} ${toSelect.value}</em></p>
+      `;
+    }
+
+    // ===== UTILITAIRES =====
+    function getItemValue(name) {
+      return window.monnaies.pieces[name] || window.monnaies.gemmes[name] || 0;
+    }
+
+    function resetConverter() {
+      document.getElementById('convQty').value = '1';
+      document.getElementById('convCurrency').selectedIndex = 0;
+      document.getElementById('calcFromQty').value = '1';
+      document.getElementById('calcFrom').selectedIndex = 0;
+      document.getElementById('calcTo').selectedIndex = 0;
+      document.getElementById('calcToQty').value = '';
+      document.getElementById('calcResult').innerHTML = '<p>Selecte monetas pro calculatione...</p>';
+      convertAll();
+      showNotification('🔄 Convertisseur réinitialisé');
+    }
+
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 10000;
+        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+        color: white; padding: 15px 25px; border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        font-family: "Quattrocento Sans", Arial, sans-serif;
+        font-weight: bold; font-size: 14px;
+        border: 2px solid #228B22;
+        animation: slideIn 0.3s ease;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // ===== EXPOSITION DES FONCTIONS =====
+    window.convertAll = convertAll;
+    window.switchReferenceTab = switchReferenceTab;
+    window.advancedCalculation = advancedCalculation;
+    window.resetConverter = resetConverter;
   </script>
-  <script src="convert.js">
-  </script>
-  <script src="nav.js">
-  </script>
- </body>
+</body>
 </html>
