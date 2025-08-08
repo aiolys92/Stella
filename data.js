@@ -96,6 +96,10 @@ if (!window.monnaies) {
         // Catégorie vide mais conservée
       },
       
+      "Personnages": {
+        "Dorusis (1.80m, forte musculature)": 80
+      },
+      
       "Objets Personnalisés": {
         // Catégorie pour les futurs ajouts
       }
