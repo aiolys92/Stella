@@ -1,32 +1,19 @@
-// ===== SCRIPT DE GESTION DES POIDS =====
-
-/**
- * Gestionnaire pour la page des poids avec inventaires multiples
- */
-
-// ===== CONSTANTES =====
-const POIDS_CONFIG = {
-  tabs: ['dorusis', 'guilde', 'cheval'],
-  defaultTab: 'dorusis',
-  unite: 'kg'
-};
+// ===== SCRIPT UNIFIÉ POUR LA GESTION DES POIDS =====
+// Un seul fichier poids.js pour tout gérer !
 
 // ===== VARIABLES GLOBALES =====
-let currentTab = POIDS_CONFIG.defaultTab;
+let currentTab = 'dorusis'; // Onglet actuel
 
-// ===== GESTION DES ONGLETS =====
+// ===== 1. GESTION DES ONGLETS =====
 /**
- * Change d'onglet actif
- * @param {string} tabName - Nom de l'onglet à activer
+ * Change d'onglet et affiche le bon inventaire
  */
 function switchTab(tabName) {
+  console.log(`Changement vers onglet: ${tabName}`);
+  
   // Désactiver tous les onglets
-  document.querySelectorAll('.tab-button').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  document.querySelectorAll('.tab-content').forEach(content => {
-    content.classList.remove('active');
-  });
+  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
   // Activer l'onglet sélectionné
   const tabButton = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
@@ -42,9 +29,9 @@ function switchTab(tabName) {
   }
 }
 
-// ===== GESTION DES OBJETS PERSONNALISÉS =====
+// ===== 2. GESTION DES OBJETS PERSONNALISÉS =====
 /**
- * Ajoute un nouvel objet personnalisé
+ * Ajoute un nouvel objet dans une catégorie
  */
 function ajouterNouvelObjet() {
   const categorieSelect = document.getElementById('newObjectCategory');
@@ -55,28 +42,26 @@ function ajouterNouvelObjet() {
   const nom = nomInput.value.trim();
   const poids = parseFloat(poidsInput.value);
   
+  // Vérifications
   if (!categorie) {
-    alert('Veuillez sélectionner une catégorie');
-    categorieSelect.focus();
+    alert('⚠️ Veuillez sélectionner une catégorie');
     return;
   }
   
   if (!nom) {
-    alert('Veuillez saisir un nom d\'objet');
-    nomInput.focus();
+    alert('⚠️ Veuillez saisir un nom d\'objet');
     return;
   }
   
   if (isNaN(poids) || poids < 0) {
-    alert('Veuillez saisir un poids valide (≥ 0)');
-    poidsInput.focus();
+    alert('⚠️ Veuillez saisir un poids valide (≥ 0)');
     return;
   }
   
   // Vérifier si l'objet existe déjà
   const poidsActuel = window.getPoidsObjet(nom);
   if (poidsActuel > 0) {
-    const confirmer = confirm(`L'objet "${nom}" existe déjà avec un poids de ${poidsActuel} kg. Voulez-vous le remplacer ?`);
+    const confirmer = confirm(`L'objet "${nom}" existe déjà. Le remplacer ?`);
     if (!confirmer) return;
   }
   
@@ -90,72 +75,55 @@ function ajouterNouvelObjet() {
   // Vider le formulaire
   nomInput.value = '';
   poidsInput.value = '';
-  nomInput.focus();
   
-  // Message de confirmation
-  showNotification(`Objet "${nom}" ajouté avec succès dans ${categorie} (${poids} kg)`);
+  showNotification(`✅ Objet "${nom}" ajouté dans ${categorie} (${poids} kg)`);
 }
 
 /**
- * Supprime un objet personnalisé
- * @param {string} nom - Nom de l'objet à supprimer
+ * Supprime un objet
  */
 function supprimerObjet(nom) {
-  const confirmer = confirm(`Êtes-vous sûr de vouloir supprimer "${nom}" ?`);
-  if (!confirmer) return;
-  
-  if (window.supprimerObjetPoids(nom)) {
-    updateObjectsList();
-    showNotification(`Objet "${nom}" supprimé`);
-  } else {
-    alert('Impossible de supprimer cet objet');
+  if (confirm(`❌ Supprimer "${nom}" ?`)) {
+    if (window.supprimerObjetPoids(nom)) {
+      updateObjectsList();
+      populateSelects();
+      showNotification(`🗑️ Objet "${nom}" supprimé`);
+    }
   }
 }
 
+// ===== 3. GESTION DES INVENTAIRES =====
 /**
- * Modifie le poids d'un objet
- * @param {string} nom - Nom de l'objet
- * @param {number} nouveauPoids - Nouveau poids
- */
-function modifierPoids(nom, nouveauPoids) {
-  if (window.modifierObjetPoids(nom, nouveauPoids)) {
-    updateObjectsList();
-    showNotification(`Poids de "${nom}" modifié: ${nouveauPoids} kg`);
-  }
-}
-
-// ===== GESTION DES INVENTAIRES =====
-/**
- * Ajoute une ligne à l'inventaire
- * @param {string} inventaire - Nom de l'inventaire (dorusis, guilde, cheval)
+ * Ajoute une ligne d'inventaire avec catégorie + objet + poids porté
  */
 function addInventaireRowPoids(inventaire) {
   const tableId = `inventaireTable${inventaire.charAt(0).toUpperCase() + inventaire.slice(1)}`;
   const table = document.getElementById(tableId);
   
   if (!table) {
-    console.error('Table non trouvée:', tableId);
+    console.error('❌ Table non trouvée:', tableId);
     return;
   }
   
   const tbody = table.querySelector('tbody');
   const row = tbody.insertRow();
   
-  // Créer les options pour les catégories
+  // Options des catégories
   const categoriesOptions = window.getCategoriesPoids()
     .map(cat => `<option value="${cat}">${cat}</option>`)
     .join('');
   
+  // Créer la ligne complète
   row.innerHTML = `
     <td>
       <select onchange="updateObjetOptions(this)" class="category-select">
-        <option value="">Choisir une catégorie</option>
+        <option value="">🗂️ Choisir catégorie</option>
         ${categoriesOptions}
       </select>
     </td>
     <td>
       <select onchange="updateInventairePoids(this)" class="object-select" disabled>
-        <option value="">Choisir un objet</option>
+        <option value="">📦 Choisir objet</option>
       </select>
     </td>
     <td>
@@ -163,13 +131,15 @@ function addInventaireRowPoids(inventaire) {
              oninput="updateInventairePoids(this)" 
              class="quantity-input">
     </td>
-    <td class="unit-weight">0</td>
+    <td class="unit-weight">-</td>
     <td class="carried-weight-cell">
-      <input type="checkbox" class="carried-checkbox" onchange="updateInventairePoids(this)">
-      <span class="carried-weight">0</span>
+      <label class="checkbox-label">
+        <input type="checkbox" class="carried-checkbox" onchange="updateInventairePoids(this)">
+        <span class="carried-weight">-</span> kg
+      </label>
     </td>
-    <td class="total-weight">0</td>
-    <td>
+    <td class="total-weight">-</td>
+    <td class="actions-cell">
       <button onclick="removeInventaireRowPoids(this)" class="btn-delete" title="Supprimer">
         🗑️
       </button>
@@ -181,41 +151,43 @@ function addInventaireRowPoids(inventaire) {
 }
 
 /**
- * Met à jour les options d'objets quand une catégorie est sélectionnée
- * @param {HTMLSelectElement} categorySelect - Select de catégorie
+ * Met à jour les objets quand une catégorie est choisie
  */
 function updateObjetOptions(categorySelect) {
   const row = categorySelect.closest('tr');
   const objectSelect = row.querySelector('.object-select');
   const categorie = categorySelect.value;
   
-  objectSelect.innerHTML = '<option value="">Choisir un objet</option>';
+  // Réinitialiser le select d'objets
+  objectSelect.innerHTML = '<option value="">📦 Choisir objet</option>';
   
   if (!categorie) {
     objectSelect.disabled = true;
+    updateInventairePoids(categorySelect); // Reset les valeurs
     return;
   }
   
+  // Charger les objets de la catégorie
   const objets = window.getObjetsByCategorie(categorie);
   const options = Object.keys(objets)
     .sort()
     .map(nom => `<option value="${nom}">${nom}</option>`)
     .join('');
   
-  objectSelect.innerHTML = `<option value="">Choisir un objet</option>${options}`;
+  objectSelect.innerHTML = `<option value="">📦 Choisir objet</option>${options}`;
   objectSelect.disabled = false;
   
-  // Déclencher la mise à jour
+  // Mettre à jour les calculs
   updateInventairePoids(categorySelect);
 }
 
 /**
- * Met à jour les calculs d'une ligne d'inventaire
- * @param {HTMLElement} element - Élément déclencheur
+ * Met à jour tous les calculs d'une ligne (LE CŒUR DU SYSTÈME)
  */
 function updateInventairePoids(element) {
   const row = element.closest('tr');
-  const categorySelect = row.querySelector('.category-select');
+  
+  // Récupérer tous les éléments de la ligne
   const objectSelect = row.querySelector('.object-select');
   const quantityInput = row.querySelector('.quantity-input');
   const unitWeightCell = row.querySelector('.unit-weight');
@@ -223,97 +195,38 @@ function updateInventairePoids(element) {
   const carriedWeightSpan = row.querySelector('.carried-weight');
   const totalWeightCell = row.querySelector('.total-weight');
   
+  // Récupérer les valeurs
   const objectName = objectSelect.value;
   const quantity = parseFloat(quantityInput.value) || 0;
   const unitWeight = objectName ? window.getPoidsObjet(objectName) : 0;
   const isCarried = carriedCheckbox.checked;
   
-  // Poids unitaire
-  unitWeightCell.textContent = unitWeight.toFixed(1);
-  
-  // Poids porté (divisé par 2 si coché)
-  const carriedWeight = isCarried ? unitWeight / 2 : unitWeight;
-  carriedWeightSpan.textContent = carriedWeight.toFixed(1);
-  
-  // Poids total = quantité × poids porté
-  const totalWeight = carriedWeight * quantity;
-  totalWeightCell.textContent = totalWeight.toFixed(1);
-  
-  // Mettre à jour le total général
-  updateTotalPoids();
-} (dorusis, guilde, cheval)
- */
-function addInventaireRowPoids(inventaire) {
-  const tableId = `inventaireTable${inventaire.charAt(0).toUpperCase() + inventaire.slice(1)}`;
-  const table = document.getElementById(tableId);
-  
-  if (!table) {
-    console.error('Table non trouvée:', tableId);
-    return;
+  // Calculs
+  if (objectName && unitWeight > 0) {
+    // 1. Poids unitaire
+    unitWeightCell.textContent = unitWeight.toFixed(1) + ' kg';
+    
+    // 2. Poids porté (÷2 si coché)
+    const carriedWeight = isCarried ? unitWeight / 2 : unitWeight;
+    carriedWeightSpan.textContent = carriedWeight.toFixed(1);
+    
+    // 3. Poids total = quantité × poids porté
+    const totalWeight = carriedWeight * quantity;
+    totalWeightCell.textContent = totalWeight.toFixed(1) + ' kg';
+    
+  } else {
+    // Reset si pas d'objet sélectionné
+    unitWeightCell.textContent = '-';
+    carriedWeightSpan.textContent = '-';
+    totalWeightCell.textContent = '-';
   }
   
-  const tbody = table.querySelector('tbody');
-  const row = tbody.insertRow();
-  
-  // Créer les options pour le select
-  const options = Object.keys(window.monnaies.poids)
-    .sort()
-    .map(nom => `<option value="${nom}">${nom}</option>`)
-    .join('');
-  
-  row.innerHTML = `
-    <td>
-      <select onchange="updateInventairePoids(this)" class="object-select">
-        ${options}
-      </select>
-    </td>
-    <td>
-      <input type="number" value="1" min="0" step="0.1" 
-             oninput="updateInventairePoids(this)" 
-             class="quantity-input">
-    </td>
-    <td class="unit-weight">0</td>
-    <td class="total-weight">0</td>
-    <td>
-      <button onclick="removeInventaireRowPoids(this)" class="btn-delete">
-        🗑️
-      </button>
-      <button onclick="duplicateRowPoids(this)" class="btn-duplicate" title="Dupliquer">
-        📄
-      </button>
-    </td>
-  `;
-  
-  // Déclencher la mise à jour initiale
-  updateInventairePoids(row.querySelector('select'));
-}
-
-/**
- * Met à jour les calculs d'une ligne d'inventaire
- * @param {HTMLElement} element - Élément déclencheur
- */
-function updateInventairePoids(element) {
-  const row = element.closest('tr');
-  const select = row.querySelector('.object-select');
-  const quantityInput = row.querySelector('.quantity-input');
-  const unitWeightCell = row.querySelector('.unit-weight');
-  const totalWeightCell = row.querySelector('.total-weight');
-  
-  const objectName = select.value;
-  const quantity = parseFloat(quantityInput.value) || 0;
-  const unitWeight = window.monnaies.poids[objectName] || 0;
-  const totalWeight = unitWeight * quantity;
-  
-  unitWeightCell.textContent = unitWeight.toFixed(1);
-  totalWeightCell.textContent = totalWeight.toFixed(1);
-  
-  // Mettre à jour le total général
+  // Mettre à jour le total général de l'onglet
   updateTotalPoids();
 }
 
 /**
  * Supprime une ligne d'inventaire
- * @param {HTMLElement} button - Bouton de suppression
  */
 function removeInventaireRowPoids(button) {
   const row = button.closest('tr');
@@ -323,157 +236,165 @@ function removeInventaireRowPoids(button) {
 
 /**
  * Duplique une ligne d'inventaire
- * @param {HTMLElement} button - Bouton de duplication
  */
 function duplicateRowPoids(button) {
   const row = button.closest('tr');
-  const table = row.closest('table');
-  const tbody = table.querySelector('tbody');
+  const tbody = row.closest('tbody');
   
-  // Créer une nouvelle ligne
-  const newRow = tbody.insertRow(row.rowIndex);
-  newRow.innerHTML = row.innerHTML;
+  // Cloner la ligne
+  const newRow = row.cloneNode(true);
+  tbody.appendChild(newRow);
   
-  // Mettre à jour les événements
-  const select = newRow.querySelector('.object-select');
-  const quantityInput = newRow.querySelector('.quantity-input');
-  
-  updateInventairePoids(select);
+  // Recalculer
+  updateInventairePoids(newRow.querySelector('.object-select'));
 }
 
 /**
- * Met à jour le total des poids pour l'onglet actuel
+ * Calcule et affiche le total de poids pour l'onglet actuel
  */
 function updateTotalPoids() {
   const currentTable = document.querySelector(`#tab-${currentTab} .inventory-table`);
   if (!currentTable) return;
   
-  const totalCells = currentTable.querySelectorAll('.total-weight');
   let total = 0;
   
-  totalCells.forEach(cell => {
-    total += parseFloat(cell.textContent) || 0;
+  // Additionner tous les poids totaux
+  currentTable.querySelectorAll('.total-weight').forEach(cell => {
+    const text = cell.textContent.replace(' kg', '');
+    const value = parseFloat(text);
+    if (!isNaN(value)) {
+      total += value;
+    }
   });
   
+  // Afficher le total
   const totalElement = document.getElementById('totalPoids');
   if (totalElement) {
     totalElement.textContent = total.toFixed(1);
   }
 }
 
-// ===== GESTION DE LA LISTE DES OBJETS =====
+// ===== 4. GESTION DE LA LISTE DES OBJETS =====
 /**
- * Met à jour l'affichage de la liste des objets
+ * Met à jour la liste complète des objets par catégories
  */
 function updateObjectsList() {
-  const container = document.getElementById('objectsList');
+  const container = document.getElementById('categoriesContainer');
   if (!container) return;
   
   container.innerHTML = '';
   
-  // Trier les objets par nom
-  const sortedObjects = Object.entries(window.monnaies.poids)
-    .sort(([a], [b]) => a.localeCompare(b));
-  
-  sortedObjects.forEach(([nom, poids]) => {
-    const objectCard = document.createElement('div');
-    objectCard.className = 'object-card';
-    objectCard.innerHTML = `
-      <div class="object-info">
-        <strong class="object-name">${nom}</strong>
-        <span class="object-weight">${poids} kg</span>
-      </div>
-      <div class="object-actions">
-        <input type="number" value="${poids}" step="0.1" min="0" 
-               onchange="modifierPoids('${nom}', this.value)" 
-               class="weight-input">
-        <button onclick="supprimerObjet('${nom}')" class="btn-delete-small">🗑️</button>
+  // Pour chaque catégorie
+  window.getCategoriesPoids().forEach(categorieName => {
+    const objets = window.getObjetsByCategorie(categorieName);
+    
+    if (Object.keys(objets).length === 0) return;
+    
+    // Créer la section de catégorie
+    const categorySection = document.createElement('div');
+    categorySection.className = 'category-section';
+    categorySection.innerHTML = `
+      <h3 class="category-title">${categorieName} (${Object.keys(objets).length} objets)</h3>
+      <div class="objects-grid">
+        ${Object.entries(objets)
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([nom, poids]) => `
+            <div class="object-card">
+              <div class="object-info">
+                <strong>${nom}</strong>
+                <span class="object-weight">${poids} kg</span>
+              </div>
+              <div class="object-actions">
+                <input type="number" value="${poids}" step="0.1" min="0" 
+                       onchange="modifierPoids('${nom}', this.value)" 
+                       class="weight-input">
+                <button onclick="supprimerObjet('${nom}')" class="btn-delete-small">🗑️</button>
+              </div>
+            </div>
+          `).join('')}
       </div>
     `;
     
-    container.appendChild(objectCard);
+    container.appendChild(categorySection);
   });
 }
 
-// ===== IMPORT/EXPORT =====
 /**
- * Exporte la liste des objets
+ * Modifie le poids d'un objet existant
  */
-function exporterObjets() {
-  const data = {
-    objets: window.monnaies.poids,
-    exportDate: new Date().toISOString(),
-    version: "1.0"
-  };
-  
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  
-  a.href = url;
-  a.download = `objets-poids-${new Date().toISOString().slice(0, 10)}.json`;
-  a.click();
-  
-  URL.revokeObjectURL(url);
-  showNotification('Liste des objets exportée');
-}
-
-/**
- * Importe une liste d'objets
- * @param {Event} event - Événement de changement de fichier
- */
-async function importerObjets(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  
-  try {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    
-    if (!data.objets || typeof data.objets !== 'object') {
-      throw new Error('Format de fichier invalide');
-    }
-    
-    // Fusionner les objets importés
-    Object.assign(window.monnaies.poids, data.objets);
-    window.objets = {
-      ...window.monnaies.pieces,
-      ...window.monnaies.gemmes,
-      ...window.monnaies.poids
-    };
-    
-    updateObjectsList();
-    showNotification(`${Object.keys(data.objets).length} objets importés`);
-    
-  } catch (error) {
-    console.error('Erreur import:', error);
-    alert('Erreur lors de l\'importation du fichier');
+function modifierPoids(nom, nouveauPoids) {
+  const poids = parseFloat(nouveauPoids);
+  if (isNaN(poids) || poids < 0) {
+    alert('⚠️ Poids invalide');
+    return;
   }
   
-  // Réinitialiser l'input
-  event.target.value = '';
+  if (window.modifierObjetPoids(nom, poids)) {
+    updateObjectsList();
+    showNotification(`✏️ Poids de "${nom}" modifié: ${poids} kg`);
+  }
 }
 
-// ===== SAUVEGARDE/CHARGEMENT INVENTAIRES =====
 /**
- * Sauvegarde tous les inventaires
+ * Peuple tous les selects avec les catégories
  */
+function populateSelects() {
+  // Select pour ajouter un nouvel objet
+  const newObjectCategory = document.getElementById('newObjectCategory');
+  if (newObjectCategory) {
+    newObjectCategory.innerHTML = window.getCategoriesPoids()
+      .map(cat => `<option value="${cat}">${cat}</option>`)
+      .join('');
+  }
+  
+  // Select pour filtrer
+  const categoryFilter = document.getElementById('categoryFilter');
+  if (categoryFilter) {
+    categoryFilter.innerHTML = `
+      <option value="">Toutes les catégories</option>
+      ${window.getCategoriesPoids().map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+    `;
+  }
+}
+
+// ===== 5. RECHERCHE ET FILTRES =====
+function filtrerParCategorie(categorie) {
+  const sections = document.querySelectorAll('.category-section');
+  sections.forEach(section => {
+    const title = section.querySelector('.category-title').textContent;
+    section.style.display = (!categorie || title.includes(categorie)) ? 'block' : 'none';
+  });
+}
+
+function rechercherObjets(terme) {
+  const cards = document.querySelectorAll('.object-card');
+  cards.forEach(card => {
+    const nom = card.textContent.toLowerCase();
+    card.style.display = nom.includes(terme.toLowerCase()) ? 'block' : 'none';
+  });
+}
+
+// ===== 6. SAUVEGARDE/CHARGEMENT =====
 function saveInventairesPoids() {
   const inventaires = {};
   
-  POIDS_CONFIG.tabs.forEach(tab => {
+  ['dorusis', 'guilde', 'cheval'].forEach(tab => {
     const table = document.querySelector(`#inventaireTable${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
     if (!table) return;
     
     const rows = [];
     table.querySelectorAll('tbody tr').forEach(row => {
-      const select = row.querySelector('.object-select');
+      const categorySelect = row.querySelector('.category-select');
+      const objectSelect = row.querySelector('.object-select');
       const quantityInput = row.querySelector('.quantity-input');
+      const carriedCheckbox = row.querySelector('.carried-checkbox');
       
-      if (select && quantityInput && quantityInput.value && parseFloat(quantityInput.value) > 0) {
+      if (objectSelect && objectSelect.value && quantityInput.value) {
         rows.push({
-          objet: select.value,
-          quantite: parseFloat(quantityInput.value)
+          categorie: categorySelect.value,
+          objet: objectSelect.value,
+          quantite: parseFloat(quantityInput.value),
+          porte: carriedCheckbox.checked
         });
       }
     });
@@ -485,7 +406,7 @@ function saveInventairesPoids() {
     inventaires: inventaires,
     objets: window.monnaies.poids,
     saveDate: new Date().toISOString(),
-    version: "1.0"
+    version: "2.0"
   };
   
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -497,439 +418,111 @@ function saveInventairesPoids() {
   a.click();
   
   URL.revokeObjectURL(url);
-  showNotification('Inventaires sauvegardés');
+  showNotification('💾 Inventaires sauvegardés');
 }
 
-/**
- * Charge les inventaires depuis un fichier
- * @param {Event} event - Événement de changement de fichier
- */
-async function loadInventairesPoids(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  
-  try {
-    const text = await file.text();
-    const data = JSON.parse(text);
-    
-    // Charger les objets si présents
-    if (data.objets) {
-      Object.assign(window.monnaies.poids, data.objets);
-      window.objets = {
-        ...window.monnaies.pieces,
-        ...window.monnaies.gemmes,
-        ...window.monnaies.poids
-      };
-      updateObjectsList();
-    }
-    
-    // Charger les inventaires
-    if (data.inventaires) {
-      POIDS_CONFIG.tabs.forEach(tab => {
-        const inventaire = data.inventaires[tab];
-        if (!inventaire) return;
-        
-        // Vider la table existante
-        const table = document.querySelector(`#inventaireTable${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
-        if (!table) return;
-        
-        const tbody = table.querySelector('tbody');
-        tbody.innerHTML = '';
-        
-        // Charger chaque objet
-        inventaire.forEach(item => {
-          addInventaireRowPoids(tab);
-          
-          const lastRow = tbody.lastElementChild;
-          if (lastRow) {
-            const select = lastRow.querySelector('.object-select');
-            const quantityInput = lastRow.querySelector('.quantity-input');
-            
-            if (select && quantityInput) {
-              select.value = item.objet;
-              quantityInput.value = item.quantite;
-              updateInventairePoids(select);
-            }
-          }
-        });
-      });
-    }
-    
-    showNotification('Inventaires chargés avec succès');
-    
-  } catch (error) {
-    console.error('Erreur chargement:', error);
-    alert('Erreur lors du chargement du fichier');
-  }
-  
-  // Réinitialiser l'input
-  event.target.value = '';
-}
-
-// ===== UTILITAIRES =====
-/**
- * Affiche une notification temporaire
- * @param {string} message - Message à afficher
- */
+// ===== 7. UTILITAIRES =====
 function showNotification(message) {
-  // Créer la notification
   const notification = document.createElement('div');
-  notification.className = 'notification';
   notification.textContent = message;
   notification.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #4CAF50;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 4px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    z-index: 10000;
+    position: fixed; top: 20px; right: 20px; z-index: 10000;
+    background: #4CAF50; color: white; padding: 12px 20px;
+    border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     animation: slideIn 0.3s ease;
   `;
   
   document.body.appendChild(notification);
   
-  // Supprimer après 3 secondes
   setTimeout(() => {
     notification.style.animation = 'slideOut 0.3s ease';
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 300);
+    setTimeout(() => notification.remove(), 300);
   }, 3000);
 }
 
-/**
- * Recherche dans les objets
- * @param {string} terme - Terme de recherche
- */
-function rechercherObjets(terme) {
-  const cards = document.querySelectorAll('.object-card');
+// ===== 8. INITIALISATION =====
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🏋️ Initialisation du système de poids...');
   
-  cards.forEach(card => {
-    const nom = card.querySelector('.object-name').textContent.toLowerCase();
-    const match = nom.includes(terme.toLowerCase());
-    card.style.display = match ? 'block' : 'none';
-  });
-}
+  // Vérifier qu'on est sur la bonne page
+  if (!document.querySelector('.tabs-container')) {
+    console.log('❌ Pas sur la page des poids');
+    return;
+  }
+  
+  // Ajouter les styles CSS
+  addPoidsStyles();
+  
+  // Initialiser l'interface
+  populateSelects();
+  updateObjectsList();
+  
+  // Activer le premier onglet
+  switchTab('dorusis');
+  addInventaireRowPoids('dorusis');
+  
+  // Configurer les événements de sauvegarde
+  const saveBtn = document.getElementById('saveInventoryBtn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', saveInventairesPoids);
+  }
+  
+  console.log('✅ Système de poids initialisé !');
+});
 
-// ===== CSS SUPPLÉMENTAIRE =====
-const addPoidsStyles = () => {
+// ===== STYLES CSS INTÉGRÉS =====
+function addPoidsStyles() {
   if (document.getElementById('poids-styles')) return;
   
   const style = document.createElement('style');
   style.id = 'poids-styles';
   style.textContent = `
-    /* Styles pour les onglets - AMÉLIORÉS */
-    .tabs-container {
-      margin: 20px 0;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      overflow: hidden;
-    }
+    /* Styles pour la page des poids */
+    .tabs-container { margin: 20px 0; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
+    .tabs-header { display: flex; background: #f8f9fa; }
+    .tab-button { flex: 1; padding: 15px; border: none; background: transparent; cursor: pointer; transition: all 0.3s; }
+    .tab-button.active { background: #2f1b0c; color: white; }
+    .tab-content { display: none; padding: 20px; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s; }
+    .tab-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
     
-    .tabs-header {
-      display: flex;
-      background: #f8f9fa;
-      border-bottom: 2px solid var(--border-color);
-      margin: 0;
-    }
+    .inventory-table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+    .inventory-table th, .inventory-table td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    .inventory-table th { background: #2f1b0c; color: white; }
     
-    .tab-button {
-      flex: 1;
-      padding: 15px 20px;
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all 0.3s ease;
-      font-weight: 500;
-      color: #666;
-    }
+    .category-select, .object-select { width: 100%; padding: 5px; }
+    .quantity-input, .weight-input { width: 80px; padding: 5px; text-align: center; }
     
-    .tab-button:hover {
-      background: #e9ecef;
-      color: var(--primary-bg);
-    }
+    .checkbox-label { display: flex; align-items: center; gap: 5px; }
+    .carried-checkbox { margin: 0; }
     
-    .tab-button.active {
-      background: var(--primary-bg);
-      color: white;
-      border-bottom-color: var(--primary-bg);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-    }
+    .btn-delete, .btn-duplicate { padding: 5px 8px; margin: 0 2px; border: none; border-radius: 3px; cursor: pointer; }
+    .btn-delete { background: #dc3545; color: white; }
+    .btn-duplicate { background: #007bff; color: white; }
+    .btn-add-row { background: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; margin: 10px 0; }
     
-    /* IMPORTANT: Gérer l'affichage des contenus d'onglets */
-    .tab-content {
-      display: none;
-      padding: 20px;
-      background: white;
-      min-height: 400px;
-      animation: fadeInTab 0.3s ease;
-    }
+    .category-section { margin: 20px 0; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
+    .category-title { background: linear-gradient(135deg, #2f1b0c, #3f2b1c); color: white; margin: 0; padding: 15px; }
+    .objects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; padding: 20px; }
+    .object-card { border: 1px solid #eee; padding: 15px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
     
-    .tab-content.active {
-      display: block;
-    }
-    
-    .tab-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #eee;
-    }
-    
-    .tab-header h2 {
-      margin: 0;
-      color: var(--primary-bg);
-    }
-    
-    /* Animation pour les changements d'onglets */
-    @keyframes fadeInTab {
-      from { 
-        opacity: 0; 
-        transform: translateY(10px); 
-      }
-      to { 
-        opacity: 1; 
-        transform: translateY(0); 
-      }
-    }
-    
-    /* Styles pour le formulaire d'ajout */
-    .custom-objects-section {
-      background: #f8f9fa;
-      padding: 20px;
-      border-radius: var(--border-radius);
-      margin: 20px 0;
-    }
-    
-    .add-object-form {
-      display: grid;
-      grid-template-columns: 1fr 1fr auto;
-      gap: 15px;
-      align-items: end;
-    }
-    
-    .form-group {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .form-group label {
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    
-    /* Total du poids */
-    .total-display {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 15px;
-      border-radius: var(--border-radius);
-      text-align: center;
-      margin: 20px 0;
-    }
-    
-    .total-weight .value {
-      font-size: 1.5em;
-      font-weight: bold;
-    }
-    
-    /* Cartes d'objets */
-    .objects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 15px;
-      margin-top: 15px;
-    }
-    
-    .object-card {
-      background: white;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      padding: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-    
-    .object-card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    
-    .object-info {
-      flex: 1;
-    }
-    
-    .object-name {
-      display: block;
-      color: var(--primary-bg);
-      margin-bottom: 5px;
-    }
-    
-    .object-weight {
-      color: #666;
-      font-size: 0.9em;
-    }
-    
-    .object-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .weight-input {
-      width: 80px;
-      padding: 5px;
-      text-align: center;
-    }
-    
-    /* Boutons spécialisés */
-    .btn-add-object, .btn-add-row {
-      background: #28a745;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: var(--transition);
-    }
-    
-    .btn-add-object:hover, .btn-add-row:hover {
-      background: #218838;
-    }
-    
-    .btn-delete, .btn-delete-small {
-      background: #dc3545;
-      color: white;
-      border: none;
-      padding: 5px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    
-    .btn-duplicate {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 5px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    
-    .btn-export {
-      background: #6f42c1;
-      color: white;
-    }
-    
-    /* Tables d'inventaire */
-    .inventory-table {
-      margin-top: 10px;
-    }
-    
-    .quantity-input, .object-select {
-      width: 100%;
-      padding: 5px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-    }
-    
-    /* Animations */
-    @keyframes slideIn {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideOut {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .add-object-form {
-        grid-template-columns: 1fr;
-      }
-      
-      .tabs-header {
-        flex-wrap: wrap;
-        gap: 5px;
-      }
-      
-      .tab-button {
-        flex: 1;
-        min-width: 120px;
-      }
-      
-      .objects-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .object-card {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      
-      .object-actions {
-        justify-content: space-between;
-      }
-    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    @keyframes slideOut { from { transform: translateX(0); } to { transform: translateX(100%); } }
   `;
   
   document.head.appendChild(style);
-};
-
-// ===== INITIALISATION =====
-document.addEventListener('DOMContentLoaded', function() {
-  // Vérifier qu'on est sur la bonne page
-  if (!document.querySelector('.tabs-container')) return;
-  
-  addPoidsStyles();
-  
-  // Initialiser les onglets
-  switchTab(POIDS_CONFIG.defaultTab);
-  
-  // Ajouter une ligne initiale à chaque onglet
-  POIDS_CONFIG.tabs.forEach(tab => {
-    addInventaireRowPoids(tab);
-  });
-  
-  // Mettre à jour la liste des objets
-  updateObjectsList();
-  
-  // Configurer les événements de fichier
-  const fileInput = document.getElementById('fileInputInventory');
-  const saveBtn = document.getElementById('saveInventoryBtn');
-  
-  if (fileInput) {
-    fileInput.addEventListener('change', loadInventairesPoids);
-  }
-  
-  if (saveBtn) {
-    saveBtn.addEventListener('click', saveInventairesPoids);
-  }
-  
-  console.log('Page des poids initialisée');
-});
+}
 
 // ===== EXPOSITION DES FONCTIONS GLOBALES =====
 window.switchTab = switchTab;
 window.ajouterNouvelObjet = ajouterNouvelObjet;
 window.addInventaireRowPoids = addInventaireRowPoids;
+window.updateObjetOptions = updateObjetOptions;
 window.updateInventairePoids = updateInventairePoids;
 window.removeInventaireRowPoids = removeInventaireRowPoids;
 window.duplicateRowPoids = duplicateRowPoids;
 window.supprimerObjet = supprimerObjet;
 window.modifierPoids = modifierPoids;
-window.exporterObjets = exporterObjets;
-window.importerObjets = importerObjets;
+window.filtrerParCategorie = filtrerParCategorie;
 window.rechercherObjets = rechercherObjets;
