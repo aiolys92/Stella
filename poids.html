@@ -63,12 +63,16 @@
         <button class="tab-button" onclick="switchTab('cheval')">🐴 Cheval de trait</button>
       </div>
 
+      <!-- Contenu des onglets - UN SEUL AFFICHÉ À LA FOIS -->
+      
       <!-- Inventaire Dorusis -->
       <div id="tab-dorusis" class="tab-content active">
-        <h2>Inventaire Dorusis</h2>
-        <button onclick="addInventaireRowPoids('dorusis')" class="btn-add-row">
-          ➕ Ajouter un objet
-        </button>
+        <div class="tab-header">
+          <h2>📦 Inventaire Dorusis</h2>
+          <button onclick="addInventaireRowPoids('dorusis')" class="btn-add-row">
+            ➕ Ajouter un objet
+          </button>
+        </div>
         <table id="inventaireTableDorusis" class="inventory-table">
           <thead>
             <tr>
@@ -87,10 +91,12 @@
 
       <!-- Inventaire Guilde -->
       <div id="tab-guilde" class="tab-content">
-        <h2>Inventaire Guilde</h2>
-        <button onclick="addInventaireRowPoids('guilde')" class="btn-add-row">
-          ➕ Ajouter un objet
-        </button>
+        <div class="tab-header">
+          <h2>⚔️ Inventaire Guilde</h2>
+          <button onclick="addInventaireRowPoids('guilde')" class="btn-add-row">
+            ➕ Ajouter un objet
+          </button>
+        </div>
         <table id="inventaireTableGuilde" class="inventory-table">
           <thead>
             <tr>
@@ -109,10 +115,12 @@
 
       <!-- Inventaire Cheval -->
       <div id="tab-cheval" class="tab-content">
-        <h2>Inventaire Cheval de trait</h2>
-        <button onclick="addInventaireRowPoids('cheval')" class="btn-add-row">
-          ➕ Ajouter un objet
-        </button>
+        <div class="tab-header">
+          <h2>🐴 Inventaire Cheval de trait</h2>
+          <button onclick="addInventaireRowPoids('cheval')" class="btn-add-row">
+            ➕ Ajouter un objet
+          </button>
+        </div>
         <table id="inventaireTableCheval" class="inventory-table">
           <thead>
             <tr>
