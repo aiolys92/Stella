@@ -1,85 +1,162 @@
 <!DOCTYPE html>
 <html lang="fr">
- <head>
-  <meta charset="utf-8"/>
-  <title>
-   Accueil
-  </title>
-  <link href="style.css" rel="stylesheet"/>
- </head>
- <body>
-  <div class="sidebar">
-   <h2>
-    Navigation
-   </h2>
-   <a href="index.html">
-    Accueil
-   </a>
-   <a href="dorusis.html">
-    Dorusis
-   </a>
-   <a href="guilde.html">
-    Guilde
-   </a>
-   <a href="liste.html">
-    Liste complète
-   </a>
-   <a href="convertisseur.html">
-    Convertisseur
-   </a>
-  </div>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestionnaire de Monnaies - Accueil</title>
+  <meta name="description" content="Gestionnaire d'inventaire pour monnaies et gemmes - Dorusis et Guilde">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
   <div class="content fade-in">
-   <div class="sidebar">
-    <h2>
-     Navigation
-    </h2>
-    <a href="index.html">
-     Accueil
-    </a>
-    <a href="dorusis.html">
-     Dorusis
-    </a>
-    <a href="guilde.html">
-     Guilde
-    </a>
-    <a href="liste.html">
-     Liste complète
-    </a>
-    <a href="convertisseur.html">
-     Convertisseur
-    </a>
-   </div>
-   <div class="content fade-in">
-    <h1>
-     Bienvenue
-    </h1>
-    <div class="nav">
-     <a href="dorusis.html">
-      <button>
-       Inventaire Dorusis
-      </button>
-     </a>
-     <a href="guilde.html">
-      <button>
-       Inventaire Guilde
-      </button>
-     </a>
-     <a href="convertisseur.html">
-      <button>
-       Convertisseur
-      </button>
-     </a>
-     <a href="liste.html">
-      Liste complète
-     </a>
-    </div>
-   </div>
+    <!-- Navigation principale intégrée -->
+    <nav class="main-nav">
+      <h2>Navigation</h2>
+      <div class="nav-grid">
+        <a href="index.html" class="nav-card active" aria-current="page">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-text">Accueil</span>
+        </a>
+        <a href="dorusis.html" class="nav-card">
+          <span class="nav-icon">👤</span>
+          <span class="nav-text">Dorusis</span>
+        </a>
+        <a href="guilde.html" class="nav-card">
+          <span class="nav-icon">⚔️</span>
+          <span class="nav-text">Guilde</span>
+        </a>
+        <a href="liste.html" class="nav-card">
+          <span class="nav-icon">📋</span>
+          <span class="nav-text">Liste complète</span>
+        </a>
+        <a href="convertisseur.html" class="nav-card">
+          <span class="nav-icon">🔄</span>
+          <span class="nav-text">Convertisseur</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main class="welcome-section">
+      <header class="welcome-header">
+        <h1>Gestionnaire de Monnaies</h1>
+        <p class="welcome-subtitle">Gérez vos inventaires de pièces et gemmes facilement</p>
+      </header>
+
+      <!-- Actions rapides -->
+      <section class="quick-actions">
+        <h2>Actions Rapides</h2>
+        <div class="action-grid">
+          <a href="dorusis.html" class="action-card primary">
+            <div class="action-icon">👤</div>
+            <div class="action-content">
+              <h3>Inventaire Dorusis</h3>
+              <p>Gérer l'inventaire personnel de Dorusis</p>
+            </div>
+          </a>
+          
+          <a href="guilde.html" class="action-card secondary">
+            <div class="action-icon">⚔️</div>
+            <div class="action-content">
+              <h3>Inventaire Guilde</h3>
+              <p>Gérer l'inventaire collectif de la guilde</p>
+            </div>
+          </a>
+          
+          <a href="convertisseur.html" class="action-card tertiary">
+            <div class="action-icon">🔄</div>
+            <div class="action-content">
+              <h3>Convertisseur</h3>
+              <p>Convertir entre différentes monnaies</p>
+            </div>
+          </a>
+          
+          <a href="liste.html" class="action-card quaternary">
+            <div class="action-icon">📋</div>
+            <div class="action-content">
+              <h3>Liste Complète</h3>
+              <p>Voir toutes les monnaies et gemmes</p>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- Informations utiles -->
+      <section class="info-section">
+        <h2>Informations</h2>
+        <div class="info-grid">
+          <div class="info-card">
+            <h3>💰 Types de Monnaies</h3>
+            <ul>
+              <li>Pièces métalliques (Fer, Argent, Or, etc.)</li>
+              <li>Gemmes précieuses (Rubis, Émeraude, etc.)</li>
+              <li>Conversion automatique en PM (Pièce Modèle)</li>
+            </ul>
+          </div>
+          
+          <div class="info-card">
+            <h3>💾 Sauvegarde</h3>
+            <ul>
+              <li>Export/Import au format JSON</li>
+              <li>Sauvegarde locale automatique</li>
+              <li>Données sécurisées dans le navigateur</li>
+            </ul>
+          </div>
+          
+          <div class="info-card">
+            <h3>📱 Responsive</h3>
+            <ul>
+              <li>Interface adaptée mobile/desktop</li>
+              <li>Navigation optimisée</li>
+              <li>Performance améliorée</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
-  \n
-  \n
-  <script src="data.js">
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  <script>
+    // Script spécifique à la page d'accueil
+    document.addEventListener('DOMContentLoaded', function() {
+      // Animation des cartes d'action au survol
+      const actionCards = document.querySelectorAll('.action-card');
+      actionCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+          this.style.transform = 'translateY(-5px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+          this.style.transform = 'translateY(0) scale(1)';
+        });
+      });
+
+      // Statistiques rapides (si des données sont disponibles)
+      if (window.monnaies) {
+        const piecesCount = Object.keys(window.monnaies.pieces).length;
+        const gemmesCount = Object.keys(window.monnaies.gemmes).length;
+        
+        // Ajouter les stats si un élément existe pour les afficher
+        const statsElement = document.querySelector('.stats-display');
+        if (statsElement) {
+          statsElement.innerHTML = `
+            <div class="stat-item">
+              <span class="stat-number">${piecesCount}</span>
+              <span class="stat-label">Types de pièces</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-number">${gemmesCount}</span>
+              <span class="stat-label">Types de gemmes</span>
+            </div>
+          `;
+        }
+      }
+
+      console.log('Page d\'accueil initialisée');
+    });
   </script>
-  <script src="script.js">
-  </script>
- </body>
+</body>
 </html>
