@@ -47,11 +47,19 @@ function switchTab(tabName) {
  * Ajoute un nouvel objet personnalisé
  */
 function ajouterNouvelObjet() {
+  const categorieSelect = document.getElementById('newObjectCategory');
   const nomInput = document.getElementById('newObjectName');
   const poidsInput = document.getElementById('newObjectWeight');
   
+  const categorie = categorieSelect.value;
   const nom = nomInput.value.trim();
   const poids = parseFloat(poidsInput.value);
+  
+  if (!categorie) {
+    alert('Veuillez sélectionner une catégorie');
+    categorieSelect.focus();
+    return;
+  }
   
   if (!nom) {
     alert('Veuillez saisir un nom d\'objet');
@@ -66,16 +74,18 @@ function ajouterNouvelObjet() {
   }
   
   // Vérifier si l'objet existe déjà
-  if (window.monnaies.poids[nom] !== undefined) {
-    const confirmer = confirm(`L'objet "${nom}" existe déjà avec un poids de ${window.monnaies.poids[nom]} kg. Voulez-vous le remplacer ?`);
+  const poidsActuel = window.getPoidsObjet(nom);
+  if (poidsActuel > 0) {
+    const confirmer = confirm(`L'objet "${nom}" existe déjà avec un poids de ${poidsActuel} kg. Voulez-vous le remplacer ?`);
     if (!confirmer) return;
   }
   
   // Ajouter l'objet
-  window.ajouterObjetPoids(nom, poids);
+  window.ajouterObjetPoids(nom, poids, categorie);
   
   // Rafraîchir l'interface
   updateObjectsList();
+  populateSelects();
   
   // Vider le formulaire
   nomInput.value = '';
@@ -83,7 +93,7 @@ function ajouterNouvelObjet() {
   nomInput.focus();
   
   // Message de confirmation
-  showNotification(`Objet "${nom}" ajouté avec succès (${poids} kg)`);
+  showNotification(`Objet "${nom}" ajouté avec succès dans ${categorie} (${poids} kg)`);
 }
 
 /**
@@ -118,6 +128,120 @@ function modifierPoids(nom, nouveauPoids) {
 /**
  * Ajoute une ligne à l'inventaire
  * @param {string} inventaire - Nom de l'inventaire (dorusis, guilde, cheval)
+ */
+function addInventaireRowPoids(inventaire) {
+  const tableId = `inventaireTable${inventaire.charAt(0).toUpperCase() + inventaire.slice(1)}`;
+  const table = document.getElementById(tableId);
+  
+  if (!table) {
+    console.error('Table non trouvée:', tableId);
+    return;
+  }
+  
+  const tbody = table.querySelector('tbody');
+  const row = tbody.insertRow();
+  
+  // Créer les options pour les catégories
+  const categoriesOptions = window.getCategoriesPoids()
+    .map(cat => `<option value="${cat}">${cat}</option>`)
+    .join('');
+  
+  row.innerHTML = `
+    <td>
+      <select onchange="updateObjetOptions(this)" class="category-select">
+        <option value="">Choisir une catégorie</option>
+        ${categoriesOptions}
+      </select>
+    </td>
+    <td>
+      <select onchange="updateInventairePoids(this)" class="object-select" disabled>
+        <option value="">Choisir un objet</option>
+      </select>
+    </td>
+    <td>
+      <input type="number" value="1" min="0" step="0.1" 
+             oninput="updateInventairePoids(this)" 
+             class="quantity-input">
+    </td>
+    <td class="unit-weight">0</td>
+    <td class="carried-weight-cell">
+      <input type="checkbox" class="carried-checkbox" onchange="updateInventairePoids(this)">
+      <span class="carried-weight">0</span>
+    </td>
+    <td class="total-weight">0</td>
+    <td>
+      <button onclick="removeInventaireRowPoids(this)" class="btn-delete" title="Supprimer">
+        🗑️
+      </button>
+      <button onclick="duplicateRowPoids(this)" class="btn-duplicate" title="Dupliquer">
+        📄
+      </button>
+    </td>
+  `;
+}
+
+/**
+ * Met à jour les options d'objets quand une catégorie est sélectionnée
+ * @param {HTMLSelectElement} categorySelect - Select de catégorie
+ */
+function updateObjetOptions(categorySelect) {
+  const row = categorySelect.closest('tr');
+  const objectSelect = row.querySelector('.object-select');
+  const categorie = categorySelect.value;
+  
+  objectSelect.innerHTML = '<option value="">Choisir un objet</option>';
+  
+  if (!categorie) {
+    objectSelect.disabled = true;
+    return;
+  }
+  
+  const objets = window.getObjetsByCategorie(categorie);
+  const options = Object.keys(objets)
+    .sort()
+    .map(nom => `<option value="${nom}">${nom}</option>`)
+    .join('');
+  
+  objectSelect.innerHTML = `<option value="">Choisir un objet</option>${options}`;
+  objectSelect.disabled = false;
+  
+  // Déclencher la mise à jour
+  updateInventairePoids(categorySelect);
+}
+
+/**
+ * Met à jour les calculs d'une ligne d'inventaire
+ * @param {HTMLElement} element - Élément déclencheur
+ */
+function updateInventairePoids(element) {
+  const row = element.closest('tr');
+  const categorySelect = row.querySelector('.category-select');
+  const objectSelect = row.querySelector('.object-select');
+  const quantityInput = row.querySelector('.quantity-input');
+  const unitWeightCell = row.querySelector('.unit-weight');
+  const carriedCheckbox = row.querySelector('.carried-checkbox');
+  const carriedWeightSpan = row.querySelector('.carried-weight');
+  const totalWeightCell = row.querySelector('.total-weight');
+  
+  const objectName = objectSelect.value;
+  const quantity = parseFloat(quantityInput.value) || 0;
+  const unitWeight = objectName ? window.getPoidsObjet(objectName) : 0;
+  const isCarried = carriedCheckbox.checked;
+  
+  // Poids unitaire
+  unitWeightCell.textContent = unitWeight.toFixed(1);
+  
+  // Poids porté (divisé par 2 si coché)
+  const carriedWeight = isCarried ? unitWeight / 2 : unitWeight;
+  carriedWeightSpan.textContent = carriedWeight.toFixed(1);
+  
+  // Poids total = quantité × poids porté
+  const totalWeight = carriedWeight * quantity;
+  totalWeightCell.textContent = totalWeight.toFixed(1);
+  
+  // Mettre à jour le total général
+  updateTotalPoids();
+} (dorusis, guilde, cheval)
  */
 function addInventaireRowPoids(inventaire) {
   const tableId = `inventaireTable${inventaire.charAt(0).toUpperCase() + inventaire.slice(1)}`;
