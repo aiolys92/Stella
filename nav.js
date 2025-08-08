@@ -1,11 +1,11 @@
 const NAV_CONFIG = {
   links: [
-    { href: 'index.html', text: 'Domus', icon: '🏠' },
+    { href: 'index.html', text: 'Accueil', icon: '🏠' },
     { href: 'dorusis.html', text: 'Dorusis', icon: '👤' },
-    { href: 'guilde.html', text: 'Guilda', icon: '⚔️' },
-    { href: 'poids.html', text: 'Pondera', mobileText: 'Poids', icon: '🏋️' },
-    { href: 'liste.html', text: 'Lista', mobileText: 'Liste', icon: '📋' },
-    { href: 'convertisseur.html', text: 'Conversio', mobileText: 'Convert', icon: '🔄' },
+    { href: 'guilde.html', text: 'Guilde', icon: '⚔️' },
+    { href: 'poids.html', text: 'Poids', mobileText: 'Poids', icon: '🏋️' },
+    { href: 'liste.html', text: 'Liste', mobileText: 'Liste', icon: '📋' },
+    { href: 'convertisseur.html', text: 'Convertisseur', mobileText: 'Convert', icon: '🔄' },
     { href: 'grimoire.html', text: 'Grimoire', icon: '📖' }
   ],
   
