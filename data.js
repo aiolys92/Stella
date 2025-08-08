@@ -1,3 +1,397 @@
+// BASE DE DONNÉES COMPLÈTE DES GEMMES AVEC TOUTES LES INFORMATIONS
+window.gemmesDetaillees = {
+  "Rubis": {
+    surnom: "Escarboucle",
+    valeur: 83.33,
+    couleur: "Rouge",
+    lienZodiacal: "Sirène/Ecrevisse",
+    lienDivin: "Perun, Gibil",
+    symbolique: "Volonté, Courage",
+    durete: 9,
+    notes: "Pierre de protection"
+  },
+  "Emeraude": {
+    surnom: "Turanite",
+    valeur: 72.92,
+    couleur: "Vert",
+    lienZodiacal: "Cerf/Tortue",
+    lienDivin: "Turan, Arcton",
+    symbolique: "Renaissance, Sagesse",
+    durete: 8,
+    notes: "Pierre de fortification"
+  },
+  "Saphir": {
+    surnom: "Werunite",
+    valeur: 62.5,
+    couleur: "Bleu",
+    lienZodiacal: "Nuage/Tortue/Phénix/Epée/Dauphins",
+    lienDivin: "Weru, Tannun, Shua",
+    symbolique: "Justice, Pureté, Liberté",
+    durete: 9,
+    notes: "Pierre céleste"
+  },
+  "Diamant": {
+    surnom: "Pierre des fous",
+    valeur: 52.08,
+    couleur: "Incolore",
+    lienZodiacal: "Paon/Licorne/Ourlarque",
+    lienDivin: "Usil, Atonar, Laran",
+    symbolique: "Invincible, Constance",
+    durete: 10,
+    notes: "Protège contre la folie"
+  },
+  "Topaze": {
+    surnom: "",
+    valeur: 52.08,
+    couleur: "Jaune/Bleu/Rose",
+    lienZodiacal: "Sirène/Phénix/Papillon/Ecrevisse/Tortue/Dauphins/Cerf/Epée",
+    lienDivin: "Tannun",
+    symbolique: "Gaité, Energie",
+    durete: 8,
+    notes: "Pierre de soin"
+  },
+  "Aigue-Marine": {
+    surnom: "Llyrite",
+    valeur: 41.67,
+    couleur: "Bleu pâle",
+    lienZodiacal: "Dauphins/Tortue/Sirène/Nuage/Ourlarque/Epée/Papillon/Epée",
+    lienDivin: "Llyr, Tannun, Ulfer",
+    symbolique: "Sensibilité, Persévérance",
+    durete: 8,
+    notes: "Protège les marins"
+  },
+  "Améthyste": {
+    surnom: "Pérunite",
+    valeur: 31.25,
+    couleur: "Violet",
+    lienZodiacal: "Phénix/Ourlarque/Licorne/Epée/Sirène/Nuage/Dauphins/Cerf",
+    lienDivin: "Perun, Arcton, Ninmah",
+    symbolique: "Sagesse, Equilibre",
+    durete: 7,
+    notes: "Pierre d'apaisement, protège des poisons"
+  },
+  "Grenat": {
+    surnom: "Usilite",
+    valeur: 20.83,
+    couleur: "Rouge/Pourpre/Violet",
+    lienZodiacal: "Ourlarque/Sirène/Tortue/Phénix/Epée",
+    lienDivin: "Usil",
+    symbolique: "Force, Charisme",
+    durete: 7,
+    notes: "Pierre d'armure, Pierre de lumière"
+  },
+  "Péridot": {
+    surnom: "Turmite",
+    valeur: 14.58,
+    couleur: "Vert",
+    lienZodiacal: "Tortue/Cerf/Paon/Epée/Sirène/Ourlarque",
+    lienDivin: "Turina",
+    symbolique: "Equilibre, Fidélité, Chance",
+    durete: 7,
+    notes: "Pierre de la paladin Pierre de protection"
+  },
+  "Cyanite": {
+    surnom: "",
+    valeur: 13.54,
+    couleur: "Bleu",
+    lienZodiacal: "Epée/Ourlarque/Tortue/Phénix/Dauphins/Cerf/Licorne",
+    lienDivin: "Shua",
+    symbolique: "Dextérité, Paix",
+    durete: "4-6+",
+    notes: "Sort de boussole"
+  },
+  "Citrine": {
+    surnom: "",
+    valeur: 12.5,
+    couleur: "Jaune",
+    lienZodiacal: "Papillon/Paon/Ourlarque/Nuage/Sirène/Epée",
+    lienDivin: "Thalma, Arcton",
+    symbolique: "Vitalité, Joie, Arts",
+    durete: 7,
+    notes: "Pierre de lumière, protection contre le vent"
+  },
+  "Pierre de Lune": {
+    surnom: "Tilvrite",
+    valeur: 11.46,
+    couleur: "Lait et reflets bleus",
+    lienZodiacal: "Ecrevisse/Papillon/Dauphins/Epée/Sirène/Tortue/Nuage/Ourlarque",
+    lienDivin: "Tilvir, Darona",
+    symbolique: "Imagination, Pureté",
+    durete: "6+",
+    notes: '"Œil de poisson", Pierre de pluie'
+  },
+  "Pierre de Soleil": {
+    surnom: "Atonarite",
+    valeur: 10.42,
+    couleur: "Doré pailleté",
+    lienZodiacal: "Paon/Sirène/Licorne",
+    lienDivin: "Atonar, Palustris",
+    symbolique: "Richesse, Jouvence",
+    durete: "6+",
+    notes: "Pierre d'orientation, Pierre de lumière"
+  },
+  "Tourmaline": {
+    surnom: "",
+    valeur: 9.38,
+    couleur: "Rose/Vert/Bleu/Noir",
+    lienZodiacal: "Tortue/Ourlarque/Papillon/Tortue/Cerf/Ecrevisse",
+    lienDivin: "Turan",
+    symbolique: "Quiétude, Protection",
+    durete: "7+",
+    notes: "Pierre électrique, Pierre de bouclier"
+  },
+  "Aventurine": {
+    surnom: "Pierre du destin",
+    valeur: 8.33,
+    couleur: "Vert",
+    lienZodiacal: "Cerf/Papillon/Phénix/Epée/Ecrevisse",
+    lienDivin: "Usil, Narax",
+    symbolique: "Harmonie, Prospérité",
+    durete: "6+",
+    notes: "Pierre de chance"
+  },
+  "Turquoise": {
+    surnom: "Pierre des dieux",
+    valeur: 7.29,
+    couleur: "Bleu-vert",
+    lienZodiacal: "Phénix/Nuage/Dauphins/Cerf/Sirène/Epée/Tortue",
+    lienDivin: "Perun, Thalma, Weru",
+    symbolique: "Communication, Energie",
+    durete: "5+",
+    notes: "Pierre de piété, Protège les voyageurs"
+  },
+  "Œil de loup (Chrysobéryl)": {
+    surnom: "Ulférite",
+    valeur: 0.89,
+    couleur: "Jaune-doré",
+    lienZodiacal: "Tortue/Epée",
+    lienDivin: "Ulfer",
+    symbolique: "Sang-froid, Abondance",
+    durete: "8+",
+    notes: "Protège les survivants"
+  },
+  "Œil de taureau (Quartz brun)": {
+    surnom: "",
+    valeur: 0.73,
+    couleur: "Jaune-rouge",
+    lienZodiacal: "Cerf",
+    lienDivin: "Turan, Ulfer, Ninmah",
+    symbolique: "Courage, Fermeté",
+    durete: 7,
+    notes: "Apporte le succès aux sports"
+  },
+  "Œil de tigre (Quartz brun)": {
+    surnom: "",
+    valeur: 0.62,
+    couleur: "Orange",
+    lienZodiacal: "Paon/Papillon/Ecrevisse/Epée/Tortue/Licorne/Cerf/Papillon",
+    lienDivin: "Narax, Arcton, Weru, Laran",
+    symbolique: "Liberté, Largesse",
+    durete: 7,
+    notes: "Protège les guerriers"
+  },
+  "Œil de faucon (Quartz bleu)": {
+    surnom: "",
+    valeur: 0.52,
+    couleur: "Gris-bleu",
+    lienZodiacal: "Papillon/Nuage/Ourlarque/",
+    lienDivin: "Thalma, Palustris, Narax",
+    symbolique: "Empathie, Evolution",
+    durete: 7,
+    notes: "Pierre de vision, Pierre de protection"
+  },
+  "Quartz fumé": {
+    surnom: "",
+    valeur: 0.42,
+    couleur: "Brun",
+    lienZodiacal: "Ourlarque/Sirène/Tortue/Epée/Phénix",
+    lienDivin: "Usil, Voltumna, Narax",
+    symbolique: "Eveil, Volonté",
+    durete: 7,
+    notes: "Pierre de protection, Pierre de clairvoyance"
+  },
+  "Quartz rose": {
+    surnom: "Pierre du cœur",
+    valeur: 0.31,
+    couleur: "Rose",
+    lienZodiacal: "Cerf/Epée/Nuage/Ourlarque",
+    lienDivin: "Turan, Tannun",
+    symbolique: "Calme, Tendresse",
+    durete: 7,
+    notes: "Pierre d'amour, Pierre de beauté"
+  },
+  "Cristal (Quartz incolore)": {
+    surnom: "",
+    valeur: 0.21,
+    couleur: "Incolore",
+    lienZodiacal: "Ourlarque",
+    lienDivin: "Usil, Darona, Palustris",
+    symbolique: "Clairvoyance, Méditatif",
+    durete: 7,
+    notes: "Amplificateur"
+  },
+  "Lapis Lazuli": {
+    surnom: "Pierre de vérité",
+    valeur: 0.19,
+    couleur: "Bleu",
+    lienZodiacal: "Nuage/Licorne/Papillon/Paon/Epée/Tortue/Phénix/Dauphins/Cerf",
+    lienDivin: "Weru, Ulfer",
+    symbolique: "Honnêteté, Intuition",
+    durete: "5+",
+    notes: "Pierre d'amitié"
+  },
+  "Jais (Jaspe noir)": {
+    surnom: "",
+    valeur: 0.17,
+    couleur: "Noir",
+    lienZodiacal: "Ourlarque/Paon/Tortue",
+    lienDivin: "Llyr, Voltumna, Guyona",
+    symbolique: "Durisme, Maîtrise",
+    durete: "6-",
+    notes: "Pierre des ténèbres, Pierre des secrets"
+  },
+  "Onyxline (Jaspe rouge)": {
+    surnom: "Corne",
+    valeur: 0.16,
+    couleur: "Rouge/Orange",
+    lienZodiacal: "Sirène/Cerf/Tortue/Ecrevisse/Licorne/Paon/Epée",
+    lienDivin: "Gibil, Arcton",
+    symbolique: "Vitalité, Initiative",
+    durete: "6+",
+    notes: "Pierre de résilience"
+  },
+  "Chrysoprase (Jaspe vert)": {
+    surnom: "",
+    valeur: 0.12,
+    couleur: "Vert",
+    lienZodiacal: "Cerf/Epée/Ecrevisse",
+    lienDivin: "Guyona",
+    symbolique: "Compassion, Clairvoyance",
+    durete: "6+",
+    notes: "Pierre de sceau, protège du venin, Invisibilité"
+  },
+  "Sardoine (Jaspe brun)": {
+    surnom: "",
+    valeur: 0.09,
+    couleur: "Brun-fauve",
+    lienZodiacal: "Licorne/Tortue/Cerf/sirène",
+    lienDivin: "Laran, Usil, Suvix",
+    symbolique: "Protection, Courage",
+    durete: "6+",
+    notes: "Pierre de guérison"
+  },
+  "Agate (Jaspe multicolore)": {
+    surnom: "Aurore",
+    valeur: 0.08,
+    couleur: "Marron/Bleu/Blanc/Rouge",
+    lienZodiacal: "Papillon/Cerf/Dauphins/Ecrevisse/Epée/Nuage",
+    lienDivin: "Thalma, Ulfer",
+    symbolique: "Curiosité, Adaptabilité",
+    durete: "6+",
+    notes: "Pierre de bonheur, Pierre de paix"
+  },
+  "Obsidienne": {
+    surnom: "",
+    valeur: 0.07,
+    couleur: "Multicolore",
+    lienZodiacal: "Epée/Tortue/Ecrevisse/Sirène/Papillon/Paon/Phénix/Nuage",
+    lienDivin: "Atonar, Turan, Shua",
+    symbolique: "Espoir, Beauté, Arts",
+    durete: 6,
+    notes: "Pierre de prémonition"
+  },
+  "Serpentine": {
+    surnom: "Laranite",
+    valeur: 0.05,
+    couleur: "Vert",
+    lienZodiacal: "Sirène/Epée/Phénix/Ourlarque",
+    lienDivin: "Laran, Usil, Voltumna",
+    symbolique: "Introspection, Occultisme",
+    durete: "5+",
+    notes: "Pierre de siège, Pierre de sceaux, combustible"
+  },
+  "Malachite": {
+    surnom: "",
+    valeur: 0.03,
+    couleur: "Vert écaillé",
+    lienZodiacal: "Tortue/Papillon/Sirène/Dauphins",
+    lienDivin: "Guyona, Llyr",
+    symbolique: "Guérison, Force",
+    durete: "2+ à 4",
+    notes: "Pierre de sceau, talisman, Pierre des rêves"
+  },
+  "Hématite": {
+    surnom: "",
+    valeur: 0.1,
+    couleur: "Vert sombre",
+    lienZodiacal: "Paon/Sirène/Phénix/Epée",
+    lienDivin: "Tannun",
+    symbolique: "Protection, Jouvence",
+    durete: 4,
+    notes: "Protège les voyageurs et enfants, Pierre de fer"
+  },
+  "Perle": {
+    surnom: "Larmes de Llyr",
+    valeur: 104.17,
+    couleur: "Blanc/Rose/Bleu/Noir",
+    lienZodiacal: "Ecrevisse/Papillon/Epée/Dauphins",
+    lienDivin: "Tilvir, Perun, Turan, Darona",
+    symbolique: "Douceur, Pureté",
+    durete: 3,
+    notes: "Parreux, pigment rouge"
+  },
+  "Ambre": {
+    surnom: "Larmes d'Atona",
+    valeur: 0.02,
+    couleur: "Orange",
+    lienZodiacal: "Paon/Cerf/Papillon/Ecrevisse/Tortue",
+    lienDivin: "Atonar",
+    symbolique: "Sérénité, Sagesse",
+    durete: "2+",
+    notes: "Pierre électrique, combustible"
+  },
+  "Corail": {
+    surnom: "Sang de basaltik",
+    valeur: 0.1,
+    couleur: "Blanc/Jaune/Orange/Rouge/",
+    lienZodiacal: "Dauphins/Cerf/Ecrevisse",
+    lienDivin: "Llyr, Ninmah, Guyona",
+    symbolique: "Vigueur, Fertilité",
+    durete: "3+",
+    notes: "Pierre de protection, Pierre magique"
+  },
+  "Jais": {
+    surnom: "Thanrite",
+    valeur: 0.06,
+    couleur: "Noir",
+    lienZodiacal: "Ourlarque/Ecrevisse/Nuage",
+    lienDivin: "Voltumna, Suvix",
+    symbolique: "Richesse, Spiritualité",
+    durete: "2-4",
+    notes: "Pierre de protection, Pierre de deuil, combustible"
+  },
+  "Nacre": {
+    surnom: "",
+    valeur: 0.04,
+    couleur: "Nacre",
+    lienZodiacal: "Ecrevisse/Sirène/Nuage",
+    lienDivin: "Tilvir, Llyr, Ninmah",
+    symbolique: "Douceur, Intuition",
+    durete: "2-4",
+    notes: "Pierre d'apaisement"
+  },
+  "Ecaille": {
+    surnom: "",
+    valeur: 0.02,
+    couleur: "Vert/Brun/Blanc",
+    lienZodiacal: "Tortue/Ecrevisse/Sirène/Dauphins",
+    lienDivin: "Thalma, Llyr, Tannun",
+    symbolique: "Longévité, Sagesse",
+    durete: "2+",
+    notes: "Pierre d'endurance"
+  }
+};
+
 if (!window.monnaies) {
   window.monnaies = {
     pieces: {
@@ -11,47 +405,10 @@ if (!window.monnaies) {
       "Titane": 0,
       "Plomp": 0,
     },
-    gemmes: {
-      "Rubis": 83.33,
-      "Emeraude": 72.92,
-      "Saphir": 62.5,
-      "Diamant": 52.08,
-      "Topaze": 52.08,
-      "Aigue-Marine": 41.67,
-      "Améthyste": 31.25,
-      "Grenat": 20.83,
-      "Péridot": 14.58,
-      "Cyanite": 13.54,
-      "Citrine": 12.5,
-      "Pierre de Lune": 11.46,
-      "Pierre de Soleil": 10.42,
-      "Tourmaline": 9.38,
-      "Aventurine": 8.33,
-      "Turquoise": 7.29,
-      "Œil de loup (Chrysobéryl)": 0.89,
-      "Œil de taureau (Quartz brun)": 0.73,
-      "Œil de tigre (Quartz brun)": 0.62,
-      "Œil de faucon (Quartz bleu)": 0.52,
-      "Quartz fumé": 0.42,
-      "Quartz rose": 0.31,
-      "Cristal (Quartz incolore)": 0.21,
-      "Lapis Lazuli": 0.19,
-      "Jais (Jaspe noir)": 0.17,
-      "Onyxline (Jaspe rouge)": 0.16,
-      "Chrysoprase (Jaspe vert)": 0.12,
-      "Sardoine (Jaspe brun)": 0.09,
-      "Agate (Jaspe multicolore)": 0.08,
-      "Obsidienne": 0.07,
-      "Serpentine": 0.05,
-      "Malachite": 0.03,
-      "Ambre": 0.02,
-      "Perle": 104.17,
-      "Hématite": 0.1,
-      "Corail": 0.1,
-      "Jais": 0.06,
-      "Nacre": 0.04,
-      "Ecaille": 0.02,
-    },
+    
+    // Génération automatique des gemmes à partir de gemmesDetaillees
+    gemmes: {},
+    
     // NOUVELLE CATÉGORIE : POIDS ORGANISÉ PAR CATÉGORIES
     poids: {
       "Équipements et Armures": {
@@ -107,6 +464,400 @@ if (!window.monnaies) {
   };
 }
 
+// BASE DE DONNÉES COMPLÈTE DES GEMMES AVEC TOUTES LES INFORMATIONS
+window.gemmesDetaillees = {
+  "Rubis": {
+    surnom: "Escarboucle",
+    valeur: 8.000,
+    couleur: "Rouge",
+    lienZodiacal: "Sirène/Ecrevisse",
+    lienDivin: "Perun, Gibil",
+    symbolique: "Volonté, Courage",
+    durete: 9,
+    notes: "Pierre de protection"
+  },
+  "Emeraude": {
+    surnom: "Turanite",
+    valeur: 7.000,
+    couleur: "Vert",
+    lienZodiacal: "Cerf/Tortue",
+    lienDivin: "Turan, Arcton",
+    symbolique: "Renaissance, Sagesse",
+    durete: 8,
+    notes: "Pierre de fortification"
+  },
+  "Saphir": {
+    surnom: "Werunite",
+    valeur: 6.000,
+    couleur: "Bleu",
+    lienZodiacal: "Nuage/Tortue/Phénix/Epée/Dauphins",
+    lienDivin: "Weru, Tannun, Shua",
+    symbolique: "Justice, Pureté, Liberté",
+    durete: 9,
+    notes: "Pierre céleste"
+  },
+  "Diamant": {
+    surnom: "Pierre des fous",
+    valeur: 1.000,
+    couleur: "Incolore",
+    lienZodiacal: "Paon/Licorne/Ourarque",
+    lienDivin: "Usil, Atonar, Laran",
+    symbolique: "Invincible, Constance",
+    durete: 10,
+    notes: "Protège contre la folie"
+  },
+  "Topaze": {
+    surnom: "",
+    valeur: 5.000,
+    couleur: "Jaune/Bleu/Rose",
+    lienZodiacal: "Sirène/Phénix/Papillon/Ecrevisse/Tortue/Dauphins/Cerf/Epée",
+    lienDivin: "Tannun",
+    symbolique: "Gaité, Energie",
+    durete: 8,
+    notes: "Pierre de soin"
+  },
+  "Aigue-Marine": {
+    surnom: "Llyrite",
+    valeur: 4.000,
+    couleur: "Bleu pâle",
+    lienZodiacal: "Dauphins/Tortue/Sirène/Nuage/Ourarque/Epée/Papillon/Epée",
+    lienDivin: "Llyr, Tannun, Ulfer",
+    symbolique: "Sensibilité, Persévérance",
+    durete: 8,
+    notes: "Protège les marins"
+  },
+  "Améthyste": {
+    surnom: "Pérunite",
+    valeur: 3.000,
+    couleur: "Violet",
+    lienZodiacal: "Phénix/Ourarque/Licorne/Epée/Sirène/Nuage/Dauphins/Cerf",
+    lienDivin: "Perun, Arcton, Ninmah",
+    symbolique: "Sagesse, Equilibre",
+    durete: 7,
+    notes: "Pierre d'apaisement, protège des poisons"
+  },
+  "Grenat": {
+    surnom: "Usilite",
+    valeur: 2.000,
+    couleur: "Rouge/Pourpre/Violet",
+    lienZodiacal: "Ourarque/Sirène/Tortue/Phénix/Epée",
+    lienDivin: "Usil",
+    symbolique: "Force, Charisme",
+    durete: 7,
+    notes: "Pierre d'armure, Pierre de lumière"
+  },
+  "Péridot": {
+    surnom: "Turmite",
+    valeur: 1.500,
+    couleur: "Vert",
+    lienZodiacal: "Tortue/Cerf/Paon/Epée/Sirène/Ourarque",
+    lienDivin: "Turina",
+    symbolique: "Equilibre, Fidélité, Chance",
+    durete: 7,
+    notes: "Pierre de la paladin Pierre de protection"
+  },
+  "Cyanite": {
+    surnom: "",
+    valeur: 1.400,
+    couleur: "Bleu",
+    lienZodiacal: "Epée/Ourarque/Tortue/Phénix/Dauphins/Cerf/Licorne",
+    lienDivin: "Shua",
+    symbolique: "Dextérité, Paix",
+    durete: "4-6+",
+    notes: "Sort de boussole"
+  },
+  "Citrine": {
+    surnom: "",
+    valeur: 1.300,
+    couleur: "Jaune",
+    lienZodiacal: "Papillon/Paon/Ourarque/Nuage/Sirène/Epée",
+    lienDivin: "Thalma, Arcton",
+    symbolique: "Vitalité, Joie, Arts",
+    durete: 7,
+    notes: "Pierre de lumière, protection contre le vent"
+  },
+  "Pierre de Lune": {
+    surnom: "Tilvrite",
+    valeur: 1.200,
+    couleur: "Lait et reflets bleus",
+    lienZodiacal: "Ecrevisse/Papillon/Dauphins/Epée/Sirène/Tortue/Nuage/Ourarque",
+    lienDivin: "Tilvir, Darona",
+    symbolique: "Imagination, Pureté",
+    durete: "6+",
+    notes: '"Œil de poisson", Pierre de pluie'
+  },
+  "Pierre de Soleil": {
+    surnom: "Atonarite",
+    valeur: 1.100,
+    couleur: "Doré pailleté",
+    lienZodiacal: "Paon/Sirène/Licorne",
+    lienDivin: "Atonar, Palustris",
+    symbolique: "Richesse, Jouvence",
+    durete: "6+",
+    notes: "Pierre d'orientation, Pierre de lumière"
+  },
+  "Tourmaline": {
+    surnom: "",
+    valeur: 1.000,
+    couleur: "Rose/Vert/Bleu/Noir",
+    lienZodiacal: "Tortue/Ourarque/Papillon/Tortue/Cerf/Ecrevisse",
+    lienDivin: "Turan",
+    symbolique: "Quiétude, Protection",
+    durete: "7+",
+    notes: "Pierre électrique, Pierre de bouclier"
+  },
+  "Aventurine": {
+    surnom: "Pierre du destin",
+    valeur: 90,
+    couleur: "Vert",
+    lienZodiacal: "Cerf/Papillon/Phénix/Epée/Ecrevisse",
+    lienDivin: "Usil, Narax",
+    symbolique: "Harmonie, Prospérité",
+    durete: "6+",
+    notes: "Pierre de chance"
+  },
+  "Turquoise": {
+    surnom: "Pierre des dieux",
+    valeur: 85,
+    couleur: "Bleu-vert",
+    lienZodiacal: "Phénix/Nuage/Dauphins/Cerf/Sirène/Epée/Tortue",
+    lienDivin: "Perun, Thalma, Weru",
+    symbolique: "Communication, Energie",
+    durete: "5+",
+    notes: "Pierre de piété, Protège les voyageurs"
+  },
+  "Œil de loup (Chrysobéryl)": {
+    surnom: "Ulférite",
+    valeur: 80,
+    couleur: "Jaune-doré",
+    lienZodiacal: "Tortue/Epée",
+    lienDivin: "Ulfer",
+    symbolique: "Sang-froid, Abondance",
+    durete: "8+",
+    notes: "Protège les survivants"
+  },
+  "Œil de taureau (Quartz brun)": {
+    surnom: "",
+    valeur: 70,
+    couleur: "Jaune-rouge",
+    lienZodiacal: "Cerf",
+    lienDivin: "Turan, Ulfer, Ninmah",
+    symbolique: "Courage, Fermeté",
+    durete: 7,
+    notes: "Apporte le succès aux sports"
+  },
+  "Œil de tigre (Quartz brun)": {
+    surnom: "",
+    valeur: 60,
+    couleur: "Orange",
+    lienZodiacal: "Paon/Papillon/Ecrevisse/Epée/Tortue/Licorne/Cerf/Papillon",
+    lienDivin: "Narax, Arcton, Weru, Laran",
+    symbolique: "Liberté, Largesse",
+    durete: 7,
+    notes: "Protège les guerriers"
+  },
+  "Œil de faucon (Quartz bleu)": {
+    surnom: "",
+    valeur: 50,
+    couleur: "Gris-bleu",
+    lienZodiacal: "Papillon/Nuage/Ourarque/",
+    lienDivin: "Thalma, Palustris, Narax",
+    symbolique: "Empathie, Evolution",
+    durete: 7,
+    notes: "Pierre de vision, Pierre de protection"
+  },
+  "Quartz fumé": {
+    surnom: "",
+    valeur: 40,
+    couleur: "Brun",
+    lienZodiacal: "Ourarque/Sirène/Tortue/Epée/Phénix",
+    lienDivin: "Usil, Voltumna, Narax",
+    symbolique: "Eveil, Volonté",
+    durete: 7,
+    notes: "Pierre de protection, Pierre de clairvoyance"
+  },
+  "Quartz rose": {
+    surnom: "Pierre du cœur",
+    valeur: 30,
+    couleur: "Rose",
+    lienZodiacal: "Cerf/Epée/Nuage/Ourarque",
+    lienDivin: "Turan, Tannun",
+    symbolique: "Calme, Tendresse",
+    durete: 7,
+    notes: "Pierre d'amour, Pierre de beauté"
+  },
+  "Cristal (Quartz incolore)": {
+    surnom: "",
+    valeur: 20,
+    couleur: "Incolore",
+    lienZodiacal: "Ourarque",
+    lienDivin: "Usil, Darona, Palustris",
+    symbolique: "Clairvoyance, Méditatif",
+    durete: 7,
+    notes: "Amplificateur"
+  },
+  "Lapis Lazuli": {
+    surnom: "Pierre de vérité",
+    valeur: 18,
+    couleur: "Bleu",
+    lienZodiacal: "Nuage/Licorne/Papillon/Paon/Epée/Tortue/Phénix/Dauphins/Cerf",
+    lienDivin: "Weru, Ulfer",
+    symbolique: "Honnêteté, Intuition",
+    durete: "5+",
+    notes: "Pierre d'amitié"
+  },
+  "Jais (Jaspe noir)": {
+    surnom: "",
+    valeur: 17,
+    couleur: "Noir",
+    lienZodiacal: "Ourarque/Paon/Tortue",
+    lienDivin: "Llyr, Voltumna, Guyona",
+    symbolique: "Durisme, Maîtrise",
+    durete: "6-",
+    notes: "Pierre des ténèbres, Pierre des secrets"
+  },
+  "Onyxline (Jaspe rouge)": {
+    surnom: "Corne",
+    valeur: 15,
+    couleur: "Rouge/Orange",
+    lienZodiacal: "Sirène/Cerf/Tortue/Ecrevisse/Licorne/Paon/Epée",
+    lienDivin: "Gibil, Arcton",
+    symbolique: "Vitalité, Initiative",
+    durete: "6+",
+    notes: "Pierre de résilience"
+  },
+  "Chrysoprase (Jaspe vert)": {
+    surnom: "",
+    valeur: 12,
+    couleur: "Vert",
+    lienZodiacal: "Cerf/Epée/Ecrevisse",
+    lienDivin: "Guyona",
+    symbolique: "Compassion, Clairvoyance",
+    durete: "6+",
+    notes: "Pierre de sceau, protège du venin, Invisibilité"
+  },
+  "Sardoine (Jaspe brun)": {
+    surnom: "",
+    valeur: 9,
+    couleur: "Brun-fauve",
+    lienZodiacal: "Licorne/Tortue/Cerf/sirène",
+    lienDivin: "Laran, Usil, Suvix",
+    symbolique: "Protection, Courage",
+    durete: "6+",
+    notes: "Pierre de guérison"
+  },
+  "Agate (Jaspe multicolore)": {
+    surnom: "Aurore",
+    valeur: 8,
+    couleur: "Marron/Bleu/Blanc/Rouge",
+    lienZodiacal: "Papillon/Cerf/Dauphins/Ecrevisse/Epée/Nuage",
+    lienDivin: "Thalma, Ulfer",
+    symbolique: "Curiosité, Adaptabilité",
+    durete: "6+",
+    notes: "Pierre de bonheur, Pierre de paix"
+  },
+  "Obsidienne": {
+    surnom: "",
+    valeur: 7,
+    couleur: "Multicolore",
+    lienZodiacal: "Epée/Tortue/Ecrevisse/Sirène/Papillon/Paon/Phénix/Nuage",
+    lienDivin: "Atonar, Turan, Shua",
+    symbolique: "Espoir, Beauté, Arts",
+    durete: 6,
+    notes: "Pierre de prémonition"
+  },
+  "Serpentine": {
+    surnom: "Laranite",
+    valeur: 5,
+    couleur: "Vert",
+    lienZodiacal: "Sirène/Epée/Phénix/Ourarque",
+    lienDivin: "Laran, Usil, Voltumna",
+    symbolique: "Introspection, Occultisme",
+    durete: "5+",
+    notes: "Pierre de siège, Pierre de sceaux, combustible"
+  },
+  "Malachite": {
+    surnom: "",
+    valeur: 3,
+    couleur: "Vert écaillé",
+    lienZodiacal: "Tortue/Papillon/Sirène/Dauphins",
+    lienDivin: "Guyona, Llyr",
+    symbolique: "Guérison, Force",
+    durete: "2+ à 4",
+    notes: "Pierre de sceau, talisman, Pierre des rêves"
+  },
+  "Hématite": {
+    surnom: "",
+    valeur: 2,
+    couleur: "Vert sombre",
+    lienZodiacal: "Paon/Sirène/Phénix/Epée",
+    lienDivin: "Tannun",
+    symbolique: "Protection, Jouvence",
+    durete: 4,
+    notes: "Protège les voyageurs et enfants, Pierre de fer"
+  },
+  "Perle": {
+    surnom: "Larmes de Llyr",
+    valeur: 10.000,
+    couleur: "Blanc/Rose/Bleu/Noir",
+    lienZodiacal: "Ecrevisse/Papillon/Epée/Dauphins",
+    lienDivin: "Tilvir, Perun, Turan, Darona",
+    symbolique: "Douceur, Pureté",
+    durete: 3,
+    notes: "Parreux, pigment rouge"
+  },
+  "Ambre": {
+    surnom: "Larmes d'Atona",
+    valeur: 11,
+    couleur: "Orange",
+    lienZodiacal: "Paon/Cerf/Papillon/Ecrevisse/Tortue",
+    lienDivin: "Atonar",
+    symbolique: "Sérénité, Sagesse",
+    durete: "2+",
+    notes: "Pierre électrique, combustible"
+  },
+  "Corail": {
+    surnom: "Sang de basaltik",
+    valeur: 10,
+    couleur: "Blanc/Jaune/Orange/Rouge/",
+    lienZodiacal: "Dauphins/Cerf/Ecrevisse",
+    lienDivin: "Llyr, Ninmah, Guyona",
+    symbolique: "Vigueur, Fertilité",
+    durete: "3+",
+    notes: "Pierre de protection, Pierre magique"
+  },
+  "Jais": {
+    surnom: "Thanrite",
+    valeur: 6,
+    couleur: "Noir",
+    lienZodiacal: "Ourarque/Ecrevisse/Nuage",
+    lienDivin: "Voltumna, Suvix",
+    symbolique: "Richesse, Spiritualité",
+    durete: "2-4",
+    notes: "Pierre de protection, Pierre de deuil, combustible"
+  },
+  "Nacre": {
+    surnom: "",
+    valeur: 4,
+    couleur: "Nacre",
+    lienZodiacal: "Ecrevisse/Sirène/Nuage",
+    lienDivin: "Tilvir, Llyr, Ninmah",
+    symbolique: "Douceur, Intuition",
+    durete: "2-4",
+    notes: "Pierre d'apaisement"
+  },
+  "Ecaille": {
+    surnom: "",
+    valeur: 2,
+    couleur: "Vert/Brun/Blanc",
+    lienZodiacal: "Tortue/Ecrevisse/Sirène/Dauphins",
+    lienDivin: "Thalma, Llyr, Tannun",
+    symbolique: "Longévité, Sagesse",
+    durete: "2+",
+    notes: "Pierre d'endurance"
+  }
+};
+
 // Objets combinés pour compatibilité (version aplatie)
 window.objets = {
   ...window.monnaies.pieces,
@@ -160,6 +911,11 @@ window.getPoidsObjet = function(nomObjet) {
     }
   }
   return 0;
+};
+
+// Fonction pour obtenir les informations détaillées d'une gemme
+window.getGemmeDetails = function(nomGemme) {
+  return window.gemmesDetaillees[nomGemme] || null;
 };
 
 // Fonction pour ajouter un nouvel objet personnalisé
