@@ -1,16 +1,30 @@
+// ===== NAVIGATION MANAGER OPTIMISÉ =====
+
+/**
+ * Gestionnaire de navigation unifié et optimisé
+ * Version 2.0 - Performance et accessibilité améliorées
+ */
+
+// ===== CONFIGURATION =====
 const NAV_CONFIG = {
   links: [
-    { href: 'index.html', text: 'Accueil', icon: '🏠' },
-    { href: 'dorusis.html', text: 'Dorusis', icon: '👤' },
-    { href: 'guilde.html', text: 'Guilde', icon: '⚔️' },
-    { href: 'poids.html', text: 'Poids', mobileText: 'Poids', icon: '🏋️' },
-    { href: 'liste.html', text: 'Liste', mobileText: 'Liste', icon: '📋' },
-    { href: 'convertisseur.html', text: 'Convertisseur', mobileText: 'Convert', icon: '🔄' },
-    { href: 'grimoire.html', text: 'Grimoire', icon: '📖' }
+    { href: 'index.html', text: 'Accueil', icon: '🏠', priority: 1 },
+    { href: 'dorusis.html', text: 'Dorusis', icon: '👤', priority: 2 },
+    { href: 'guilde.html', text: 'Guilde', icon: '⚔️', priority: 3 },
+    { href: 'poids.html', text: 'Poids', mobileText: 'Poids', icon: '🏋️', priority: 4 },
+    { href: 'liste.html', text: 'Liste', mobileText: 'Liste', icon: '📋', priority: 5 },
+    { href: 'convertisseur.html', text: 'Convertisseur', mobileText: 'Convert', icon: '🔄', priority: 6 },
+    { href: 'grimoire.html', text: 'Grimoire', icon: '📖', priority: 7 }
   ],
   
-  // Pages qui ne doivent pas avoir la sidebar (ex: page d'accueil avec nav custom)
-  excludeFromSidebar: ['index.html']
+  // Pages sans sidebar (navigation personnalisée)
+  excludeFromSidebar: ['index.html'],
+  
+  // Breakpoint mobile
+  mobileBreakpoint: 768,
+  
+  // Délai pour le debouncing du resize
+  resizeDebounce: 250
 };
 
 // ===== CLASSE PRINCIPALE =====
@@ -19,21 +33,37 @@ class NavigationManager {
     this.currentPage = this.getCurrentPage();
     this.isMobile = this.checkMobile();
     this.isInitialized = false;
+    this.resizeTimer = null;
+    this.elements = {
+      sidebar: null,
+      mobileNav: null
+    };
   }
 
   /**
    * Initialise le système de navigation
+   * @returns {boolean} Succès de l'initialisation
    */
   init() {
-    if (this.isInitialized) return;
+    if (this.isInitialized) {
+      console.warn('Navigation déjà initialisée');
+      return true;
+    }
 
-    this.cleanup();
-    this.injectNavigation();
-    this.setupEventListeners();
-    this.updateActiveLink();
-    this.isInitialized = true;
+    try {
+      this.cleanup();
+      this.injectNavigation();
+      this.setupEventListeners();
+      this.updateActiveLink();
+      this.addNavigationStyles();
+      this.isInitialized = true;
 
-    console.log('Navigation initialisée pour:', this.currentPage);
+      console.log(`✅ Navigation initialisée pour: ${this.currentPage} (${this.isMobile ? 'mobile' : 'desktop'})`);
+      return true;
+    } catch (error) {
+      console.error('Erreur lors de l\'initialisation de la navigation:', error);
+      return false;
+    }
   }
 
   /**
@@ -51,20 +81,26 @@ class NavigationManager {
    * @returns {boolean} True si mobile
    */
   checkMobile() {
-    return window.innerWidth <= 768;
+    return window.innerWidth <= NAV_CONFIG.mobileBreakpoint;
   }
 
   /**
    * Nettoie la navigation existante
    */
   cleanup() {
+    // Supprimer les éléments existants
     document.querySelectorAll('.sidebar, .mobile-nav').forEach(el => el.remove());
+    
+    // Nettoyer les références
+    this.elements.sidebar = null;
+    this.elements.mobileNav = null;
   }
 
   /**
    * Injecte la navigation appropriée
    */
   injectNavigation() {
+    // Toujours injecter la navigation mobile
     this.injectMobileNav();
     
     // Injecter la sidebar seulement si pas exclue
@@ -77,46 +113,74 @@ class NavigationManager {
    * Crée et injecte la sidebar desktop
    */
   injectSidebar() {
-    const sidebar = document.createElement('div');
+    const sidebar = document.createElement('nav');
     sidebar.className = 'sidebar';
+    sidebar.setAttribute('aria-label', 'Navigation principale');
     
+    // Titre de la sidebar
     const title = document.createElement('h2');
     title.textContent = 'Navigation';
     sidebar.appendChild(title);
 
-    // Créer les liens
-    NAV_CONFIG.links.forEach(linkConfig => {
-      const link = this.createNavLink(linkConfig, false);
-      sidebar.appendChild(link);
-    });
+    // Liste des liens
+    const linksList = document.createElement('ul');
+    linksList.className = 'nav-links';
+    linksList.setAttribute('role', 'menubar');
 
-    // Injecter avant le contenu
+    NAV_CONFIG.links
+      .sort((a, b) => a.priority - b.priority)
+      .forEach(linkConfig => {
+        const listItem = document.createElement('li');
+        listItem.setAttribute('role', 'none');
+        
+        const link = this.createNavLink(linkConfig, false);
+        link.setAttribute('role', 'menuitem');
+        
+        listItem.appendChild(link);
+        linksList.appendChild(listItem);
+      });
+
+    sidebar.appendChild(linksList);
+
+    // Injecter avant le contenu principal
     const content = document.querySelector('.content');
-    if (content) {
-      document.body.insertBefore(sidebar, content);
+    if (content && content.parentNode) {
+      content.parentNode.insertBefore(sidebar, content);
     } else {
       document.body.insertBefore(sidebar, document.body.firstChild);
     }
+
+    this.elements.sidebar = sidebar;
   }
 
   /**
    * Crée et injecte la navigation mobile
    */
   injectMobileNav() {
-    const mobileNav = document.createElement('div');
+    const mobileNav = document.createElement('nav');
     mobileNav.className = 'mobile-nav';
+    mobileNav.setAttribute('aria-label', 'Navigation mobile');
+
+    // Conteneur scrollable
+    const navContainer = document.createElement('div');
+    navContainer.className = 'mobile-nav-container';
 
     // Créer les liens mobiles
-    NAV_CONFIG.links.forEach(linkConfig => {
-      const link = this.createNavLink(linkConfig, true);
-      mobileNav.appendChild(link);
-    });
+    NAV_CONFIG.links
+      .sort((a, b) => a.priority - b.priority)
+      .forEach(linkConfig => {
+        const link = this.createNavLink(linkConfig, true);
+        navContainer.appendChild(link);
+      });
 
+    mobileNav.appendChild(navContainer);
     document.body.insertBefore(mobileNav, document.body.firstChild);
+
+    this.elements.mobileNav = mobileNav;
   }
 
   /**
-   * Crée un lien de navigation
+   * Crée un lien de navigation optimisé
    * @param {Object} config - Configuration du lien
    * @param {boolean} isMobile - Si c'est pour la version mobile
    * @returns {HTMLAnchorElement} Élément de lien
@@ -124,18 +188,28 @@ class NavigationManager {
   createNavLink(config, isMobile = false) {
     const link = document.createElement('a');
     link.href = config.href;
+    link.className = 'nav-link';
     
-    // Texte différent pour mobile si disponible
+    // Texte approprié pour le contexte
     const text = isMobile && config.mobileText ? config.mobileText : config.text;
     
-    // Ajouter icône si disponible
-    if (config.icon && isMobile) {
-      link.innerHTML = `${config.icon} ${text}`;
+    // Contenu du lien
+    if (config.icon) {
+      const icon = document.createElement('span');
+      icon.className = 'nav-icon';
+      icon.textContent = config.icon;
+      icon.setAttribute('aria-hidden', 'true');
+      link.appendChild(icon);
+      
+      const textSpan = document.createElement('span');
+      textSpan.className = 'nav-text';
+      textSpan.textContent = text;
+      link.appendChild(textSpan);
     } else {
       link.textContent = text;
     }
 
-    // Marquer le lien actuel
+    // État actif
     if (config.href === this.currentPage) {
       link.classList.add('active');
       link.setAttribute('aria-current', 'page');
@@ -143,21 +217,31 @@ class NavigationManager {
 
     // Attributs d'accessibilité
     link.setAttribute('aria-label', `Aller à la page ${config.text}`);
+    
+    // Préchargement pour les performances
+    if (config.href !== this.currentPage) {
+      link.setAttribute('rel', 'prefetch');
+    }
 
     return link;
   }
 
   /**
-   * Met à jour le lien actif
+   * Met à jour les liens actifs
    */
   updateActiveLink() {
-    document.querySelectorAll('.sidebar a, .mobile-nav a').forEach(link => {
-      link.classList.remove('active');
-      link.removeAttribute('aria-current');
+    const allLinks = document.querySelectorAll('.sidebar a, .mobile-nav a');
+    
+    allLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      const isActive = href === this.currentPage;
       
-      if (link.getAttribute('href') === this.currentPage) {
-        link.classList.add('active');
+      link.classList.toggle('active', isActive);
+      
+      if (isActive) {
         link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
       }
     });
   }
@@ -166,135 +250,395 @@ class NavigationManager {
    * Configure les événements
    */
   setupEventListeners() {
-    // Réinitialiser la navigation au redimensionnement
-    let resizeTimeout;
+    // Gestion du redimensionnement avec debouncing
     window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        const newIsMobile = this.checkMobile();
-        if (newIsMobile !== this.isMobile) {
-          this.isMobile = newIsMobile;
-          this.init(); // Réinitialiser si changement mobile/desktop
-        }
-      }, 250);
+      clearTimeout(this.resizeTimer);
+      this.resizeTimer = setTimeout(() => {
+        this.handleResize();
+      }, NAV_CONFIG.resizeDebounce);
     });
 
-    // Gestion des clics sur les liens (pour SPA future si besoin)
+    // Gestion des clics de navigation
     document.addEventListener('click', (e) => {
-      if (e.target.matches('.sidebar a, .mobile-nav a')) {
-        // Ici on pourrait ajouter une logique SPA
-        // Pour l'instant, navigation normale
+      if (e.target.closest('.nav-link')) {
+        this.handleNavClick(e);
       }
+    });
+
+    // Support clavier pour l'accessibilité
+    document.addEventListener('keydown', (e) => {
+      if (e.target.closest('.nav-link')) {
+        this.handleKeyNavigation(e);
+      }
+    });
+
+    // Gestion du changement d'historique (pour les SPA)
+    window.addEventListener('popstate', () => {
+      this.currentPage = this.getCurrentPage();
+      this.updateActiveLink();
     });
   }
 
   /**
-   * Réinitialise la navigation (utile pour les changements dynamiques)
+   * Gère le redimensionnement de la fenêtre
+   */
+  handleResize() {
+    const newIsMobile = this.checkMobile();
+    
+    if (newIsMobile !== this.isMobile) {
+      this.isMobile = newIsMobile;
+      console.log(`📱 Basculement vers ${this.isMobile ? 'mobile' : 'desktop'}`);
+      
+      // Réinitialiser uniquement si nécessaire
+      this.refresh();
+    }
+  }
+
+  /**
+   * Gère les clics de navigation
+   * @param {Event} e - Événement de clic
+   */
+  handleNavClick(e) {
+    const link = e.target.closest('.nav-link');
+    if (!link) return;
+
+    // Ajouter une classe de chargement
+    link.classList.add('loading');
+    
+    // Retirer la classe après un court délai
+    setTimeout(() => {
+      link.classList.remove('loading');
+    }, 300);
+
+    // Ici on pourrait ajouter une logique SPA si nécessaire
+    // Pour l'instant, navigation normale
+  }
+
+  /**
+   * Gère la navigation au clavier
+   * @param {Event} e - Événement clavier
+   */
+  handleKeyNavigation(e) {
+    const link = e.target;
+    
+    switch (e.key) {
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        link.click();
+        break;
+        
+      case 'ArrowDown':
+      case 'ArrowRight':
+        e.preventDefault();
+        this.focusNextLink(link);
+        break;
+        
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        e.preventDefault();
+        this.focusPrevLink(link);
+        break;
+    }
+  }
+
+  /**
+   * Focus sur le lien suivant
+   * @param {HTMLElement} currentLink - Lien actuel
+   */
+  focusNextLink(currentLink) {
+    const container = currentLink.closest('.sidebar, .mobile-nav');
+    const links = container.querySelectorAll('.nav-link');
+    const currentIndex = Array.from(links).indexOf(currentLink);
+    const nextIndex = (currentIndex + 1) % links.length;
+    links[nextIndex].focus();
+  }
+
+  /**
+   * Focus sur le lien précédent
+   * @param {HTMLElement} currentLink - Lien actuel
+   */
+  focusPrevLink(currentLink) {
+    const container = currentLink.closest('.sidebar, .mobile-nav');
+    const links = container.querySelectorAll('.nav-link');
+    const currentIndex = Array.from(links).indexOf(currentLink);
+    const prevIndex = currentIndex === 0 ? links.length - 1 : currentIndex - 1;
+    links[prevIndex].focus();
+  }
+
+  /**
+   * Ajoute les styles CSS nécessaires
+   */
+  addNavigationStyles() {
+    if (document.getElementById('nav-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'nav-styles';
+    style.textContent = `
+      /* Styles de navigation optimisés */
+      .nav-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .nav-link.loading::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        animation: nav-loading 0.6s ease-in-out;
+      }
+      
+      @keyframes nav-loading {
+        to { left: 100%; }
+      }
+      
+      .nav-icon {
+        font-size: 1.1em;
+        flex-shrink: 0;
+      }
+      
+      .nav-text {
+        flex: 1;
+      }
+      
+      .mobile-nav-container {
+        display: flex;
+        gap: 4px;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 0 8px;
+      }
+      
+      .mobile-nav-container::-webkit-scrollbar {
+        height: 4px;
+      }
+      
+      .mobile-nav-container::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.1);
+      }
+      
+      .mobile-nav-container::-webkit-scrollbar-thumb {
+        background: var(--accent-gold);
+        border-radius: 2px;
+      }
+      
+      /* Animation de focus pour l'accessibilité */
+      .nav-link:focus {
+        outline: 2px solid var(--accent-gold);
+        outline-offset: 2px;
+        border-radius: var(--border-radius);
+      }
+      
+      /* Indicateur de page active amélioré */
+      .sidebar .nav-link.active {
+        background: rgba(218, 165, 32, 0.3);
+        border-left: 4px solid var(--accent-gold);
+        padding-left: 11px;
+      }
+      
+      .mobile-nav .nav-link.active {
+        background: rgba(218, 165, 32, 0.3);
+        border-bottom: 2px solid var(--accent-gold);
+      }
+      
+      /* Responsive amélioré */
+      @media (max-width: ${NAV_CONFIG.mobileBreakpoint}px) {
+        .mobile-nav .nav-text {
+          font-size: 0.75rem;
+        }
+      }
+      
+      /* Mode haut contraste */
+      @media (prefers-contrast: high) {
+        .nav-link.active {
+          border-width: 3px;
+        }
+      }
+      
+      /* Préférence de mouvement réduit */
+      @media (prefers-reduced-motion: reduce) {
+        .nav-link {
+          transition: none;
+        }
+        
+        @keyframes nav-loading {
+          to { left: 100%; }
+        }
+      }
+    `;
+    
+    document.head.appendChild(style);
+  }
+
+  /**
+   * Réinitialise la navigation
    */
   refresh() {
     this.isInitialized = false;
     this.currentPage = this.getCurrentPage();
-    this.init();
+    return this.init();
   }
 
   /**
-   * Ajoute un lien personnalisé à la navigation
+   * Ajoute un lien personnalisé
    * @param {Object} linkConfig - Configuration du nouveau lien
+   * @returns {boolean} Succès de l'ajout
    */
   addCustomLink(linkConfig) {
     if (!linkConfig.href || !linkConfig.text) {
       console.error('Configuration de lien invalide');
-      return;
+      return false;
+    }
+
+    // Assigner une priorité par défaut
+    if (!linkConfig.priority) {
+      linkConfig.priority = NAV_CONFIG.links.length + 1;
     }
 
     NAV_CONFIG.links.push(linkConfig);
     this.refresh();
+    return true;
   }
 
   /**
-   * Supprime un lien de la navigation
+   * Supprime un lien
    * @param {string} href - href du lien à supprimer
+   * @returns {boolean} Succès de la suppression
    */
   removeLink(href) {
     const index = NAV_CONFIG.links.findIndex(link => link.href === href);
-    if (index !== -1) {
-      NAV_CONFIG.links.splice(index, 1);
-      this.refresh();
+    if (index === -1) return false;
+
+    NAV_CONFIG.links.splice(index, 1);
+    this.refresh();
+    return true;
+  }
+
+  /**
+   * Obtient les statistiques de navigation
+   * @returns {Object} Statistiques
+   */
+  getStats() {
+    return {
+      isInitialized: this.isInitialized,
+      currentPage: this.currentPage,
+      isMobile: this.isMobile,
+      linksCount: NAV_CONFIG.links.length,
+      hasSidebar: !!this.elements.sidebar,
+      hasMobileNav: !!this.elements.mobileNav
+    };
+  }
+
+  /**
+   * Détruit le gestionnaire
+   */
+  destroy() {
+    // Nettoyer les timers
+    if (this.resizeTimer) {
+      clearTimeout(this.resizeTimer);
     }
+
+    // Supprimer les éléments
+    this.cleanup();
+
+    // Supprimer les styles
+    const styles = document.getElementById('nav-styles');
+    if (styles) {
+      styles.remove();
+    }
+
+    // Réinitialiser l'état
+    this.isInitialized = false;
+    console.log('Navigation détruite');
   }
 }
 
-// ===== INSTANCE GLOBALE =====
+// ===== INSTANCE GLOBALE ET FONCTIONS UTILITAIRES =====
 let navigationManager = null;
 
 /**
  * Initialise le gestionnaire de navigation
+ * @returns {boolean} Succès de l'initialisation
  */
 function initializeNavigation() {
+  if (navigationManager) {
+    console.warn('Navigation déjà initialisée');
+    return true;
+  }
+
   navigationManager = new NavigationManager();
-  navigationManager.init();
+  return navigationManager.init();
 }
 
 /**
- * Fonction utilitaire pour actualiser la navigation
+ * Actualise la navigation
+ * @returns {boolean} Succès de l'actualisation
  */
 function refreshNavigation() {
-  if (navigationManager) {
-    navigationManager.refresh();
+  if (!navigationManager) {
+    return initializeNavigation();
   }
+  return navigationManager.refresh();
 }
 
-// ===== STYLES CSS SUPPLÉMENTAIRES =====
-const addNavigationStyles = () => {
-  if (document.getElementById('nav-styles')) return;
-  
-  const style = document.createElement('style');
-  style.id = 'nav-styles';
-  style.textContent = `
-    /* Styles pour les liens actifs */
-    .sidebar a.active,
-    .mobile-nav a.active {
-      background-color: rgba(255, 255, 255, 0.2);
-      border-left: 3px solid #fff;
-      padding-left: 9px;
-    }
-    
-    .mobile-nav a.active {
-      border-left: none;
-      border-bottom: 2px solid #fff;
-      padding-left: 12px;
-    }
-    
-    /* Animation de transition */
-    .sidebar a,
-    .mobile-nav a {
-      transition: all 0.2s ease;
-      position: relative;
-    }
-    
-    /* Indicateur de chargement */
-    .nav-loading::after {
-      content: '...';
-      animation: navLoading 1s infinite;
-    }
-    
-    @keyframes navLoading {
-      0%, 33% { content: ''; }
-      34%, 66% { content: '.'; }
-      67%, 99% { content: '..'; }
-      100% { content: '...'; }
-    }
-  `;
-  
-  document.head.appendChild(style);
-};
+/**
+ * Obtient les statistiques de navigation
+ * @returns {Object|null} Statistiques ou null
+ */
+function getNavigationStats() {
+  return navigationManager?.getStats() || null;
+}
 
-// ===== DÉMARRAGE =====
+/**
+ * Ajoute un lien personnalisé
+ * @param {Object} linkConfig - Configuration du lien
+ * @returns {boolean} Succès
+ */
+function addNavigationLink(linkConfig) {
+  return navigationManager?.addCustomLink(linkConfig) || false;
+}
+
+/**
+ * Supprime un lien de navigation
+ * @param {string} href - href du lien
+ * @returns {boolean} Succès
+ */
+function removeNavigationLink(href) {
+  return navigationManager?.removeLink(href) || false;
+}
+
+// ===== DÉMARRAGE AUTOMATIQUE =====
 document.addEventListener('DOMContentLoaded', () => {
-  addNavigationStyles();
-  initializeNavigation();
+  // Petite temporisation pour s'assurer que tout est chargé
+  setTimeout(initializeNavigation, 50);
+});
+
+// ===== NETTOYAGE À LA FERMETURE =====
+window.addEventListener('beforeunload', () => {
+  if (navigationManager) {
+    navigationManager.destroy();
+  }
 });
 
 // ===== EXPOSITION POUR USAGE EXTERNE =====
 window.NavigationManager = NavigationManager;
 window.refreshNavigation = refreshNavigation;
+window.getNavigationStats = getNavigationStats;
+window.addNavigationLink = addNavigationLink;
+window.removeNavigationLink = removeNavigationLink;
+
+console.log('✅ Module de navigation optimisé chargé');
