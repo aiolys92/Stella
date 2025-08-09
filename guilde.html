@@ -63,9 +63,6 @@
               <button onclick="addInventaireRow('pieces')" class="btn-action btn-add">
                 ➕ Ajouter une monnaie
               </button>
-              <button onclick="transferFromPersonal('pieces')" class="btn-action btn-transfer">
-                📤 Transfer depuis personnel
-              </button>
               <button onclick="distributeToMembers('pieces')" class="btn-action btn-load">
                 📊 Distribuer aux Membres
               </button>
@@ -80,7 +77,6 @@
                   <th width="15%">Quantité</th>
                   <th width="15%">Valeur Unitaire</th>
                   <th width="15%">Valeur Totale</th>
-                  <th width="15%">Contribution</th>
                   <th width="15%">Actions</th>
                 </tr>
               </thead>
@@ -109,9 +105,6 @@
               <button onclick="addInventaireRow('gemmes')" class="btn-action btn-add">
                 ➕ Ajouter une gemme
               </button>
-              <button onclick="transferFromPersonal('gemmes')" class="btn-action btn-transfer">
-                📤 Transfer depuis personnel
-              </button>
               <button onclick="distributeToMembers('gemmes')" class="btn-action btn-load">
                 📊 Distribuer aux Membres
               </button>
@@ -126,7 +119,6 @@
                   <th width="15%">Quantité</th>
                   <th width="15%">Valeur Unitaire</th>
                   <th width="15%">Valeur Totale</th>
-                  <th width="15%">Contribution</th>
                   <th width="15%">Actions</th>
                 </tr>
               </thead>
@@ -210,7 +202,7 @@
     <!-- Liste des objets par catégories - CONSULTATION SEULEMENT -->
     <section class="section">
       <h2>📋 Liste de Toutes les Monnaies et Gemmes</h2>
-      <p class="section-subtitle"><em>Consultation seulement - Aucune action de suppression</em></p>
+      <p class="section-subtitle"><em>Consultation seulement - Référence des valeurs</em></p>
       
       <!-- Filtres et recherche -->
       <div class="filters-row">
@@ -306,8 +298,8 @@
           <h3>📈 Gestion de Guilde</h3>
           <div id="statsGuild">
             <p>Membres actifs: <span id="activeMembers">4</span></p>
-            <p>Dernière contribution: <span id="lastContribution">Jamais</span></p>
-            <p>Croissance: <span id="growth">+0%</span> (mois)</p>
+            <p>Dernière modification: <span id="lastModification">Jamais</span></p>
+            <p>Croissance: <span id="growth">+0%</span> (estimée)</p>
             <p>Stabilité: <span id="stability">Stable</span></p>
           </div>
         </div>
@@ -315,20 +307,20 @@
     </section>
 
     <!-- Modal pour les contributions -->
-    <div id="contributionModal" class="popin-overlay" onclick="closeContributionModal()">
-      <div class="popin-content" onclick="event.stopPropagation()">
-        <div class="popin-header">
+    <div id="contributionModal" class="modal-overlay" onclick="closeContributionModal()">
+      <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
           <h2>📝 Gestion des Membres</h2>
-          <button onclick="closeContributionModal()" class="popin-close">✕</button>
+          <button onclick="closeContributionModal()" class="modal-close">✕</button>
         </div>
         
-        <div class="popin-form">
+        <div class="modal-body">
           <h3>Membres de la Guilde</h3>
           <div id="membersList">
             <!-- Généré dynamiquement -->
           </div>
           
-          <div class="form-field">
+          <div class="modal-actions">
             <button onclick="addNewMember()" class="btn-action btn-add">
               ➕ Ajouter un Membre
             </button>
@@ -341,12 +333,12 @@
     </div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Scripts dans l'ordre correct -->
   <script src="data.js"></script>
   <script src="script.js"></script>
   <script src="nav.js"></script>
   <script>
-    // Variables globales pour la page Guilde
+    // ===== VARIABLES GLOBALES =====
     let currentInventoryTab = 'pieces';
     let guildMembers = [
       { name: 'Dorusis', contribution: 25, class: 'Guerrier' },
@@ -355,436 +347,42 @@
       { name: 'Prêtre Benedictus', contribution: 25, class: 'Prêtre' }
     ];
 
-    // ===== STATISTIQUES =====
-    function updateStatistics() {
-      if (!window.monnaies) return;
-      
-      // Statistiques des monnaies
-      const monetaeKeys = Object.keys(window.monnaies.pieces);
-      const monetaeValues = Object.values(window.monnaies.pieces);
-      const avgMonetae = monetaeValues.reduce((a, b) => a + b, 0) / monetaeValues.length;
-      const maxMonetae = Math.max(...monetaeValues);
-      
-      document.getElementById('countMonetae').textContent = monetaeKeys.length;
-      document.getElementById('avgMonetae').textContent = avgMonetae.toFixed(2);
-      document.getElementById('maxMonetae').textContent = maxMonetae.toFixed(2);
-      
-      // Statistiques des gemmes
-      const gemmaeKeys = Object.keys(window.monnaies.gemmes);
-      const gemmaeValues = Object.values(window.monnaies.gemmes);
-      const avgGemmae = gemmaeValues.reduce((a, b) => a + b, 0) / gemmaeValues.length;
-      const maxGemmae = Math.max(...gemmaeValues);
-      
-      document.getElementById('countGemmae').textContent = gemmaeKeys.length;
-      document.getElementById('avgGemmae').textContent = avgGemmae.toFixed(2);
-      document.getElementById('maxGemmae').textContent = maxGemmae.toFixed(2);
-      
-      // Calculs pour l'inventaire actuel
-      const totalItems = document.querySelectorAll('#inventaireTablePieces tbody tr, #inventaireTableGemmes tbody tr').length;
-      const totalValue = parseFloat(document.getElementById('totalPieces').textContent) || 0;
-      
-      document.getElementById('countTotal').textContent = totalItems;
-      document.getElementById('valueTotal').textContent = totalValue.toFixed(2);
-      
-      // Status du trésor de guilde
-      let status = 'Vide';
-      if (totalValue > 5000) status = 'Très riche';
-      else if (totalValue > 2000) status = 'Riche';
-      else if (totalValue > 500) status = 'Modeste';
-      else if (totalValue > 100) status = 'Pauvre';
-      else if (totalValue > 0) status = 'Très pauvre';
-      
-      document.getElementById('statusTotal').textContent = status;
-      
-      // Par membre
-      const memberCount = guildMembers.length;
-      const perMember = memberCount > 0 ? totalValue / memberCount : 0;
-      document.getElementById('perMember').textContent = perMember.toFixed(2);
-      
-      // Distribution des valeurs
-      let monetaeTotal = 0, gemmaeTotal = 0;
-      
-      document.querySelectorAll('#inventaireTablePieces .total').forEach(cell => {
-        monetaeTotal += parseFloat(cell.textContent) || 0;
-      });
-      
-      document.querySelectorAll('#inventaireTableGemmes .total').forEach(cell => {
-        gemmaeTotal += parseFloat(cell.textContent) || 0;
-      });
-      
-      const percentMonetae = totalValue > 0 ? (monetaeTotal / totalValue * 100).toFixed(1) : 0;
-      const percentGemmae = totalValue > 0 ? (gemmaeTotal / totalValue * 100).toFixed(1) : 0;
-      
-      document.getElementById('percentMonetae').textContent = percentMonetae + '%';
-      document.getElementById('percentGemmae').textContent = percentGemmae + '%';
-      
-      // Statistiques de guilde
-      document.getElementById('activeMembers').textContent = memberCount;
-      
-      // Simuler des données de gestion
-      const now = new Date();
-      document.getElementById('lastContribution').textContent = now.toLocaleDateString('fr-FR');
-      
-      // Calculer la croissance (simulée)
-      const growth = Math.random() * 10 - 2; // Entre -2% et +8%
-      document.getElementById('growth').textContent = (growth >= 0 ? '+' : '') + growth.toFixed(1) + '%';
-      
-      // Stabilité basée sur la valeur totale et le nombre de membres
-      let stability = 'Stable';
-      if (totalValue > 1000 && memberCount >= 3) stability = 'Prospère';
-      else if (totalValue < 100 || memberCount < 2) stability = 'Instable';
-      else if (totalValue > 500) stability = 'En croissance';
-      
-      document.getElementById('stability').textContent = stability;
-    }
-
-    // ===== FONCTIONS UTILITAIRES =====
-    function showNotification(message) {
-      const notification = document.createElement('div');
-      notification.textContent = message;
-      notification.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 10000;
-        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
-        color: white; padding: 15px 25px; border-radius: 8px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        font-family: "Quattrocento Sans", Arial, sans-serif;
-        font-weight: bold; font-size: 14px;
-        border: 2px solid #228B22;
-        animation: slideIn 0.3s ease;
-      `;
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-      }, 3000);
-    }
-
     // ===== INITIALISATION =====
     document.addEventListener('DOMContentLoaded', function() {
       console.log('⚔️ Inventaire Guilde - Initialisé');
       
+      // Attendre que les données soient chargées
+      if (!window.monnaies) {
+        setTimeout(initializeGuild, 100);
+      } else {
+        initializeGuild();
+      }
+    });
+
+    function initializeGuild() {
       // Peupler la liste des objets
       populateObjectsList();
+      
+      // Ajouter des lignes initiales
+      addInventaireRow('pieces');
+      addInventaireRow('gemmes');
       
       // Mettre à jour les statistiques
       updateStatistics();
       
-      // Observer les changements dans les tableaux pour mettre à jour les stats
-      const observer = new MutationObserver(updateStatistics);
+      // Configurer les événements de fichier
+      setupFileHandlers();
       
-      const tables = document.querySelectorAll('#inventaireTablePieces tbody, #inventaireTableGemmes tbody');
-      tables.forEach(table => {
-        observer.observe(table, { childList: true, subtree: true });
-      });
-      
-      // Observer les changements du total
-      const totalObserver = new MutationObserver(updateStatistics);
-      const totalElement = document.getElementById('totalPieces');
-      if (totalElement) {
-        totalObserver.observe(totalElement, { childList: true, characterData: true, subtree: true });
-      }
+      // Observer les changements dans les tableaux
+      setupTableObservers();
       
       // Initialiser le nombre de membres et la preview
       document.getElementById('memberCount').value = guildMembers.length;
       updateMembersPreview();
-    });
-
-    // ===== EXPOSITION DES FONCTIONS =====
-    window.switchInventoryTab = switchInventoryTab;
-    window.updateStatistics = updateStatistics;
-    window.filtrerParCategorie = filtrerParCategorie;
-    window.rechercherObjets = rechercherObjets;
-    window.transferFromPersonal = transferFromPersonal;
-    window.distributeToMembers = distributeToMembers;
-    window.updateAllDistributions = updateAllDistributions;
-    window.openContributionModal = openContributionModal;
-    window.closeContributionModal = closeContributionModal;
-    window.addNewMember = addNewMember;
-    window.removeMember = removeMember;
-    window.updateMemberName = updateMemberName;
-    window.updateMemberClass = updateMemberClass;
-    window.saveContributions = saveContributions;
-  </script>
-
-  <!-- Styles supplémentaires pour la guilde -->
-  <style>
-    .section-subtitle {
-      text-align: center;
-      font-style: italic;
-      color: var(--primary-dark);
-      margin-bottom: 20px;
+      updateAllDistributions();
     }
 
-    .distribution-section {
-      margin-top: 30px;
-      padding: 20px;
-      background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--content-bg) 100%);
-      border-radius: var(--border-radius);
-      border: 2px solid var(--accent-gold);
-    }
-
-    .distribution-section h3 {
-      margin: 0 0 20px 0;
-      color: var(--primary-bg);
-      text-align: center;
-      font-family: var(--font-title);
-    }
-
-    .distribution-config {
-      background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--content-bg) 100%);
-      padding: 25px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 25px;
-    }
-
-    .config-form {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 20px;
-      margin-top: 15px;
-      align-items: start;
-    }
-
-    .members-preview {
-      background: var(--content-bg);
-      padding: 15px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-    }
-
-    .members-preview h4 {
-      margin: 0 0 10px 0;
-      color: var(--primary-dark);
-      font-family: var(--font-title);
-    }
-
-    .member-tag {
-      display: inline-block;
-      background: var(--accent-gold);
-      color: var(--primary-dark);
-      padding: 4px 8px;
-      margin: 2px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-
-    .currency-breakdown {
-      background: var(--content-bg);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 20px;
-    }
-
-    .currency-breakdown h4 {
-      margin: 0 0 15px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-      text-align: center;
-    }
-
-    .currency-distribution-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 15px;
-    }
-
-    .currency-card {
-      background: var(--secondary-bg);
-      padding: 15px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-    }
-
-    .currency-header {
-      text-align: center;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .currency-header h4 {
-      margin: 0 0 5px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-    }
-
-    .currency-total {
-      font-size: 0.9rem;
-      color: var(--accent-gold);
-      font-weight: bold;
-    }
-
-    .member-shares {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .member-share {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 5px 10px;
-      background: var(--content-bg);
-      border-radius: 5px;
-      border: 1px solid var(--border-color);
-    }
-
-    .member-name {
-      font-weight: bold;
-      color: var(--primary-dark);
-    }
-
-    .share-amount {
-      font-weight: bold;
-      color: var(--accent-gold);
-    }
-
-    .total-summary {
-      background: var(--content-bg);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      border: 2px solid var(--accent-gold);
-    }
-
-    .total-summary h4 {
-      margin: 0 0 15px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-      text-align: center;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-    }
-
-    .summary-card {
-      background: var(--secondary-bg);
-      padding: 15px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-    }
-
-    .summary-card h4 {
-      margin: 0 0 10px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-      text-align: center;
-    }
-
-    .member-summary {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .currency-group {
-      background: var(--content-bg);
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid var(--border-color);
-    }
-
-    .currency-group h5 {
-      margin: 0 0 8px 0;
-      color: var(--primary-dark);
-      font-size: 0.9rem;
-      font-weight: bold;
-    }
-
-    .summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 2px 5px;
-      font-size: 0.85rem;
-    }
-
-    .distribution-results {
-      margin-top: 25px;
-    }
-
-    .member-contribution {
-      background: var(--content-bg);
-      padding: 15px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 10px;
-    }
-
-    .member-info {
-      display: grid;
-      grid-template-columns: 2fr 1fr auto;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .member-info input,
-    .member-info select {
-      margin: 0;
-      padding: 8px;
-      font-size: 0.9rem;
-    }
-
-    .no-results {
-      text-align: center;
-      color: var(--primary-dark);
-      font-style: italic;
-      padding: 20px;
-    }
-
-    /* Responsive pour les modaux */
-    @media (max-width: 768px) {
-      .config-form {
-        grid-template-columns: 1fr;
-      }
-      
-      .currency-distribution-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .member-info {
-        grid-template-columns: 1fr;
-        gap: 8px;
-      }
-      
-      .popin-content {
-        width: 95%;
-        max-height: 95vh;
-      }
-      
-      .currency-card {
-        min-width: unset;
-      }
-    }
-
-    /* Animations pour les cartes */
-    .currency-card,
-    .summary-card {
-      transition: var(--transition);
-    }
-
-    .currency-card:hover,
-    .summary-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(47, 27, 20, 0.15);
-      border-color: var(--accent-gold);
-    }
-  </style>
-</body>
-</html> GESTION DES ONGLETS D'INVENTAIRE =====
+    // ===== GESTION DES ONGLETS =====
     function switchInventoryTab(tabName) {
       // Désactiver tous les onglets
       document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -805,6 +403,10 @@
         }
       }
     }
+
+    // ===== GESTION DES INVENTAIRES (utilise script.js) =====
+    // Les fonctions addInventaireRow, removeInventaireRow, updateInventaire 
+    // sont déjà définies dans script.js
 
     // ===== DISTRIBUTION DANS LES ONGLETS MONNAIES/GEMMES =====
     function distributeToMembers(type) {
@@ -994,11 +596,16 @@
       rows.forEach(row => {
         const cells = row.querySelectorAll('td');
         if (cells.length >= 2) {
-          const name = cells[0].textContent.trim();
-          const quantity = parseInt(cells[1].textContent) || 0;
+          const nameSelect = cells[0].querySelector('select');
+          const quantityInput = cells[1].querySelector('input');
           
-          if (quantity > 0) {
-            treasureData.push({ name, quantity });
+          if (nameSelect && quantityInput) {
+            const name = nameSelect.value;
+            const quantity = parseInt(quantityInput.value) || 0;
+            
+            if (name && quantity > 0) {
+              treasureData.push({ name, quantity });
+            }
           }
         }
       });
@@ -1043,12 +650,6 @@
       });
     }
 
-    // ===== FONCTIONS DE TRANSFERT =====
-    function transferFromPersonal(type) {
-      showNotification(`📤 Fonction de transfert depuis l'inventaire personnel vers la guilde (${type})`);
-      // À implémenter : transfert depuis l'inventaire de Dorusis vers la guilde
-    }
-
     // ===== GESTION DES CONTRIBUTIONS =====
     function openContributionModal() {
       document.getElementById('contributionModal').classList.add('active');
@@ -1074,6 +675,8 @@
               <option value="Mage" ${member.class === 'Mage' ? 'selected' : ''}>Mage</option>
               <option value="Voleur" ${member.class === 'Voleur' ? 'selected' : ''}>Voleur</option>
               <option value="Prêtre" ${member.class === 'Prêtre' ? 'selected' : ''}>Prêtre</option>
+              <option value="Paladin" ${member.class === 'Paladin' ? 'selected' : ''}>Paladin</option>
+              <option value="Ranger" ${member.class === 'Ranger' ? 'selected' : ''}>Ranger</option>
             </select>
             <button onclick="removeMember(${index})" class="btn-action btn-delete">🗑️</button>
           </div>
@@ -1095,11 +698,15 @@
     }
 
     function removeMember(index) {
-      guildMembers.splice(index, 1);
-      populateMembersList();
-      document.getElementById('memberCount').value = guildMembers.length;
-      updateMembersPreview();
-      updateAllDistributions();
+      if (guildMembers.length > 1) {
+        guildMembers.splice(index, 1);
+        populateMembersList();
+        document.getElementById('memberCount').value = guildMembers.length;
+        updateMembersPreview();
+        updateAllDistributions();
+      } else {
+        showNotification('⚠️ Au moins un membre doit rester dans la guilde');
+      }
     }
 
     function updateMemberName(index, name) {
@@ -1118,14 +725,17 @@
       closeContributionModal();
       updateAllDistributions();
       updateMembersPreview();
+      document.getElementById('lastModification').textContent = new Date().toLocaleDateString('fr-FR');
       showNotification('💾 Membres sauvegardés');
     }
 
     // ===== POPULATION DE LA LISTE DES OBJETS =====
     function populateObjectsList() {
+      if (!window.monnaies) return;
+
       // Peupler la liste des monnaies
       const listMonetae = document.getElementById('listMonetae');
-      if (listMonetae && window.monnaies) {
+      if (listMonetae && window.monnaies.pieces) {
         listMonetae.innerHTML = '';
         Object.entries(window.monnaies.pieces)
           .sort(([,a], [,b]) => b - a)
@@ -1138,8 +748,9 @@
           });
       }
 
+      // Peupler la liste des gemmes
       const listGemmae = document.getElementById('listGemmae');
-      if (listGemmae && window.monnaies) {
+      if (listGemmae && window.monnaies.gemmes) {
         listGemmae.innerHTML = '';
         Object.entries(window.monnaies.gemmes)
           .sort(([,a], [,b]) => b - a)
@@ -1153,4 +764,663 @@
       }
     }
 
-    // =====
+    // ===== STATISTIQUES =====
+    function updateStatistics() {
+      if (!window.monnaies) return;
+      
+      // Statistiques des monnaies
+      const monetaeKeys = Object.keys(window.monnaies.pieces || {});
+      const monetaeValues = Object.values(window.monnaies.pieces || {});
+      const avgMonetae = monetaeValues.length > 0 ? monetaeValues.reduce((a, b) => a + b, 0) / monetaeValues.length : 0;
+      const maxMonetae = monetaeValues.length > 0 ? Math.max(...monetaeValues) : 0;
+      
+      document.getElementById('countMonetae').textContent = monetaeKeys.length;
+      document.getElementById('avgMonetae').textContent = avgMonetae.toFixed(2);
+      document.getElementById('maxMonetae').textContent = maxMonetae.toFixed(2);
+      
+      // Statistiques des gemmes
+      const gemmaeKeys = Object.keys(window.monnaies.gemmes || {});
+      const gemmaeValues = Object.values(window.monnaies.gemmes || {});
+      const avgGemmae = gemmaeValues.length > 0 ? gemmaeValues.reduce((a, b) => a + b, 0) / gemmaeValues.length : 0;
+      const maxGemmae = gemmaeValues.length > 0 ? Math.max(...gemmaeValues) : 0;
+      
+      document.getElementById('countGemmae').textContent = gemmaeKeys.length;
+      document.getElementById('avgGemmae').textContent = avgGemmae.toFixed(2);
+      document.getElementById('maxGemmae').textContent = maxGemmae.toFixed(2);
+      
+      // Calculs pour l'inventaire actuel
+      const totalItems = document.querySelectorAll('#inventaireTablePieces tbody tr, #inventaireTableGemmes tbody tr').length;
+      const totalValue = parseFloat(document.getElementById('totalPieces').textContent) || 0;
+      
+      document.getElementById('countTotal').textContent = totalItems;
+      document.getElementById('valueTotal').textContent = totalValue.toFixed(2);
+      
+      // Status du trésor de guilde
+      let status = 'Vide';
+      if (totalValue > 5000) status = 'Très riche';
+      else if (totalValue > 2000) status = 'Riche';
+      else if (totalValue > 500) status = 'Modeste';
+      else if (totalValue > 100) status = 'Pauvre';
+      else if (totalValue > 0) status = 'Très pauvre';
+      
+      document.getElementById('statusTotal').textContent = status;
+      
+      // Par membre
+      const memberCount = guildMembers.length;
+      const perMember = memberCount > 0 ? totalValue / memberCount : 0;
+      document.getElementById('perMember').textContent = perMember.toFixed(2);
+      
+      // Distribution des valeurs
+      let monetaeTotal = 0, gemmaeTotal = 0;
+      
+      document.querySelectorAll('#inventaireTablePieces .total').forEach(cell => {
+        monetaeTotal += parseFloat(cell.textContent) || 0;
+      });
+      
+      document.querySelectorAll('#inventaireTableGemmes .total').forEach(cell => {
+        gemmaeTotal += parseFloat(cell.textContent) || 0;
+      });
+      
+      const percentMonetae = totalValue > 0 ? (monetaeTotal / totalValue * 100).toFixed(1) : 0;
+      const percentGemmae = totalValue > 0 ? (gemmaeTotal / totalValue * 100).toFixed(1) : 0;
+      
+      document.getElementById('percentMonetae').textContent = percentMonetae + '%';
+      document.getElementById('percentGemmae').textContent = percentGemmae + '%';
+      
+      // Statistiques de guilde
+      document.getElementById('activeMembers').textContent = memberCount;
+      
+      // Calculer la croissance (simulée basée sur la valeur totale)
+      const growth = totalValue > 1000 ? Math.random() * 5 + 2 : Math.random() * 3;
+      document.getElementById('growth').textContent = '+' + growth.toFixed(1) + '%';
+      
+      // Stabilité basée sur la valeur totale et le nombre de membres
+      let stability = 'Stable';
+      if (totalValue > 2000 && memberCount >= 3) stability = 'Prospère';
+      else if (totalValue < 100 || memberCount < 2) stability = 'Instable';
+      else if (totalValue > 500) stability = 'En croissance';
+      
+      document.getElementById('stability').textContent = stability;
+    }
+
+    // ===== GESTION DES FICHIERS =====
+    function setupFileHandlers() {
+      const fileInput = document.getElementById('fileInputInventory');
+      const saveButton = document.getElementById('saveInventoryBtn');
+
+      if (fileInput) {
+        fileInput.addEventListener('change', loadFromFileInventory);
+      }
+
+      if (saveButton) {
+        saveButton.addEventListener('click', saveToFileInventory);
+      }
+    }
+
+    function setupTableObservers() {
+      // Observer les changements dans les tableaux pour mettre à jour les stats
+      const observer = new MutationObserver(updateStatistics);
+      
+      const tables = document.querySelectorAll('#inventaireTablePieces tbody, #inventaireTableGemmes tbody');
+      tables.forEach(table => {
+        if (table) {
+          observer.observe(table, { childList: true, subtree: true });
+        }
+      });
+      
+      // Observer les changements du total
+      const totalObserver = new MutationObserver(updateStatistics);
+      const totalElement = document.getElementById('totalPieces');
+      if (totalElement) {
+        totalObserver.observe(totalElement, { childList: true, characterData: true, subtree: true });
+      }
+    }
+
+    // ===== FONCTIONS UTILITAIRES =====
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.textContent = message;
+      notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 10000;
+        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+        color: white; padding: 15px 25px; border-radius: 8px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        font-family: "Quattrocento Sans", Arial, sans-serif;
+        font-weight: bold; font-size: 14px;
+        border: 2px solid #228B22;
+        animation: slideInGuild 0.3s ease;
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'slideOutGuild 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+
+    // ===== EXPOSITION DES FONCTIONS =====
+    window.switchInventoryTab = switchInventoryTab;
+    window.updateStatistics = updateStatistics;
+    window.filtrerParCategorie = filtrerParCategorie;
+    window.rechercherObjets = rechercherObjets;
+    window.distributeToMembers = distributeToMembers;
+    window.updateAllDistributions = updateAllDistributions;
+    window.openContributionModal = openContributionModal;
+    window.closeContributionModal = closeContributionModal;
+    window.addNewMember = addNewMember;
+    window.removeMember = removeMember;
+    window.updateMemberName = updateMemberName;
+    window.updateMemberClass = updateMemberClass;
+    window.saveContributions = saveContributions;
+  </script>
+
+  <!-- Styles spécifiques à la guilde -->
+  <style>
+    /* ===== STYLES GUILDE OPTIMISÉS ===== */
+    
+    .section-subtitle {
+      text-align: center;
+      font-style: italic;
+      color: var(--primary-dark);
+      margin-bottom: 20px;
+      opacity: 0.8;
+    }
+
+    .total-display {
+      background: linear-gradient(135deg, var(--accent-gold) 0%, #F4E07A 100%);
+      padding: 15px 25px;
+      border-radius: var(--border-radius);
+      text-align: center;
+      margin: 20px 0;
+      border: 2px solid var(--primary-bg);
+      box-shadow: var(--shadow);
+    }
+
+    .total-label {
+      font-family: var(--font-title);
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-right: 10px;
+    }
+
+    .total-value {
+      font-family: var(--font-title);
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-bg);
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+
+    .total-unit {
+      font-family: var(--font-ui);
+      font-weight: 600;
+      color: var(--primary-dark);
+      margin-left: 5px;
+    }
+
+    .tab-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px 0;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .tab-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .distribution-section {
+      margin-top: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--content-bg) 100%);
+      border-radius: var(--border-radius);
+      border: 2px solid var(--accent-gold);
+      box-shadow: var(--shadow);
+    }
+
+    .distribution-section h3 {
+      margin: 0 0 20px 0;
+      color: var(--primary-bg);
+      text-align: center;
+      font-family: var(--font-title);
+    }
+
+    .distribution-config {
+      background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--content-bg) 100%);
+      padding: 25px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      margin-bottom: 25px;
+      box-shadow: var(--shadow);
+    }
+
+    .config-form {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+      margin-top: 15px;
+      align-items: start;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .input-group label {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--primary-dark);
+      font-family: var(--font-title);
+    }
+
+    .members-preview {
+      background: var(--content-bg);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .members-preview h4 {
+      margin: 0 0 10px 0;
+      color: var(--primary-dark);
+      font-family: var(--font-title);
+    }
+
+    .member-tag {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent-gold) 0%, #F4E07A 100%);
+      color: var(--primary-dark);
+      padding: 6px 12px;
+      margin: 4px;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      font-family: var(--font-ui);
+      border: 1px solid var(--primary-bg);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .currency-breakdown {
+      background: var(--content-bg);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .currency-breakdown h4 {
+      margin: 0 0 15px 0;
+      color: var(--primary-bg);
+      font-family: var(--font-title);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .currency-distribution-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+    }
+
+    .currency-card {
+      background: linear-gradient(135deg, var(--secondary-bg) 0%, #FAF7F0 100%);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .currency-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-dark);
+      border-color: var(--accent-gold);
+    }
+
+    .currency-header {
+      text-align: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--accent-gold);
+    }
+
+    .currency-header h4 {
+      margin: 0 0 5px 0;
+      color: var(--primary-bg);
+      font-family: var(--font-title);
+      font-weight: 600;
+    }
+
+    .currency-total {
+      font-size: 0.9rem;
+      color: var(--accent-gold);
+      font-weight: bold;
+      font-family: var(--font-ui);
+    }
+
+    .member-shares {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .member-share {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--content-bg);
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      transition: var(--transition);
+    }
+
+    .member-share:hover {
+      background: rgba(218, 165, 32, 0.1);
+      border-color: var(--accent-gold);
+    }
+
+    .member-name {
+      font-weight: bold;
+      color: var(--primary-dark);
+      font-family: var(--font-ui);
+    }
+
+    .share-amount {
+      font-weight: bold;
+      color: var(--accent-gold);
+      font-family: var(--font-title);
+      background: rgba(218, 165, 32, 0.2);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .total-summary {
+      background: linear-gradient(135deg, var(--content-bg) 0%, var(--secondary-bg) 100%);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      border: 2px solid var(--accent-gold);
+      box-shadow: var(--shadow);
+    }
+
+    .total-summary h4 {
+      margin: 0 0 15px 0;
+      color: var(--primary-bg);
+      font-family: var(--font-title);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .summary-card {
+      background: var(--secondary-bg);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-dark);
+    }
+
+    .summary-card h4 {
+      margin: 0 0 10px 0;
+      color: var(--primary-bg);
+      font-family: var(--font-title);
+      text-align: center;
+      border-bottom: 1px solid var(--accent-gold);
+      padding-bottom: 8px;
+    }
+
+    .member-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .currency-group {
+      background: var(--content-bg);
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid var(--border-color);
+    }
+
+    .currency-group h5 {
+      margin: 0 0 8px 0;
+      color: var(--primary-dark);
+      font-size: 0.9rem;
+      font-weight: bold;
+      font-family: var(--font-title);
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 5px;
+      font-size: 0.85rem;
+      font-family: var(--font-ui);
+    }
+
+    .filters-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: var(--secondary-bg);
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+    }
+
+    .filter-group, .search-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .filter-group label, .search-group label {
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: var(--primary-dark);
+      font-family: var(--font-title);
+    }
+
+    .categories-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 20px;
+    }
+
+    .category-section {
+      background: var(--content-bg);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+    }
+
+    .category-section h3 {
+      margin: 0 0 15px 0;
+      color: var(--primary-bg);
+      font-family: var(--font-title);
+      text-align: center;
+      border-bottom: 2px solid var(--accent-gold);
+      padding-bottom: 10px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, var(--content-bg) 0%, var(--secondary-bg) 100%);
+      padding: 20px;
+      border-radius: var(--border-radius);
+      border: 2px solid var(--border-color);
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+    }
+
+    .info-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-dark);
+      border-color: var(--accent-gold);
+    }
+
+    .info-card h3 {
+      margin: 0 0 15px 0;
+      color: var(--primary-bg);
+      font-family: var(--font-title);
+      text-align: center;
+      border-bottom: 1px solid var(--accent-gold);
+      padding-bottom: 8px;
+    }
+
+    .info-card p {
+      margin: 8px 0;
+      font-family: var(--font-ui);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .info-card span {
+      font-weight: bold;
+      color: var(--accent-gold);
+    }
+
+    .member-contribution {
+      background: var(--content-bg);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+    }
+
+    .member-info {
+      display: grid;
+      grid-template-columns: 2fr 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .member-info input,
+    .member-info select {
+      padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-family: var(--font-ui);
+      font-size: 0.9rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .no-results {
+      text-align: center;
+      color: var(--primary-dark);
+      font-style: italic;
+      padding: 20px;
+      background: rgba(139, 69, 19, 0.1);
+      border-radius: var(--border-radius);
+      border: 1px dashed var(--border-color);
+    }
+
+    /* Animations */
+    @keyframes slideInGuild {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOutGuild {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(100%); opacity: 0; }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .config-form {
+        grid-template-columns: 1fr;
+      }
+      
+      .currency-distribution-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .member-info {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      
+      .currency-card {
+        min-width: unset;
+      }
+
+      .filters-row {
+        grid-template-columns: 1fr;
+      }
+
+      .categories-container {
+        grid-template-columns: 1fr;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-actions {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .tab-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+
+      .tab-actions {
+        justify-content: center;
+      }
+
+      .total-display {
+        padding: 10px 15px;
+      }
+
+      .total-value {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</body>
+</html>
