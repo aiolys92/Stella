@@ -1,4 +1,4 @@
-// ===== BASE DE DONNÉES UNIFIÉE DES MONNAIES ET GEMMES =====
+// ===== BASE DE DONNÉES COMPLÈTE ET CORRIGÉE =====
 
 if (!window.monnaies) {
   window.monnaies = {
@@ -14,47 +14,47 @@ if (!window.monnaies) {
       "Plomp": 0,
     },
     
-    // GEMMES UNIFIÉES - VALEURS LES PLUS PETITES CONSERVÉES
+    // GEMMES - VALEURS CORRECTES SELON VOTRE SPÉCIFICATION
     gemmes: {
-      "Perle": 10.000,
-      "Rubis": 8.000,
-      "Emeraude": 7.000,
-      "Saphir": 6.000,
-      "Topaze": 5.000,
-      "Aigue-Marine": 4.000,
-      "Améthyste": 3.000,
-      "Grenat": 2.000,
-      "Péridot": 1.500,
-      "Cyanite": 1.400,
-      "Citrine": 1.300,
-      "Pierre de Lune": 1.200,
-      "Pierre de Soleil": 1.100,
-      "Tourmaline": 1.000,
-      "Diamant": 1.000, // Valeur la plus petite conservée
-      "Aventurine": 90,
-      "Turquoise": 85,
-      "Œil de loup (Chrysobéryl)": 80,
-      "Œil de taureau (Quartz brun)": 70,
-      "Œil de tigre (Quartz brun)": 60,
-      "Œil de faucon (Quartz bleu)": 50,
-      "Quartz fumé": 40,
-      "Quartz rose": 30,
-      "Cristal (Quartz incolore)": 20,
-      "Lapis Lazuli": 18,
-      "Jais (Jaspe noir)": 17,
-      "Onyxline (Jaspe rouge)": 15,
-      "Chrysoprase (Jaspe vert)": 12,
-      "Ambre": 11,
-      "Corail": 10,
-      "Sardoine (Jaspe brun)": 9,
-      "Agate (Jaspe multicolore)": 8,
-      "Obsidienne": 7,
-      "Jais": 6,
-      "Serpentine": 5,
-      "Nacre": 4,
-      "Malachite": 3,
-      "Hématite": 2,
-      "Ecaille": 2
+      "Rubis": 83.33,
+      "Emeraude": 72.92,
+      "Saphir": 62.5,
+      "Diamant": 52.08,
+      "Topaze": 52.08,
+      "Aigue-Marine": 41.67,
+      "Améthyste": 31.25,
+      "Grenat": 20.83,
+      "Péridot": 14.58,
+      "Cyanite": 13.54,
+      "Citrine": 12.5,
+      "Pierre de Lune": 11.46,
+      "Pierre de Soleil": 10.42,
+      "Tourmaline": 9.38,
+      "Aventurine": 8.33,
+      "Turquoise": 7.29,
+      "Œil de loup (Chrysobéryl)": 0.89,
+      "Œil de taureau (Quartz brun)": 0.73,
+      "Œil de tigre (Quartz brun)": 0.62,
+      "Œil de faucon (Quartz bleu)": 0.52,
+      "Quartz fumé": 0.42,
+      "Quartz rose": 0.31,
+      "Cristal (Quartz incolore)": 0.21,
+      "Lapis Lazuli": 0.19,
+      "Jais (Jaspe noir)": 0.17,
+      "Onyxline (Jaspe rouge)": 0.16,
+      "Chrysoprase (Jaspe vert)": 0.12,
+      "Sardoine (Jaspe brun)": 0.09,
+      "Agate (Jaspe multicolore)": 0.08,
+      "Obsidienne": 0.07,
+      "Serpentine": 0.05,
+      "Malachite": 0.03,
+      "Ambre": 0.02,
+      "Perle": 104.17,
+      "Hématite": 0.1,
+      "Corail": 0.1,
+      "Jais": 0.06,
+      "Nacre": 0.04,
+      "Ecaille": 0.02
     },
     
     // POIDS ORGANISÉ PAR CATÉGORIES
@@ -112,11 +112,11 @@ if (!window.monnaies) {
   };
 }
 
-// ===== BASE DE DONNÉES COMPLÈTE DES GEMMES AVEC TOUTES LES INFORMATIONS =====
+// ===== BASE DE DONNÉES DÉTAILLÉE DES GEMMES SELON L'IMAGE =====
 window.gemmesDetaillees = {
   "Rubis": {
     surnom: "Escarboucle",
-    valeur: 8.000,
+    valeur: 83.33,
     couleur: "Rouge",
     lienZodiacal: "Sirène/Ecrevisse",
     lienDivin: "Perun, Gibil",
@@ -126,7 +126,7 @@ window.gemmesDetaillees = {
   },
   "Emeraude": {
     surnom: "Turanite",
-    valeur: 7.000,
+    valeur: 72.92,
     couleur: "Vert",
     lienZodiacal: "Cerf/Tortue",
     lienDivin: "Turan, Arcton",
@@ -136,7 +136,7 @@ window.gemmesDetaillees = {
   },
   "Saphir": {
     surnom: "Werunite",
-    valeur: 6.000,
+    valeur: 62.5,
     couleur: "Bleu",
     lienZodiacal: "Nuage/Tortue/Phénix/Epée/Dauphins",
     lienDivin: "Weru, Tannun, Shua",
@@ -146,7 +146,7 @@ window.gemmesDetaillees = {
   },
   "Diamant": {
     surnom: "Pierre des fous",
-    valeur: 1.000, // Valeur la plus petite conservée
+    valeur: 52.08,
     couleur: "Incolore",
     lienZodiacal: "Paon/Licorne/Ourlarque",
     lienDivin: "Usil, Atonar, Laran",
@@ -156,7 +156,7 @@ window.gemmesDetaillees = {
   },
   "Topaze": {
     surnom: "",
-    valeur: 5.000,
+    valeur: 52.08,
     couleur: "Jaune/Bleu/Rose",
     lienZodiacal: "Sirène/Phénix/Papillon/Ecrevisse/Tortue/Dauphins/Cerf/Epée",
     lienDivin: "Tannun",
@@ -166,7 +166,7 @@ window.gemmesDetaillees = {
   },
   "Aigue-Marine": {
     surnom: "Llyrite",
-    valeur: 4.000,
+    valeur: 41.67,
     couleur: "Bleu pâle",
     lienZodiacal: "Dauphins/Tortue/Sirène/Nuage/Ourlarque/Epée/Papillon/Epée",
     lienDivin: "Llyr, Tannun, Ulfer",
@@ -176,7 +176,7 @@ window.gemmesDetaillees = {
   },
   "Améthyste": {
     surnom: "Pérunite",
-    valeur: 3.000,
+    valeur: 31.25,
     couleur: "Violet",
     lienZodiacal: "Phénix/Ourlarque/Licorne/Epée/Sirène/Nuage/Dauphins/Cerf",
     lienDivin: "Perun, Arcton, Ninmah",
@@ -186,7 +186,7 @@ window.gemmesDetaillees = {
   },
   "Grenat": {
     surnom: "Usilite",
-    valeur: 2.000,
+    valeur: 20.83,
     couleur: "Rouge/Pourpre/Violet",
     lienZodiacal: "Ourlarque/Sirène/Tortue/Phénix/Epée",
     lienDivin: "Usil",
@@ -196,7 +196,7 @@ window.gemmesDetaillees = {
   },
   "Péridot": {
     surnom: "Turmite",
-    valeur: 1.500,
+    valeur: 14.58,
     couleur: "Vert",
     lienZodiacal: "Tortue/Cerf/Paon/Epée/Sirène/Ourlarque",
     lienDivin: "Turina",
@@ -206,7 +206,7 @@ window.gemmesDetaillees = {
   },
   "Cyanite": {
     surnom: "",
-    valeur: 1.400,
+    valeur: 13.54,
     couleur: "Bleu",
     lienZodiacal: "Epée/Ourlarque/Tortue/Phénix/Dauphins/Cerf/Licorne",
     lienDivin: "Shua",
@@ -216,7 +216,7 @@ window.gemmesDetaillees = {
   },
   "Citrine": {
     surnom: "",
-    valeur: 1.300,
+    valeur: 12.5,
     couleur: "Jaune",
     lienZodiacal: "Papillon/Paon/Ourlarque/Nuage/Sirène/Epée",
     lienDivin: "Thalma, Arcton",
@@ -226,7 +226,7 @@ window.gemmesDetaillees = {
   },
   "Pierre de Lune": {
     surnom: "Tilvrite",
-    valeur: 1.200,
+    valeur: 11.46,
     couleur: "Lait et reflets bleus",
     lienZodiacal: "Ecrevisse/Papillon/Dauphins/Epée/Sirène/Tortue/Nuage/Ourlarque",
     lienDivin: "Tilvir, Darona",
@@ -236,7 +236,7 @@ window.gemmesDetaillees = {
   },
   "Pierre de Soleil": {
     surnom: "Atonarite",
-    valeur: 1.100,
+    valeur: 10.42,
     couleur: "Doré pailleté",
     lienZodiacal: "Paon/Sirène/Licorne",
     lienDivin: "Atonar, Palustris",
@@ -246,7 +246,7 @@ window.gemmesDetaillees = {
   },
   "Tourmaline": {
     surnom: "",
-    valeur: 1.000,
+    valeur: 9.38,
     couleur: "Rose/Vert/Bleu/Noir",
     lienZodiacal: "Tortue/Ourlarque/Papillon/Tortue/Cerf/Ecrevisse",
     lienDivin: "Turan",
@@ -256,7 +256,7 @@ window.gemmesDetaillees = {
   },
   "Aventurine": {
     surnom: "Pierre du destin",
-    valeur: 90,
+    valeur: 8.33,
     couleur: "Vert",
     lienZodiacal: "Cerf/Papillon/Phénix/Epée/Ecrevisse",
     lienDivin: "Usil, Narax",
@@ -266,7 +266,7 @@ window.gemmesDetaillees = {
   },
   "Turquoise": {
     surnom: "Pierre des dieux",
-    valeur: 85,
+    valeur: 7.29,
     couleur: "Bleu-vert",
     lienZodiacal: "Phénix/Nuage/Dauphins/Cerf/Sirène/Epée/Tortue",
     lienDivin: "Perun, Thalma, Weru",
@@ -276,7 +276,7 @@ window.gemmesDetaillees = {
   },
   "Œil de loup (Chrysobéryl)": {
     surnom: "Ulférite",
-    valeur: 80,
+    valeur: 0.89,
     couleur: "Jaune-doré",
     lienZodiacal: "Tortue/Epée",
     lienDivin: "Ulfer",
@@ -286,7 +286,7 @@ window.gemmesDetaillees = {
   },
   "Œil de taureau (Quartz brun)": {
     surnom: "",
-    valeur: 70,
+    valeur: 0.73,
     couleur: "Jaune-rouge",
     lienZodiacal: "Cerf",
     lienDivin: "Turan, Ulfer, Ninmah",
@@ -296,7 +296,7 @@ window.gemmesDetaillees = {
   },
   "Œil de tigre (Quartz brun)": {
     surnom: "",
-    valeur: 60,
+    valeur: 0.62,
     couleur: "Orange",
     lienZodiacal: "Paon/Papillon/Ecrevisse/Epée/Tortue/Licorne/Cerf/Papillon",
     lienDivin: "Narax, Arcton, Weru, Laran",
@@ -306,7 +306,7 @@ window.gemmesDetaillees = {
   },
   "Œil de faucon (Quartz bleu)": {
     surnom: "",
-    valeur: 50,
+    valeur: 0.52,
     couleur: "Gris-bleu",
     lienZodiacal: "Papillon/Nuage/Ourlarque/",
     lienDivin: "Thalma, Palustris, Narax",
@@ -316,7 +316,7 @@ window.gemmesDetaillees = {
   },
   "Quartz fumé": {
     surnom: "",
-    valeur: 40,
+    valeur: 0.42,
     couleur: "Brun",
     lienZodiacal: "Ourlarque/Sirène/Tortue/Epée/Phénix",
     lienDivin: "Usil, Voltumna, Narax",
@@ -326,7 +326,7 @@ window.gemmesDetaillees = {
   },
   "Quartz rose": {
     surnom: "Pierre du cœur",
-    valeur: 30,
+    valeur: 0.31,
     couleur: "Rose",
     lienZodiacal: "Cerf/Epée/Nuage/Ourlarque",
     lienDivin: "Turan, Tannun",
@@ -336,7 +336,7 @@ window.gemmesDetaillees = {
   },
   "Cristal (Quartz incolore)": {
     surnom: "",
-    valeur: 20,
+    valeur: 0.21,
     couleur: "Incolore",
     lienZodiacal: "Ourlarque",
     lienDivin: "Usil, Darona, Palustris",
@@ -346,7 +346,7 @@ window.gemmesDetaillees = {
   },
   "Lapis Lazuli": {
     surnom: "Pierre de vérité",
-    valeur: 18,
+    valeur: 0.19,
     couleur: "Bleu",
     lienZodiacal: "Nuage/Licorne/Papillon/Paon/Epée/Tortue/Phénix/Dauphins/Cerf",
     lienDivin: "Weru, Ulfer",
@@ -356,7 +356,7 @@ window.gemmesDetaillees = {
   },
   "Jais (Jaspe noir)": {
     surnom: "",
-    valeur: 17,
+    valeur: 0.17,
     couleur: "Noir",
     lienZodiacal: "Ourlarque/Paon/Tortue",
     lienDivin: "Llyr, Voltumna, Guyona",
@@ -366,7 +366,7 @@ window.gemmesDetaillees = {
   },
   "Onyxline (Jaspe rouge)": {
     surnom: "Corne",
-    valeur: 15,
+    valeur: 0.16,
     couleur: "Rouge/Orange",
     lienZodiacal: "Sirène/Cerf/Tortue/Ecrevisse/Licorne/Paon/Epée",
     lienDivin: "Gibil, Arcton",
@@ -376,7 +376,7 @@ window.gemmesDetaillees = {
   },
   "Chrysoprase (Jaspe vert)": {
     surnom: "",
-    valeur: 12,
+    valeur: 0.12,
     couleur: "Vert",
     lienZodiacal: "Cerf/Epée/Ecrevisse",
     lienDivin: "Guyona",
@@ -386,7 +386,7 @@ window.gemmesDetaillees = {
   },
   "Sardoine (Jaspe brun)": {
     surnom: "",
-    valeur: 9,
+    valeur: 0.09,
     couleur: "Brun-fauve",
     lienZodiacal: "Licorne/Tortue/Cerf/sirène",
     lienDivin: "Laran, Usil, Suvix",
@@ -396,7 +396,7 @@ window.gemmesDetaillees = {
   },
   "Agate (Jaspe multicolore)": {
     surnom: "Aurore",
-    valeur: 8,
+    valeur: 0.08,
     couleur: "Marron/Bleu/Blanc/Rouge",
     lienZodiacal: "Papillon/Cerf/Dauphins/Ecrevisse/Epée/Nuage",
     lienDivin: "Thalma, Ulfer",
@@ -406,7 +406,7 @@ window.gemmesDetaillees = {
   },
   "Obsidienne": {
     surnom: "",
-    valeur: 7,
+    valeur: 0.07,
     couleur: "Multicolore",
     lienZodiacal: "Epée/Tortue/Ecrevisse/Sirène/Papillon/Paon/Phénix/Nuage",
     lienDivin: "Atonar, Turan, Shua",
@@ -416,8 +416,8 @@ window.gemmesDetaillees = {
   },
   "Serpentine": {
     surnom: "Laranite",
-    valeur: 5,
-    couleur: "Vert",
+    valeur: 0.05,
+    couleur: "Vert écaillé",
     lienZodiacal: "Sirène/Epée/Phénix/Ourlarque",
     lienDivin: "Laran, Usil, Voltumna",
     symbolique: "Introspection, Occultisme",
@@ -426,7 +426,7 @@ window.gemmesDetaillees = {
   },
   "Malachite": {
     surnom: "",
-    valeur: 3,
+    valeur: 0.03,
     couleur: "Vert écaillé",
     lienZodiacal: "Tortue/Papillon/Sirène/Dauphins",
     lienDivin: "Guyona, Llyr",
@@ -434,29 +434,9 @@ window.gemmesDetaillees = {
     durete: "2+ à 4",
     notes: "Pierre de sceau, talisman, Pierre des rêves"
   },
-  "Hématite": {
-    surnom: "",
-    valeur: 2,
-    couleur: "Vert sombre",
-    lienZodiacal: "Paon/Sirène/Phénix/Epée",
-    lienDivin: "Tannun",
-    symbolique: "Protection, Jouvence",
-    durete: 4,
-    notes: "Protège les voyageurs et enfants, Pierre de fer"
-  },
-  "Perle": {
-    surnom: "Larmes de Llyr",
-    valeur: 10.000,
-    couleur: "Blanc/Rose/Bleu/Noir",
-    lienZodiacal: "Ecrevisse/Papillon/Epée/Dauphins",
-    lienDivin: "Tilvir, Perun, Turan, Darona",
-    symbolique: "Douceur, Pureté",
-    durete: 3,
-    notes: "Parreux, pigment rouge"
-  },
   "Ambre": {
     surnom: "Larmes d'Atona",
-    valeur: 11,
+    valeur: 0.02,
     couleur: "Orange",
     lienZodiacal: "Paon/Cerf/Papillon/Ecrevisse/Tortue",
     lienDivin: "Atonar",
@@ -464,10 +444,30 @@ window.gemmesDetaillees = {
     durete: "2+",
     notes: "Pierre électrique, combustible"
   },
+  "Perle": {
+    surnom: "Larmes de Llyr",
+    valeur: 104.17,
+    couleur: "Blanc/Rose/Bleu/Noir",
+    lienZodiacal: "Ecrevisse/Papillon/Epée/Dauphins",
+    lienDivin: "Tilvir, Perun, Turan, Darona",
+    symbolique: "Douceur, Pureté",
+    durete: 3,
+    notes: "Parreux, pigment rouge"
+  },
+  "Hématite": {
+    surnom: "",
+    valeur: 0.1,
+    couleur: "Brun-rouge à noir métallique",
+    lienZodiacal: "Paon/Sirène/Phénix/Epée",
+    lienDivin: "Laran, Gibil, Suvix",
+    symbolique: "Rigueur, Puissance",
+    durete: 4,
+    notes: "Protège les voyageurs et enfants, Pierre de fer"
+  },
   "Corail": {
     surnom: "Sang de basaltik",
-    valeur: 10,
-    couleur: "Blanc/Jaune/Orange/Rouge/",
+    valeur: 0.1,
+    couleur: "Blanc/Jaune/Orange/Rouge",
     lienZodiacal: "Dauphins/Cerf/Ecrevisse",
     lienDivin: "Llyr, Ninmah, Guyona",
     symbolique: "Vigueur, Fertilité",
@@ -476,7 +476,7 @@ window.gemmesDetaillees = {
   },
   "Jais": {
     surnom: "Thanrite",
-    valeur: 6,
+    valeur: 0.06,
     couleur: "Noir",
     lienZodiacal: "Ourlarque/Ecrevisse/Nuage",
     lienDivin: "Voltumna, Suvix",
@@ -486,7 +486,7 @@ window.gemmesDetaillees = {
   },
   "Nacre": {
     surnom: "",
-    valeur: 4,
+    valeur: 0.04,
     couleur: "Nacre",
     lienZodiacal: "Ecrevisse/Sirène/Nuage",
     lienDivin: "Tilvir, Llyr, Ninmah",
@@ -496,7 +496,7 @@ window.gemmesDetaillees = {
   },
   "Ecaille": {
     surnom: "",
-    valeur: 2,
+    valeur: 0.02,
     couleur: "Vert/Brun/Blanc",
     lienZodiacal: "Tortue/Ecrevisse/Sirène/Dauphins",
     lienDivin: "Thalma, Llyr, Tannun",
@@ -689,17 +689,270 @@ window.validerDonnees = function() {
     }
   });
   
+  // Vérifier les gemmes manquantes dans gemmesDetaillees
+  Object.keys(window.monnaies.gemmes).forEach(nom => {
+    if (!window.gemmesDetaillees[nom]) {
+      rapport.avertissements.push(`Détails manquants pour la gemme: ${nom}`);
+    }
+  });
+  
   console.log('Validation des données:', rapport);
   return rapport;
 };
 
+/**
+ * Recherche une gemme par nom ou surnom
+ * @param {string} terme - Terme de recherche
+ * @returns {Array} Liste des gemmes correspondantes
+ */
+window.rechercherGemme = function(terme) {
+  const termeLower = terme.toLowerCase();
+  const resultats = [];
+  
+  Object.entries(window.gemmesDetaillees).forEach(([nom, details]) => {
+    if (nom.toLowerCase().includes(termeLower) ||
+        (details.surnom && details.surnom.toLowerCase().includes(termeLower)) ||
+        details.couleur.toLowerCase().includes(termeLower)) {
+      resultats.push({
+        nom: nom,
+        details: details
+      });
+    }
+  });
+  
+  return resultats;
+};
+
+/**
+ * Obtient les gemmes par couleur
+ * @param {string} couleur - Couleur recherchée
+ * @returns {Array} Liste des gemmes de cette couleur
+ */
+window.getGemmesParCouleur = function(couleur) {
+  const couleurLower = couleur.toLowerCase();
+  const resultats = [];
+  
+  Object.entries(window.gemmesDetaillees).forEach(([nom, details]) => {
+    if (details.couleur.toLowerCase().includes(couleurLower)) {
+      resultats.push({
+        nom: nom,
+        details: details
+      });
+    }
+  });
+  
+  return resultats.sort((a, b) => b.details.valeur - a.details.valeur);
+};
+
+/**
+ * Obtient les gemmes par lien divin
+ * @param {string} divinite - Nom de la divinité
+ * @returns {Array} Liste des gemmes liées à cette divinité
+ */
+window.getGemmesParDivinite = function(divinite) {
+  const diviniteLower = divinite.toLowerCase();
+  const resultats = [];
+  
+  Object.entries(window.gemmesDetaillees).forEach(([nom, details]) => {
+    if (details.lienDivin && details.lienDivin.toLowerCase().includes(diviniteLower)) {
+      resultats.push({
+        nom: nom,
+        details: details
+      });
+    }
+  });
+  
+  return resultats.sort((a, b) => b.details.valeur - a.details.valeur);
+};
+
+/**
+ * Obtient les statistiques complètes
+ * @returns {Object} Statistiques détaillées
+ */
+window.getStatistiques = function() {
+  const stats = {
+    pieces: {
+      total: Object.keys(window.monnaies.pieces).length,
+      valeurMax: Math.max(...Object.values(window.monnaies.pieces)),
+      valeurMin: Math.min(...Object.values(window.monnaies.pieces)),
+      valeurMoyenne: Object.values(window.monnaies.pieces).reduce((a, b) => a + b, 0) / Object.keys(window.monnaies.pieces).length
+    },
+    gemmes: {
+      total: Object.keys(window.monnaies.gemmes).length,
+      valeurMax: Math.max(...Object.values(window.monnaies.gemmes)),
+      valeurMin: Math.min(...Object.values(window.monnaies.gemmes)),
+      valeurMoyenne: Object.values(window.monnaies.gemmes).reduce((a, b) => a + b, 0) / Object.keys(window.monnaies.gemmes).length,
+      parCouleur: {},
+      parDurete: {}
+    },
+    poids: {
+      categories: Object.keys(window.monnaies.poids).length,
+      objetsTotal: Object.values(window.monnaies.poids).reduce((total, cat) => total + Object.keys(cat).length, 0)
+    }
+  };
+  
+  // Statistiques par couleur pour les gemmes
+  Object.values(window.gemmesDetaillees).forEach(details => {
+    const couleurs = details.couleur.split('/');
+    couleurs.forEach(couleur => {
+      const c = couleur.trim();
+      stats.gemmes.parCouleur[c] = (stats.gemmes.parCouleur[c] || 0) + 1;
+    });
+  });
+  
+  // Statistiques par dureté pour les gemmes
+  Object.values(window.gemmesDetaillees).forEach(details => {
+    const durete = details.durete.toString();
+    stats.gemmes.parDurete[durete] = (stats.gemmes.parDurete[durete] || 0) + 1;
+  });
+  
+  return stats;
+};
+
+/**
+ * Exporte toutes les données au format JSON
+ * @returns {string} Données au format JSON
+ */
+window.exporterDonnees = function() {
+  const donnees = {
+    version: "2.1",
+    dateExport: new Date().toISOString(),
+    monnaies: window.monnaies,
+    gemmesDetaillees: window.gemmesDetaillees,
+    statistiques: window.getStatistiques()
+  };
+  
+  return JSON.stringify(donnees, null, 2);
+};
+
+/**
+ * Importe des données depuis un JSON
+ * @param {string} jsonData - Données JSON à importer
+ * @returns {boolean} Succès de l'import
+ */
+window.importerDonnees = function(jsonData) {
+  try {
+    const donnees = JSON.parse(jsonData);
+    
+    if (donnees.monnaies) {
+      window.monnaies = donnees.monnaies;
+    }
+    
+    if (donnees.gemmesDetaillees) {
+      window.gemmesDetaillees = donnees.gemmesDetaillees;
+    }
+    
+    // Resynchroniser
+    Object.keys(window.gemmesDetaillees).forEach(nom => {
+      window.monnaies.gemmes[nom] = window.gemmesDetaillees[nom].valeur;
+    });
+    
+    // Reconstruire objets combinés
+    window.objets = {
+      ...window.monnaies.pieces,
+      ...window.monnaies.gemmes
+    };
+    
+    Object.values(window.monnaies.poids).forEach(categorie => {
+      Object.assign(window.objets, categorie);
+    });
+    
+    console.log('✅ Données importées avec succès');
+    return true;
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'import:', error);
+    return false;
+  }
+};
+
 // ===== INITIALISATION ET VALIDATION =====
-console.log('📊 Base de données unifiée chargée');
+console.log('📊 Base de données corrigée et complète chargée');
 console.log(`💰 ${Object.keys(window.monnaies.pieces).length} monnaies`);
 console.log(`💎 ${Object.keys(window.monnaies.gemmes).length} gemmes`);
 console.log(`⚖️ ${Object.keys(window.monnaies.poids).length} catégories de poids`);
 
 // Validation automatique au chargement
 setTimeout(() => {
-  window.validerDonnees();
+  const validation = window.validerDonnees();
+  if (validation.erreurs.length === 0) {
+    console.log('✅ Toutes les données sont cohérentes');
+  } else {
+    console.warn('⚠️ Erreurs détectées:', validation.erreurs);
+  }
+  
+  if (validation.avertissements.length > 0) {
+    console.info('ℹ️ Avertissements:', validation.avertissements);
+  }
 }, 100);
+
+// ===== INFORMATIONS DE DEBUG =====
+window.debugGemmes = function() {
+  console.log('=== DEBUG GEMMES ===');
+  console.log('Gemmes les plus chères:');
+  Object.entries(window.monnaies.gemmes)
+    .sort(([,a], [,b]) => b - a)
+    .slice(0, 5)
+    .forEach(([nom, valeur]) => {
+      console.log(`  ${nom}: ${valeur} PM`);
+    });
+  
+  console.log('Couleurs disponibles:');
+  const couleurs = new Set();
+  Object.values(window.gemmesDetaillees).forEach(details => {
+    details.couleur.split('/').forEach(c => couleurs.add(c.trim()));
+  });
+  console.log(`  ${Array.from(couleurs).sort().join(', ')}`);
+  
+  console.log('Divinités liées:');
+  const divinites = new Set();
+  Object.values(window.gemmesDetaillees).forEach(details => {
+    if (details.lienDivin) {
+      details.lienDivin.split(',').forEach(d => divinites.add(d.trim()));
+    }
+  });
+  console.log(`  ${Array.from(divinites).sort().join(', ')}`);
+};
+
+// ===== CONTRÔLE DE QUALITÉ =====
+window.verifierCoherence = function() {
+  console.log('🔍 Vérification de la cohérence des données...');
+  
+  let erreurs = 0;
+  
+  // Vérifier que toutes les gemmes dans monnaies.gemmes ont des détails
+  Object.keys(window.monnaies.gemmes).forEach(nom => {
+    if (!window.gemmesDetaillees[nom]) {
+      console.error(`❌ Gemme sans détails: ${nom}`);
+      erreurs++;
+    }
+  });
+  
+  // Vérifier que toutes les gemmes détaillées sont dans monnaies.gemmes
+  Object.keys(window.gemmesDetaillees).forEach(nom => {
+    if (window.monnaies.gemmes[nom] === undefined) {
+      console.error(`❌ Détails sans gemme correspondante: ${nom}`);
+      erreurs++;
+    }
+  });
+  
+  // Vérifier la cohérence des valeurs
+  Object.entries(window.gemmesDetaillees).forEach(([nom, details]) => {
+    if (window.monnaies.gemmes[nom] !== details.valeur) {
+      console.error(`❌ Valeur incohérente pour ${nom}: ${window.monnaies.gemmes[nom]} vs ${details.valeur}`);
+      erreurs++;
+    }
+  });
+  
+  if (erreurs === 0) {
+    console.log('✅ Toutes les données sont cohérentes !');
+  } else {
+    console.log(`❌ ${erreurs} erreur(s) détectée(s)`);
+  }
+  
+  return erreurs === 0;
+};
+
+// Vérification automatique
+setTimeout(() => {
+  window.verifierCoherence();
+}, 200);
