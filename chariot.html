@@ -41,7 +41,7 @@
     </header>
 
     <!-- Stat cards -->
-    <div class="stats-bar">
+    <div class="stats-bar stats-bar-4">
       <div class="stat-card">
         <span class="stat-icon">📦</span>
         <div>
@@ -52,7 +52,7 @@
       <div class="stat-card">
         <span class="stat-icon">⚖️</span>
         <div>
-          <div class="stat-label">Poids total</div>
+          <div class="stat-label">Poids effectif</div>
           <div class="stat-value" id="statWeight">0.00 kg</div>
         </div>
       </div>
@@ -61,6 +61,13 @@
         <div>
           <div class="stat-label">Valeur totale</div>
           <div class="stat-value" id="statValue">0.00 pm</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✨</span>
+        <div>
+          <div class="stat-label">Objets magiques</div>
+          <div class="stat-value" id="statMagic">0</div>
         </div>
       </div>
     </div>
@@ -80,6 +87,11 @@
         <option value="autre">📦 Autres</option>
       </select>
 
+      <label class="filter-check" id="magicFilterLabel">
+        <input type="checkbox" id="magicFilter" onchange="this.closest('label').classList.toggle('active',this.checked)">
+        ✨ Magiques
+      </label>
+
       <div class="spacer"></div>
 
       <label class="btn btn-ghost" style="cursor:pointer" title="Importer un fichier JSON">
@@ -95,12 +107,11 @@
         <table class="inv-table">
           <thead>
             <tr>
-              <th data-sort="type" class="sortable">Type <span class="sort-arrow"></span></th>
-              <th data-sort="nom"  class="sortable sort-asc">Nom <span class="sort-arrow"></span></th>
-              <th data-sort="categorie" class="sortable hide-sm">Catégorie <span class="sort-arrow"></span></th>
-              <th data-sort="quantite"  class="sortable" style="text-align:center">Qté <span class="sort-arrow"></span></th>
-              <th data-sort="poids" class="sortable hide-sm" style="text-align:right">Poids/u <span class="sort-arrow"></span></th>
-              <th style="text-align:right">Total poids</th>
+              <th data-sort="categorie" class="sortable">Catégorie / Type <span class="sort-arrow"></span></th>
+              <th data-sort="nom" class="sortable sort-asc">Nom <span class="sort-arrow"></span></th>
+              <th data-sort="quantite" class="sortable" style="text-align:center">Qté <span class="sort-arrow"></span></th>
+              <th style="text-align:center" title="⚖️ Poids porté (÷2) · 👤 Sur moi">État</th>
+              <th style="text-align:right">Poids total</th>
               <th data-sort="prix" class="sortable hide-sm" style="text-align:right">Prix/u <span class="sort-arrow"></span></th>
               <th class="hide-md-only">Caractéristiques</th>
               <th style="text-align:center">Actions</th>
@@ -135,17 +146,9 @@
               <label>Nom de l'objet *</label>
               <input name="nom" type="text" placeholder="Ex : Corde de remorquage" autocomplete="off" required>
             </div>
-            <div class="field">
-              <label>Catégorie</label>
+            <div class="field full-width">
+              <label>Catégorie <span style="font-size:.75rem;color:var(--text-muted);font-weight:400">(détermine le type de champs)</span></label>
               <select name="categorie" id="formCategorie"></select>
-            </div>
-            <div class="field">
-              <label>Type d'objet</label>
-              <select name="type">
-                <option value="arme">⚔️ Arme</option>
-                <option value="armure">🛡️ Armure</option>
-                <option value="autre" selected>📦 Autre</option>
-              </select>
             </div>
             <div class="field">
               <label>Quantité</label>
@@ -159,16 +162,44 @@
               <label>Prix (pm / unité)</label>
               <input name="prix" type="number" value="0" min="0" step="0.01" placeholder="0.00">
             </div>
+            <div class="field">
+              <label style="display:flex;align-items:center;height:100%">
+                <label class="magic-toggle-wrap" style="margin-top:22px">
+                  <input type="checkbox" name="magique" id="f-magique">
+                  ✨ Objet magique
+                </label>
+              </label>
+            </div>
           </div>
 
+          <!-- ─── Champs ARME ─── -->
           <div id="fields-arme" class="type-section" style="display:none">
             <h4>⚔️ Statistiques d'arme</h4>
             <div class="form-grid cols-5">
-              <div class="field"><label>Initiative</label><input name="initiative" type="text" placeholder="+1"></div>
-              <div class="field"><label>Attaque</label><input name="attaque" type="text" placeholder="+2"></div>
-              <div class="field"><label>Parade</label><input name="parade" type="text" placeholder="+1"></div>
-              <div class="field"><label>Seconde Parade</label><input name="seconde_parade" type="text" placeholder="0"></div>
-              <div class="field"><label>Dommage</label><input name="dommage" type="text" placeholder="1d8+2"></div>
+              <div class="field">
+                <label>Initiative</label>
+                <input name="initiative" type="text" placeholder="+1">
+              </div>
+              <div class="field">
+                <label>Attaque</label>
+                <input name="attaque" type="text" placeholder="+2">
+              </div>
+              <div class="field">
+                <label>Parade</label>
+                <input name="parade" type="text" placeholder="+1">
+              </div>
+              <div class="field">
+                <label>Seconde Parade</label>
+                <input name="seconde_parade" type="text" placeholder="0">
+              </div>
+              <div class="field">
+                <label>Dommage</label>
+                <input name="dommage" type="text" placeholder="1d8+2">
+              </div>
+            </div>
+            <div class="field full-width" style="margin-top:10px">
+              <label>Autres propriétés</label>
+              <textarea name="autres" rows="2" placeholder="Notes, effets spéciaux, enchantements…"></textarea>
             </div>
           </div>
 
@@ -187,9 +218,15 @@
             </div>
           </div>
 
+          <!-- Ajouter catégorie perso -->
           <div class="cat-add-row">
             <span style="font-size:.8rem;color:var(--text-muted);white-space:nowrap">➕ Catégorie :</span>
             <input id="newCatInput" type="text" placeholder="Nom de la nouvelle catégorie…">
+            <select id="newCatType" title="Type de la nouvelle catégorie" style="padding:7px 9px;border:1px solid var(--parch-dark);border-radius:6px;font-size:.82rem;background:var(--parch-light);color:var(--text-body);cursor:pointer;">
+              <option value="autre">📦 Autre</option>
+              <option value="arme">⚔️ Arme</option>
+              <option value="armure">🛡️ Armure</option>
+            </select>
             <button type="button" id="addCatBtn" class="btn-sm">Ajouter</button>
           </div>
         </form>
