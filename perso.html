@@ -17,7 +17,16 @@
       <a href="chariot.html"><span class="nav-icon">🛒</span> Chariot</a>
       <a href="guilde.html"><span class="nav-icon">⚔️</span> Guilde</a>
     </div>
-    <div class="sidebar-footer">Toutes vos données restent<br>stockées localement.</div>
+    <div class="sidebar-global">
+      <div class="sidebar-global-title">🌐 Global · 3 inventaires</div>
+      <button class="sg-btn" onclick="globalExport()">💾 Exporter tout</button>
+      <label class="sg-btn">
+        📂 Importer tout
+        <input type="file" accept=".json" style="display:none"
+               onchange="if(this.files[0])globalImport(this.files[0]);this.value=''">
+      </label>
+    </div>
+    <div class="sidebar-footer">Données stockées localement.</div>
   </nav>
 
   <!-- ══ MOBILE NAV ══ -->
@@ -94,11 +103,11 @@
 
       <div class="spacer"></div>
 
-      <label class="btn btn-ghost" style="cursor:pointer" title="Importer un fichier JSON">
+      <label class="btn btn-ghost" style="cursor:pointer" title="Importer (auto-détecte individuel ou global)">
         📂 Importer
         <input type="file" id="importFile" accept=".json" style="display:none">
       </label>
-      <button class="btn btn-ghost" onclick="inv.exportJSON()" title="Exporter en JSON">💾 Exporter</button>
+      <button class="btn btn-ghost" onclick="globalExport()" title="Exporter les 3 inventaires">💾 Exporter tout</button>
     </div>
 
     <!-- Tableau -->
@@ -253,6 +262,38 @@
   <script>
     window.inv = new Inventory({ key: 'inv_perso', title: 'Dorusis' });
   </script>
+
+  <!-- ══ MODAL DÉPLACEMENT ══ -->
+  <div id="moveModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-box" style="max-width:440px">
+      <div class="modal-head">
+        <h3>🔄 Déplacer l'objet</h3>
+        <button class="modal-close" onclick="inv.closeMoveModal()" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="move-item-preview">
+          <span>📦</span>
+          <span id="moveItemName"></span>
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <label>Déplacer vers</label>
+          <select id="moveDest" class="move-dest-select"></select>
+        </div>
+        <div id="moveQtyWrap" class="field" style="display:none">
+          <label>
+            Quantité à déplacer
+            <span id="moveQtyMax" style="font-size:.78rem;color:var(--text-muted);font-weight:400;margin-left:4px"></span>
+          </label>
+          <input type="number" id="moveQty" class="move-qty-input" min="1" value="1">
+          <p class="move-qty-hint">Laissez le reste dans l'inventaire source.</p>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="inv.closeMoveModal()">Annuler</button>
+        <button class="btn btn-primary" onclick="inv.confirmMove()">🔄 Déplacer</button>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>

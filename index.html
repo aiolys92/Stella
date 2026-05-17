@@ -71,7 +71,16 @@
       <a href="chariot.html"><span class="nav-icon">🛒</span> Chariot</a>
       <a href="guilde.html"><span class="nav-icon">⚔️</span> Guilde</a>
     </div>
-    <div class="sidebar-footer">Toutes vos données restent<br>stockées localement.</div>
+    <div class="sidebar-global">
+      <div class="sidebar-global-title">🌐 Global · 3 inventaires</div>
+      <button class="sg-btn" onclick="globalExport()">💾 Exporter tout</button>
+      <label class="sg-btn">
+        📂 Importer tout
+        <input type="file" accept=".json" style="display:none"
+               onchange="if(this.files[0])globalImport(this.files[0]);this.value=''">
+      </label>
+    </div>
+    <div class="sidebar-footer">Données stockées localement.</div>
   </nav>
 
   <!-- Mobile nav -->
