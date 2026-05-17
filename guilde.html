@@ -4,1423 +4,209 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Inventaire Guilde</title>
-  <meta name="description" content="Inventaire commun de la guilde - Gestion du trésor collectif">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="content fade-in">
-    <!-- En-tête de la page -->
+
+  <!-- ══ SIDEBAR ══ -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">⚜ INVENTAIRES<span>Gestionnaire d'équipement</span></div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span> Accueil</a>
+      <a href="perso.html"><span class="nav-icon">👤</span> Perso · Dorusis</a>
+      <a href="chariot.html"><span class="nav-icon">🛒</span> Chariot</a>
+      <a href="guilde.html" class="active"><span class="nav-icon">⚔️</span> Guilde</a>
+    </div>
+    <div class="sidebar-footer">Toutes vos données restent<br>stockées localement.</div>
+  </nav>
+
+  <!-- ══ MOBILE NAV ══ -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <a href="index.html"><span class="mn-icon">🏠</span> Accueil</a>
+      <a href="perso.html"><span class="mn-icon">👤</span> Perso</a>
+      <a href="chariot.html"><span class="mn-icon">🛒</span> Chariot</a>
+      <a href="guilde.html" class="active"><span class="mn-icon">⚔️</span> Guilde</a>
+    </div>
+  </nav>
+
+  <!-- ══ CONTENU PRINCIPAL ══ -->
+  <main class="main-wrap fade-up">
+
+    <!-- En-tête -->
     <header class="page-header">
-      <h1>⚔️ INVENTAIRE GUILDE ⚔️</h1>
-      <p class="page-subtitle">Trésor commun de la confrérie</p>
+      <h1>⚔️ INVENTAIRE · GUILDE</h1>
+      <p class="page-header-sub">Trésor commun et équipement de la confrérie</p>
+      <span class="page-header-ornament">⚔️</span>
     </header>
 
-    <!-- Contrôles principaux -->
-    <section class="section">
-      <div class="controls-header">
-        <div class="controls-left">
-          <h2>💰 Gestion du Trésor Commun</h2>
-        </div>
-        <div class="controls-right">
-          <input type="file" accept=".json" id="fileInputInventory" style="display: none;">
-          <button onclick="document.getElementById('fileInputInventory').click()" class="btn-action btn-load">
-            📂 Importer
-          </button>
-          <button id="saveInventoryBtn" class="btn-action btn-save">
-            💾 Sauvegarder
-          </button>
+    <!-- Stat cards -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <span class="stat-icon">📦</span>
+        <div>
+          <div class="stat-label">Objets</div>
+          <div class="stat-value" id="statItems">0</div>
         </div>
       </div>
-      
-      <!-- Affichage du total -->
-      <div class="total-display">
-        <span class="total-label">Valeur Totale Guilde:</span>
-        <span id="totalPieces" class="total-value">0</span>
-        <span class="total-unit">PM</span>
-      </div>
-    </section>
-
-    <!-- Onglets des inventaires -->
-    <section class="section">
-      <div class="tabs-container">
-        <div class="tabs-header">
-          <button class="tab-button active" onclick="switchInventoryTab('pieces')" title="Monnaies métalliques de la guilde">
-            🪙 Monnaies
-          </button>
-          <button class="tab-button" onclick="switchInventoryTab('gemmes')" title="Gemmes précieuses de la guilde">
-            💎 Gemmes
-          </button>
-          <button class="tab-button" onclick="switchInventoryTab('distribution')" title="Distribution entre les membres">
-            📊 Distribution
-          </button>
-        </div>
-
-        <!-- Inventaire des Pièces -->
-        <div id="tab-pieces" class="tab-content active">
-          <div class="tab-header">
-            <h2>🪙 Monnaies Métalliques de la Guilde</h2>
-            <div class="tab-actions">
-              <button onclick="addInventaireRow('pieces')" class="btn-action btn-add">
-                ➕ Ajouter une monnaie
-              </button>
-              <button onclick="distributeToMembers('pieces')" class="btn-action btn-load">
-                📊 Distribuer aux Membres
-              </button>
-            </div>
-          </div>
-          
-          <div class="table-container">
-            <table id="inventaireTablePieces" class="inventory-table">
-              <thead>
-                <tr>
-                  <th width="25%">Nom</th>
-                  <th width="15%">Quantité</th>
-                  <th width="15%">Valeur Unitaire</th>
-                  <th width="15%">Valeur Totale</th>
-                  <th width="15%">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Lignes générées dynamiquement -->
-              </tbody>
-            </table>
-            
-            <!-- Section de distribution pour les pièces -->
-            <div id="distributionPieces" class="distribution-section" style="display: none;">
-              <h3>📊 Distribution des Monnaies</h3>
-              <div class="distribution-results">
-                <div class="currency-distribution-grid" id="distributionGridPieces">
-                  <!-- Généré dynamiquement -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Inventaire des Gemmes -->
-        <div id="tab-gemmes" class="tab-content">
-          <div class="tab-header">
-            <h2>💎 Gemmes Précieuses de la Guilde</h2>
-            <div class="tab-actions">
-              <button onclick="addInventaireRow('gemmes')" class="btn-action btn-add">
-                ➕ Ajouter une gemme
-              </button>
-              <button onclick="distributeToMembers('gemmes')" class="btn-action btn-load">
-                📊 Distribuer aux Membres
-              </button>
-            </div>
-          </div>
-          
-          <div class="table-container">
-            <table id="inventaireTableGemmes" class="inventory-table">
-              <thead>
-                <tr>
-                  <th width="25%">Nom</th>
-                  <th width="15%">Quantité</th>
-                  <th width="15%">Valeur Unitaire</th>
-                  <th width="15%">Valeur Totale</th>
-                  <th width="15%">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Lignes générées dynamiquement -->
-              </tbody>
-            </table>
-            
-            <!-- Section de distribution pour les gemmes -->
-            <div id="distributionGemmes" class="distribution-section" style="display: none;">
-              <h3>📊 Distribution des Gemmes</h3>
-              <div class="distribution-results">
-                <div class="currency-distribution-grid" id="distributionGridGemmes">
-                  <!-- Généré dynamiquement -->
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Onglet Distribution -->
-        <div id="tab-distribution" class="tab-content">
-          <div class="tab-header">
-            <h2>📊 Distribution du Trésor</h2>
-            <div class="tab-actions">
-              <button onclick="openContributionModal()" class="btn-action btn-add">
-                📝 Gestion des Membres
-              </button>
-            </div>
-          </div>
-          
-          <!-- Configuration de la distribution -->
-          <div class="distribution-config">
-            <h3>⚙️ Configuration des Membres</h3>
-            <div class="config-form">
-              <div class="input-group">
-                <label for="memberCount">Nombre de Membres:</label>
-                <input type="number" id="memberCount" value="4" min="1" max="20" onchange="updateAllDistributions()">
-              </div>
-              <div class="members-preview">
-                <h4>Membres Actuels:</h4>
-                <div id="membersPreview">
-                  <!-- Liste des membres -->
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Résultats de distribution générale -->
-          <div class="distribution-results">
-            <h3>📈 Distribution Totale du Trésor</h3>
-            
-            <!-- Distribution par type de monnaie -->
-            <div class="currency-breakdown">
-              <h4>🪙 Distribution des Monnaies</h4>
-              <div class="currency-distribution-grid" id="distributionMonnaies">
-                <!-- Généré dynamiquement -->
-              </div>
-            </div>
-
-            <!-- Distribution des gemmes -->
-            <div class="currency-breakdown">
-              <h4>💎 Distribution des Gemmes</h4>
-              <div class="currency-distribution-grid" id="distributionGemmesList">
-                <!-- Généré dynamiquement -->
-              </div>
-            </div>
-
-            <!-- Résumé total -->
-            <div class="total-summary">
-              <h4>📊 Résumé de la Distribution</h4>
-              <div class="summary-grid" id="distributionSummary">
-                <!-- Généré dynamiquement -->
-              </div>
-            </div>
-          </div>
+      <div class="stat-card">
+        <span class="stat-icon">⚖️</span>
+        <div>
+          <div class="stat-label">Poids total</div>
+          <div class="stat-value" id="statWeight">0.00 kg</div>
         </div>
       </div>
-    </section>
-
-    <!-- Liste des objets par catégories - CONSULTATION SEULEMENT -->
-    <section class="section">
-      <h2>📋 Liste de Toutes les Monnaies et Gemmes</h2>
-      <p class="section-subtitle"><em>Consultation seulement - Référence des valeurs</em></p>
-      
-      <!-- Filtres et recherche -->
-      <div class="filters-row">
-        <div class="filter-group">
-          <label for="categoryFilter">Catégorie:</label>
-          <select id="categoryFilter" onchange="filtrerParCategorie(this.value)">
-            <option value="">Toutes les catégories</option>
-            <option value="pieces">Monnaies</option>
-            <option value="gemmes">Gemmes</option>
-          </select>
-        </div>
-        
-        <div class="search-group">
-          <label for="searchObjects">Rechercher:</label>
-          <input type="text" id="searchObjects" placeholder="Nom de l'objet..." 
-                 oninput="rechercherObjets(this.value)">
-        </div>
-      </div>
-      
-      <!-- Conteneur des catégories - LECTURE SEULE -->
-      <div class="categories-container" id="categoriesContainer">
-        <div class="category-section">
-          <h3>🪙 Monnaies Métalliques</h3>
-          <div class="table-container">
-            <table class="inventory-table">
-              <thead>
-                <tr>
-                  <th width="60%">Nom</th>
-                  <th width="40%">Valeur (PM)</th>
-                </tr>
-              </thead>
-              <tbody id="listMonetae">
-                <!-- Généré par JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        
-        <div class="category-section">
-          <h3>💎 Gemmes Précieuses</h3>
-          <div class="table-container">
-            <table class="inventory-table">
-              <thead>
-                <tr>
-                  <th width="60%">Nom</th>
-                  <th width="40%">Valeur (PM)</th>
-                </tr>
-              </thead>
-              <tbody id="listGemmae">
-                <!-- Généré par JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Informations sur le trésor de guilde -->
-    <section class="section">
-      <h2>📊 Statistiques du Trésor de Guilde</h2>
-      <div class="info-grid">
-        <div class="info-card">
-          <h3>🪙 État des Monnaies</h3>
-          <div id="statsMonetae">
-            <p>Types disponibles: <span id="countMonetae">-</span></p>
-            <p>Valeur moyenne: <span id="avgMonetae">-</span> PM</p>
-            <p>Valeur maximale: <span id="maxMonetae">-</span> PM</p>
-            <p>Pourcentage du total: <span id="percentMonetae">0%</span></p>
-          </div>
-        </div>
-        
-        <div class="info-card">
-          <h3>💎 État des Gemmes</h3>
-          <div id="statsGemmae">
-            <p>Types disponibles: <span id="countGemmae">-</span></p>
-            <p>Valeur moyenne: <span id="avgGemmae">-</span> PM</p>
-            <p>Valeur maximale: <span id="maxGemmae">-</span> PM</p>
-            <p>Pourcentage du total: <span id="percentGemmae">0%</span></p>
-          </div>
-        </div>
-        
-        <div class="info-card">
-          <h3>⚖️ Total du Trésor</h3>
-          <div id="statsTotal">
-            <p>Objets totaux: <span id="countTotal">0</span></p>
-            <p>Valeur totale: <span id="valueTotal">0</span> PM</p>
-            <p>État de la guilde: <span id="statusTotal">Vide</span></p>
-            <p>Par membre: <span id="perMember">0</span> PM</p>
-          </div>
-        </div>
-        
-        <div class="info-card">
-          <h3>📈 Gestion de Guilde</h3>
-          <div id="statsGuild">
-            <p>Membres actifs: <span id="activeMembers">4</span></p>
-            <p>Dernière modification: <span id="lastModification">Jamais</span></p>
-            <p>Croissance: <span id="growth">+0%</span> (estimée)</p>
-            <p>Stabilité: <span id="stability">Stable</span></p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Modal pour les contributions -->
-    <div id="contributionModal" class="modal-overlay" onclick="closeContributionModal()">
-      <div class="modal-content" onclick="event.stopPropagation()">
-        <div class="modal-header">
-          <h2>📝 Gestion des Membres</h2>
-          <button onclick="closeContributionModal()" class="modal-close">✕</button>
-        </div>
-        
-        <div class="modal-body">
-          <h3>Membres de la Guilde</h3>
-          <div id="membersList">
-            <!-- Généré dynamiquement -->
-          </div>
-          
-          <div class="modal-actions">
-            <button onclick="addNewMember()" class="btn-action btn-add">
-              ➕ Ajouter un Membre
-            </button>
-            <button onclick="saveContributions()" class="btn-action btn-save">
-              💾 Sauvegarder les Membres
-            </button>
-          </div>
+      <div class="stat-card">
+        <span class="stat-icon">💰</span>
+        <div>
+          <div class="stat-label">Valeur totale</div>
+          <div class="stat-value" id="statValue">0.00 pm</div>
         </div>
       </div>
     </div>
+
+    <!-- Barre de contrôles -->
+    <div class="controls-bar">
+      <button class="btn btn-primary" onclick="inv.openModal()">✨ Ajouter un objet</button>
+
+      <div class="search-wrap">
+        <input type="search" id="searchInput" placeholder="Rechercher un objet…">
+      </div>
+
+      <select class="filter-select" id="typeFilter">
+        <option value="">Tous les types</option>
+        <option value="arme">⚔️ Armes</option>
+        <option value="armure">🛡️ Armures</option>
+        <option value="autre">📦 Autres</option>
+      </select>
+
+      <div class="spacer"></div>
+
+      <label class="btn btn-ghost" style="cursor:pointer" title="Importer un fichier JSON">
+        📂 Importer
+        <input type="file" id="importFile" accept=".json" style="display:none">
+      </label>
+      <button class="btn btn-ghost" onclick="inv.exportJSON()" title="Exporter en JSON">💾 Exporter</button>
+    </div>
+
+    <!-- Tableau -->
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th data-sort="type" class="sortable">Type <span class="sort-arrow"></span></th>
+              <th data-sort="nom"  class="sortable sort-asc">Nom <span class="sort-arrow"></span></th>
+              <th data-sort="categorie" class="sortable hide-sm">Catégorie <span class="sort-arrow"></span></th>
+              <th data-sort="quantite"  class="sortable" style="text-align:center">Qté <span class="sort-arrow"></span></th>
+              <th data-sort="poids" class="sortable hide-sm" style="text-align:right">Poids/u <span class="sort-arrow"></span></th>
+              <th style="text-align:right">Total poids</th>
+              <th data-sort="prix" class="sortable hide-sm" style="text-align:right">Prix/u <span class="sort-arrow"></span></th>
+              <th class="hide-md-only">Caractéristiques</th>
+              <th style="text-align:center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryBody"></tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <div class="foot-item">📦 <span class="foot-val" id="footCount">0 objet</span></div>
+        <div class="foot-item">⚖️ <span class="foot-val" id="footWeight">0.00 kg</span></div>
+        <div class="foot-item">💰 <span class="foot-val" id="footValue">0.00 pm</span></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ══ MODAL ══ -->
+  <div id="itemModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+
+      <div class="modal-head">
+        <h3 id="modalTitle">✨ Nouvel objet</h3>
+        <button class="modal-close" onclick="inv.closeModal()" aria-label="Fermer">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="itemForm" novalidate>
+          <div class="form-grid">
+            <div class="field full-width">
+              <label>Nom de l'objet *</label>
+              <input name="nom" type="text" placeholder="Ex : Bouclier de la guilde" autocomplete="off" required>
+            </div>
+            <div class="field">
+              <label>Catégorie</label>
+              <select name="categorie" id="formCategorie"></select>
+            </div>
+            <div class="field">
+              <label>Type d'objet</label>
+              <select name="type">
+                <option value="arme">⚔️ Arme</option>
+                <option value="armure">🛡️ Armure</option>
+                <option value="autre" selected>📦 Autre</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Quantité</label>
+              <input name="quantite" type="number" value="1" min="0" step="1">
+            </div>
+            <div class="field">
+              <label>Poids (kg / unité)</label>
+              <input name="poids" type="number" value="0" min="0" step="0.1" placeholder="0.0">
+            </div>
+            <div class="field">
+              <label>Prix (pm / unité)</label>
+              <input name="prix" type="number" value="0" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+
+          <div id="fields-arme" class="type-section" style="display:none">
+            <h4>⚔️ Statistiques d'arme</h4>
+            <div class="form-grid cols-5">
+              <div class="field"><label>Initiative</label><input name="initiative" type="text" placeholder="+1"></div>
+              <div class="field"><label>Attaque</label><input name="attaque" type="text" placeholder="+2"></div>
+              <div class="field"><label>Parade</label><input name="parade" type="text" placeholder="+1"></div>
+              <div class="field"><label>Seconde Parade</label><input name="seconde_parade" type="text" placeholder="0"></div>
+              <div class="field"><label>Dommage</label><input name="dommage" type="text" placeholder="1d8+2"></div>
+            </div>
+          </div>
+
+          <div id="fields-armure" class="type-section" style="display:none">
+            <h4>🛡️ Protection</h4>
+            <div class="form-grid cols-3">
+              <div class="field"><label>Encaissement</label><input name="encaissement" type="text" placeholder="3"></div>
+            </div>
+          </div>
+
+          <div id="fields-autre" class="type-section">
+            <h4>📋 Caractéristiques</h4>
+            <div class="field">
+              <label>Description / Propriétés</label>
+              <textarea name="caracteristiques" rows="3" placeholder="Décrivez les propriétés, effets ou notes sur cet objet…"></textarea>
+            </div>
+          </div>
+
+          <div class="cat-add-row">
+            <span style="font-size:.8rem;color:var(--text-muted);white-space:nowrap">➕ Catégorie :</span>
+            <input id="newCatInput" type="text" placeholder="Nom de la nouvelle catégorie…">
+            <button type="button" id="addCatBtn" class="btn-sm">Ajouter</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" onclick="inv.closeModal()">Annuler</button>
+        <button type="submit" form="itemForm" class="btn btn-primary">💾 Sauvegarder</button>
+      </div>
+
+    </div>
   </div>
 
-  <!-- Scripts dans l'ordre correct -->
-  <script src="data.js"></script>
-  <script src="script.js"></script>
-  <script src="nav.js"></script>
+  <script src="inventory.js"></script>
   <script>
-    // ===== VARIABLES GLOBALES =====
-    let currentInventoryTab = 'pieces';
-    let guildMembers = [
-      { name: 'Dorusis', contribution: 25, class: 'Guerrier' },
-      { name: 'Mage Aurelius', contribution: 30, class: 'Mage' },
-      { name: 'Voleur Shadow', contribution: 20, class: 'Voleur' },
-      { name: 'Prêtre Benedictus', contribution: 25, class: 'Prêtre' }
-    ];
-
-    // ===== INITIALISATION =====
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('⚔️ Inventaire Guilde - Initialisé');
-      
-      // Attendre que les données soient chargées
-      if (!window.monnaies) {
-        setTimeout(initializeGuild, 100);
-      } else {
-        initializeGuild();
-      }
-    });
-
-    function initializeGuild() {
-      // Peupler la liste des objets
-      populateObjectsList();
-      
-      // Ajouter des lignes initiales
-      addInventaireRow('pieces');
-      addInventaireRow('gemmes');
-      
-      // Mettre à jour les statistiques
-      updateStatistics();
-      
-      // Configurer les événements de fichier
-      setupFileHandlers();
-      
-      // Observer les changements dans les tableaux
-      setupTableObservers();
-      
-      // Initialiser le nombre de membres et la preview
-      document.getElementById('memberCount').value = guildMembers.length;
-      updateMembersPreview();
-      updateAllDistributions();
-    }
-
-    // ===== GESTION DES ONGLETS =====
-    function switchInventoryTab(tabName) {
-      // Désactiver tous les onglets
-      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-      // Activer l'onglet sélectionné
-      const tabButton = document.querySelector(`[onclick="switchInventoryTab('${tabName}')"]`);
-      const tabContent = document.getElementById(`tab-${tabName}`);
-      
-      if (tabButton && tabContent) {
-        tabButton.classList.add('active');
-        tabContent.classList.add('active');
-        currentInventoryTab = tabName;
-        
-        if (tabName === 'distribution') {
-          updateAllDistributions();
-          updateMembersPreview();
-        }
-      }
-    }
-
-    // ===== GESTION DES INVENTAIRES (utilise script.js) =====
-    // Les fonctions addInventaireRow, removeInventaireRow, updateInventaire 
-    // sont déjà définies dans script.js
-
-    // ===== DISTRIBUTION DANS LES ONGLETS MONNAIES/GEMMES =====
-    function distributeToMembers(type) {
-      const distributionSection = document.getElementById(`distribution${type.charAt(0).toUpperCase() + type.slice(1)}`);
-      const grid = document.getElementById(`distributionGrid${type.charAt(0).toUpperCase() + type.slice(1)}`);
-      
-      if (distributionSection.style.display === 'none') {
-        // Afficher la distribution
-        distributionSection.style.display = 'block';
-        calculateDistributionForType(type);
-        showNotification(`📊 Distribution des ${type} calculée`);
-      } else {
-        // Masquer la distribution
-        distributionSection.style.display = 'none';
-      }
-    }
-
-    function calculateDistributionForType(type) {
-      const grid = document.getElementById(`distributionGrid${type.charAt(0).toUpperCase() + type.slice(1)}`);
-      const tableId = type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes';
-      
-      // Récupérer les données du trésor pour ce type
-      const treasureData = gatherTreasureData(type);
-      
-      if (treasureData.length === 0) {
-        grid.innerHTML = '<p class="no-results">Aucun trésor à distribuer</p>';
-        return;
-      }
-      
-      // Créer les cartes de distribution par monnaie/gemme
-      grid.innerHTML = '';
-      
-      treasureData.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'currency-card';
-        
-        // Calculer la distribution par membre pour cet item
-        const sharePerMember = Math.floor(item.quantity / guildMembers.length);
-        const remainder = item.quantity % guildMembers.length;
-        
-        let distributionHTML = `
-          <div class="currency-header">
-            <h4>${item.name}</h4>
-            <div class="currency-total">${item.quantity} disponible(s)</div>
-          </div>
-          <div class="member-shares">
-        `;
-        
-        guildMembers.forEach((member, index) => {
-          const memberShare = sharePerMember + (index < remainder ? 1 : 0);
-          distributionHTML += `
-            <div class="member-share">
-              <span class="member-name">${member.name}:</span>
-              <span class="share-amount">${memberShare}</span>
-            </div>
-          `;
-        });
-        
-        distributionHTML += '</div>';
-        card.innerHTML = distributionHTML;
-        grid.appendChild(card);
-      });
-    }
-
-    // ===== DISTRIBUTION GÉNÉRALE =====
-    function updateAllDistributions() {
-      updateGlobalDistribution();
-      
-      // Mettre à jour les distributions dans les onglets monnaies/gemmes si elles sont visibles
-      if (document.getElementById('distributionPieces').style.display !== 'none') {
-        calculateDistributionForType('pieces');
-      }
-      if (document.getElementById('distributionGemmes').style.display !== 'none') {
-        calculateDistributionForType('gemmes');
-      }
-    }
-
-    function updateGlobalDistribution() {
-      // Distribution des monnaies
-      const monnaiesData = gatherTreasureData('pieces');
-      const monnaiesGrid = document.getElementById('distributionMonnaies');
-      generateDistributionGrid(monnaiesGrid, monnaiesData);
-      
-      // Distribution des gemmes
-      const gemmesData = gatherTreasureData('gemmes');
-      const gemmesGrid = document.getElementById('distributionGemmesList');
-      generateDistributionGrid(gemmesGrid, gemmesData);
-      
-      // Résumé général
-      updateDistributionSummary(monnaiesData, gemmesData);
-    }
-
-    function generateDistributionGrid(container, treasureData) {
-      if (treasureData.length === 0) {
-        container.innerHTML = '<p class="no-results">Aucun élément à distribuer</p>';
-        return;
-      }
-      
-      container.innerHTML = '';
-      
-      treasureData.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'currency-card';
-        
-        // Calculer la distribution par membre
-        const sharePerMember = Math.floor(item.quantity / guildMembers.length);
-        const remainder = item.quantity % guildMembers.length;
-        
-        let distributionHTML = `
-          <div class="currency-header">
-            <h4>${item.name}</h4>
-            <div class="currency-total">${item.quantity} total</div>
-          </div>
-          <div class="member-shares">
-        `;
-        
-        guildMembers.forEach((member, index) => {
-          const memberShare = sharePerMember + (index < remainder ? 1 : 0);
-          distributionHTML += `
-            <div class="member-share">
-              <span class="member-name">${member.name}:</span>
-              <span class="share-amount">${memberShare}</span>
-            </div>
-          `;
-        });
-        
-        distributionHTML += '</div>';
-        card.innerHTML = distributionHTML;
-        container.appendChild(card);
-      });
-    }
-
-    function updateDistributionSummary(monnaiesData, gemmesData) {
-      const summaryGrid = document.getElementById('distributionSummary');
-      summaryGrid.innerHTML = '';
-      
-      guildMembers.forEach(member => {
-        const card = document.createElement('div');
-        card.className = 'summary-card';
-        
-        let summaryHTML = `
-          <h4>${member.name}</h4>
-          <div class="member-summary">
-        `;
-        
-        // Résumé des monnaies
-        if (monnaiesData.length > 0) {
-          summaryHTML += '<div class="currency-group"><h5>🪙 Monnaies:</h5>';
-          monnaiesData.forEach(item => {
-            const sharePerMember = Math.floor(item.quantity / guildMembers.length);
-            const remainder = item.quantity % guildMembers.length;
-            const memberIndex = guildMembers.indexOf(member);
-            const memberShare = sharePerMember + (memberIndex < remainder ? 1 : 0);
-            if (memberShare > 0) {
-              summaryHTML += `<div class="summary-item">${item.name}: ${memberShare}</div>`;
-            }
-          });
-          summaryHTML += '</div>';
-        }
-        
-        // Résumé des gemmes
-        if (gemmesData.length > 0) {
-          summaryHTML += '<div class="currency-group"><h5>💎 Gemmes:</h5>';
-          gemmesData.forEach(item => {
-            const sharePerMember = Math.floor(item.quantity / guildMembers.length);
-            const remainder = item.quantity % guildMembers.length;
-            const memberIndex = guildMembers.indexOf(member);
-            const memberShare = sharePerMember + (memberIndex < remainder ? 1 : 0);
-            if (memberShare > 0) {
-              summaryHTML += `<div class="summary-item">${item.name}: ${memberShare}</div>`;
-            }
-          });
-          summaryHTML += '</div>';
-        }
-        
-        summaryHTML += '</div>';
-        card.innerHTML = summaryHTML;
-        summaryGrid.appendChild(card);
-      });
-    }
-
-    function gatherTreasureData(type) {
-      const tableId = type === 'pieces' ? 'inventaireTablePieces' : 'inventaireTableGemmes';
-      const treasureData = [];
-      
-      const rows = document.querySelectorAll(`#${tableId} tbody tr`);
-      rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length >= 2) {
-          const nameSelect = cells[0].querySelector('select');
-          const quantityInput = cells[1].querySelector('input');
-          
-          if (nameSelect && quantityInput) {
-            const name = nameSelect.value;
-            const quantity = parseInt(quantityInput.value) || 0;
-            
-            if (name && quantity > 0) {
-              treasureData.push({ name, quantity });
-            }
-          }
-        }
-      });
-      
-      return treasureData;
-    }
-
-    function updateMembersPreview() {
-      const preview = document.getElementById('membersPreview');
-      preview.innerHTML = guildMembers.map(member => 
-        `<span class="member-tag">${member.name} (${member.class})</span>`
-      ).join('');
-    }
-
-    // ===== GESTION DES FILTRES POUR LA LISTE =====
-    function filtrerParCategorie(categorie) {
-      const sections = document.querySelectorAll('.category-section');
-      sections.forEach(section => {
-        if (categorie === '') {
-          section.style.display = 'block';
-        } else {
-          const isRelevant = (categorie === 'pieces' && section.querySelector('#listMonetae')) ||
-                           (categorie === 'gemmes' && section.querySelector('#listGemmae'));
-          section.style.display = isRelevant ? 'block' : 'none';
-        }
-      });
-    }
-
-    function rechercherObjets(query) {
-      if (!query.trim()) {
-        document.querySelectorAll('#listMonetae tr, #listGemmae tr').forEach(row => {
-          row.style.display = '';
-        });
-        return;
-      }
-
-      const queryLower = query.toLowerCase();
-      
-      document.querySelectorAll('#listMonetae tr, #listGemmae tr').forEach(row => {
-        const name = row.cells[0].textContent.toLowerCase();
-        row.style.display = name.includes(queryLower) ? '' : 'none';
-      });
-    }
-
-    // ===== GESTION DES CONTRIBUTIONS =====
-    function openContributionModal() {
-      document.getElementById('contributionModal').classList.add('active');
-      populateMembersList();
-    }
-
-    function closeContributionModal() {
-      document.getElementById('contributionModal').classList.remove('active');
-    }
-
-    function populateMembersList() {
-      const membersList = document.getElementById('membersList');
-      membersList.innerHTML = '';
-      
-      guildMembers.forEach((member, index) => {
-        const memberDiv = document.createElement('div');
-        memberDiv.className = 'member-contribution';
-        memberDiv.innerHTML = `
-          <div class="member-info">
-            <input type="text" value="${member.name}" onchange="updateMemberName(${index}, this.value)" placeholder="Nom du membre">
-            <select onchange="updateMemberClass(${index}, this.value)">
-              <option value="Guerrier" ${member.class === 'Guerrier' ? 'selected' : ''}>Guerrier</option>
-              <option value="Mage" ${member.class === 'Mage' ? 'selected' : ''}>Mage</option>
-              <option value="Voleur" ${member.class === 'Voleur' ? 'selected' : ''}>Voleur</option>
-              <option value="Prêtre" ${member.class === 'Prêtre' ? 'selected' : ''}>Prêtre</option>
-              <option value="Paladin" ${member.class === 'Paladin' ? 'selected' : ''}>Paladin</option>
-              <option value="Ranger" ${member.class === 'Ranger' ? 'selected' : ''}>Ranger</option>
-            </select>
-            <button onclick="removeMember(${index})" class="btn-action btn-delete">🗑️</button>
-          </div>
-        `;
-        membersList.appendChild(memberDiv);
-      });
-    }
-
-    function addNewMember() {
-      guildMembers.push({
-        name: 'Nouveau Membre',
-        contribution: 25,
-        class: 'Guerrier'
-      });
-      populateMembersList();
-      document.getElementById('memberCount').value = guildMembers.length;
-      updateMembersPreview();
-      updateAllDistributions();
-    }
-
-    function removeMember(index) {
-      if (guildMembers.length > 1) {
-        guildMembers.splice(index, 1);
-        populateMembersList();
-        document.getElementById('memberCount').value = guildMembers.length;
-        updateMembersPreview();
-        updateAllDistributions();
-      } else {
-        showNotification('⚠️ Au moins un membre doit rester dans la guilde');
-      }
-    }
-
-    function updateMemberName(index, name) {
-      guildMembers[index].name = name;
-      updateMembersPreview();
-      updateAllDistributions();
-    }
-
-    function updateMemberClass(index, classType) {
-      guildMembers[index].class = classType;
-      updateMembersPreview();
-      updateAllDistributions();
-    }
-
-    function saveContributions() {
-      closeContributionModal();
-      updateAllDistributions();
-      updateMembersPreview();
-      document.getElementById('lastModification').textContent = new Date().toLocaleDateString('fr-FR');
-      showNotification('💾 Membres sauvegardés');
-    }
-
-    // ===== POPULATION DE LA LISTE DES OBJETS =====
-    function populateObjectsList() {
-      if (!window.monnaies) return;
-
-      // Peupler la liste des monnaies
-      const listMonetae = document.getElementById('listMonetae');
-      if (listMonetae && window.monnaies.pieces) {
-        listMonetae.innerHTML = '';
-        Object.entries(window.monnaies.pieces)
-          .sort(([,a], [,b]) => b - a)
-          .forEach(([nom, valeur]) => {
-            const row = listMonetae.insertRow();
-            row.innerHTML = `
-              <td><strong>${nom}</strong></td>
-              <td>${valeur.toFixed(4)}</td>
-            `;
-          });
-      }
-
-      // Peupler la liste des gemmes
-      const listGemmae = document.getElementById('listGemmae');
-      if (listGemmae && window.monnaies.gemmes) {
-        listGemmae.innerHTML = '';
-        Object.entries(window.monnaies.gemmes)
-          .sort(([,a], [,b]) => b - a)
-          .forEach(([nom, valeur]) => {
-            const row = listGemmae.insertRow();
-            row.innerHTML = `
-              <td><strong>${nom}</strong></td>
-              <td>${valeur.toFixed(2)}</td>
-            `;
-          });
-      }
-    }
-
-    // ===== STATISTIQUES =====
-    function updateStatistics() {
-      if (!window.monnaies) return;
-      
-      // Statistiques des monnaies
-      const monetaeKeys = Object.keys(window.monnaies.pieces || {});
-      const monetaeValues = Object.values(window.monnaies.pieces || {});
-      const avgMonetae = monetaeValues.length > 0 ? monetaeValues.reduce((a, b) => a + b, 0) / monetaeValues.length : 0;
-      const maxMonetae = monetaeValues.length > 0 ? Math.max(...monetaeValues) : 0;
-      
-      document.getElementById('countMonetae').textContent = monetaeKeys.length;
-      document.getElementById('avgMonetae').textContent = avgMonetae.toFixed(2);
-      document.getElementById('maxMonetae').textContent = maxMonetae.toFixed(2);
-      
-      // Statistiques des gemmes
-      const gemmaeKeys = Object.keys(window.monnaies.gemmes || {});
-      const gemmaeValues = Object.values(window.monnaies.gemmes || {});
-      const avgGemmae = gemmaeValues.length > 0 ? gemmaeValues.reduce((a, b) => a + b, 0) / gemmaeValues.length : 0;
-      const maxGemmae = gemmaeValues.length > 0 ? Math.max(...gemmaeValues) : 0;
-      
-      document.getElementById('countGemmae').textContent = gemmaeKeys.length;
-      document.getElementById('avgGemmae').textContent = avgGemmae.toFixed(2);
-      document.getElementById('maxGemmae').textContent = maxGemmae.toFixed(2);
-      
-      // Calculs pour l'inventaire actuel
-      const totalItems = document.querySelectorAll('#inventaireTablePieces tbody tr, #inventaireTableGemmes tbody tr').length;
-      const totalValue = parseFloat(document.getElementById('totalPieces').textContent) || 0;
-      
-      document.getElementById('countTotal').textContent = totalItems;
-      document.getElementById('valueTotal').textContent = totalValue.toFixed(2);
-      
-      // Status du trésor de guilde
-      let status = 'Vide';
-      if (totalValue > 5000) status = 'Très riche';
-      else if (totalValue > 2000) status = 'Riche';
-      else if (totalValue > 500) status = 'Modeste';
-      else if (totalValue > 100) status = 'Pauvre';
-      else if (totalValue > 0) status = 'Très pauvre';
-      
-      document.getElementById('statusTotal').textContent = status;
-      
-      // Par membre
-      const memberCount = guildMembers.length;
-      const perMember = memberCount > 0 ? totalValue / memberCount : 0;
-      document.getElementById('perMember').textContent = perMember.toFixed(2);
-      
-      // Distribution des valeurs
-      let monetaeTotal = 0, gemmaeTotal = 0;
-      
-      document.querySelectorAll('#inventaireTablePieces .total').forEach(cell => {
-        monetaeTotal += parseFloat(cell.textContent) || 0;
-      });
-      
-      document.querySelectorAll('#inventaireTableGemmes .total').forEach(cell => {
-        gemmaeTotal += parseFloat(cell.textContent) || 0;
-      });
-      
-      const percentMonetae = totalValue > 0 ? (monetaeTotal / totalValue * 100).toFixed(1) : 0;
-      const percentGemmae = totalValue > 0 ? (gemmaeTotal / totalValue * 100).toFixed(1) : 0;
-      
-      document.getElementById('percentMonetae').textContent = percentMonetae + '%';
-      document.getElementById('percentGemmae').textContent = percentGemmae + '%';
-      
-      // Statistiques de guilde
-      document.getElementById('activeMembers').textContent = memberCount;
-      
-      // Calculer la croissance (simulée basée sur la valeur totale)
-      const growth = totalValue > 1000 ? Math.random() * 5 + 2 : Math.random() * 3;
-      document.getElementById('growth').textContent = '+' + growth.toFixed(1) + '%';
-      
-      // Stabilité basée sur la valeur totale et le nombre de membres
-      let stability = 'Stable';
-      if (totalValue > 2000 && memberCount >= 3) stability = 'Prospère';
-      else if (totalValue < 100 || memberCount < 2) stability = 'Instable';
-      else if (totalValue > 500) stability = 'En croissance';
-      
-      document.getElementById('stability').textContent = stability;
-    }
-
-    // ===== GESTION DES FICHIERS =====
-    function setupFileHandlers() {
-      const fileInput = document.getElementById('fileInputInventory');
-      const saveButton = document.getElementById('saveInventoryBtn');
-
-      if (fileInput) {
-        fileInput.addEventListener('change', loadFromFileInventory);
-      }
-
-      if (saveButton) {
-        saveButton.addEventListener('click', saveToFileInventory);
-      }
-    }
-
-    function setupTableObservers() {
-      // Observer les changements dans les tableaux pour mettre à jour les stats
-      const observer = new MutationObserver(updateStatistics);
-      
-      const tables = document.querySelectorAll('#inventaireTablePieces tbody, #inventaireTableGemmes tbody');
-      tables.forEach(table => {
-        if (table) {
-          observer.observe(table, { childList: true, subtree: true });
-        }
-      });
-      
-      // Observer les changements du total
-      const totalObserver = new MutationObserver(updateStatistics);
-      const totalElement = document.getElementById('totalPieces');
-      if (totalElement) {
-        totalObserver.observe(totalElement, { childList: true, characterData: true, subtree: true });
-      }
-    }
-
-    // ===== FONCTIONS UTILITAIRES =====
-    function showNotification(message) {
-      const notification = document.createElement('div');
-      notification.textContent = message;
-      notification.style.cssText = `
-        position: fixed; top: 20px; right: 20px; z-index: 10000;
-        background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
-        color: white; padding: 15px 25px; border-radius: 8px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        font-family: "Quattrocento Sans", Arial, sans-serif;
-        font-weight: bold; font-size: 14px;
-        border: 2px solid #228B22;
-        animation: slideInGuild 0.3s ease;
-      `;
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        notification.style.animation = 'slideOutGuild 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-      }, 3000);
-    }
-
-    // ===== EXPOSITION DES FONCTIONS =====
-    window.switchInventoryTab = switchInventoryTab;
-    window.updateStatistics = updateStatistics;
-    window.filtrerParCategorie = filtrerParCategorie;
-    window.rechercherObjets = rechercherObjets;
-    window.distributeToMembers = distributeToMembers;
-    window.updateAllDistributions = updateAllDistributions;
-    window.openContributionModal = openContributionModal;
-    window.closeContributionModal = closeContributionModal;
-    window.addNewMember = addNewMember;
-    window.removeMember = removeMember;
-    window.updateMemberName = updateMemberName;
-    window.updateMemberClass = updateMemberClass;
-    window.saveContributions = saveContributions;
+    window.inv = new Inventory({ key: 'inv_guilde', title: 'Guilde' });
   </script>
 
-  <!-- Styles spécifiques à la guilde -->
-  <style>
-    /* ===== STYLES GUILDE OPTIMISÉS ===== */
-    
-    .section-subtitle {
-      text-align: center;
-      font-style: italic;
-      color: var(--primary-dark);
-      margin-bottom: 20px;
-      opacity: 0.8;
-    }
-
-    .total-display {
-      background: linear-gradient(135deg, var(--accent-gold) 0%, #F4E07A 100%);
-      padding: 15px 25px;
-      border-radius: var(--border-radius);
-      text-align: center;
-      margin: 20px 0;
-      border: 2px solid var(--primary-bg);
-      box-shadow: var(--shadow);
-    }
-
-    .total-label {
-      font-family: var(--font-title);
-      font-weight: 600;
-      color: var(--primary-dark);
-      margin-right: 10px;
-    }
-
-    .total-value {
-      font-family: var(--font-title);
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: var(--primary-bg);
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    }
-
-    .total-unit {
-      font-family: var(--font-ui);
-      font-weight: 600;
-      color: var(--primary-dark);
-      margin-left: 5px;
-    }
-
-    .tab-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding: 15px 0;
-      border-bottom: 2px solid var(--border-color);
-    }
-
-    .tab-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .distribution-section {
-      margin-top: 30px;
-      padding: 20px;
-      background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--content-bg) 100%);
-      border-radius: var(--border-radius);
-      border: 2px solid var(--accent-gold);
-      box-shadow: var(--shadow);
-    }
-
-    .distribution-section h3 {
-      margin: 0 0 20px 0;
-      color: var(--primary-bg);
-      text-align: center;
-      font-family: var(--font-title);
-    }
-
-    .distribution-config {
-      background: linear-gradient(135deg, var(--secondary-bg) 0%, var(--content-bg) 100%);
-      padding: 25px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 25px;
-      box-shadow: var(--shadow);
-    }
-
-    .config-form {
-      display: grid;
-      grid-template-columns: 1fr 2fr;
-      gap: 20px;
-      margin-top: 15px;
-      align-items: start;
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .input-group label {
-      font-weight: bold;
-      margin-bottom: 8px;
-      color: var(--primary-dark);
-      font-family: var(--font-title);
-    }
-
-    .members-preview {
-      background: var(--content-bg);
-      padding: 15px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .members-preview h4 {
-      margin: 0 0 10px 0;
-      color: var(--primary-dark);
-      font-family: var(--font-title);
-    }
-
-    .member-tag {
-      display: inline-block;
-      background: linear-gradient(135deg, var(--accent-gold) 0%, #F4E07A 100%);
-      color: var(--primary-dark);
-      padding: 6px 12px;
-      margin: 4px;
-      border-radius: 15px;
-      font-size: 0.85rem;
-      font-weight: bold;
-      font-family: var(--font-ui);
-      border: 1px solid var(--primary-bg);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-
-    .currency-breakdown {
-      background: var(--content-bg);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 20px;
-      box-shadow: var(--shadow);
-    }
-
-    .currency-breakdown h4 {
-      margin: 0 0 15px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .currency-distribution-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 15px;
-    }
-
-    .currency-card {
-      background: linear-gradient(135deg, var(--secondary-bg) 0%, #FAF7F0 100%);
-      padding: 15px;
-      border-radius: var(--border-radius);
-      border: 2px solid var(--border-color);
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-
-    .currency-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-dark);
-      border-color: var(--accent-gold);
-    }
-
-    .currency-header {
-      text-align: center;
-      margin-bottom: 15px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid var(--accent-gold);
-    }
-
-    .currency-header h4 {
-      margin: 0 0 5px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-      font-weight: 600;
-    }
-
-    .currency-total {
-      font-size: 0.9rem;
-      color: var(--accent-gold);
-      font-weight: bold;
-      font-family: var(--font-ui);
-    }
-
-    .member-shares {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .member-share {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 12px;
-      background: var(--content-bg);
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      transition: var(--transition);
-    }
-
-    .member-share:hover {
-      background: rgba(218, 165, 32, 0.1);
-      border-color: var(--accent-gold);
-    }
-
-    .member-name {
-      font-weight: bold;
-      color: var(--primary-dark);
-      font-family: var(--font-ui);
-    }
-
-    .share-amount {
-      font-weight: bold;
-      color: var(--accent-gold);
-      font-family: var(--font-title);
-      background: rgba(218, 165, 32, 0.2);
-      padding: 2px 8px;
-      border-radius: 4px;
-    }
-
-    .total-summary {
-      background: linear-gradient(135deg, var(--content-bg) 0%, var(--secondary-bg) 100%);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      border: 2px solid var(--accent-gold);
-      box-shadow: var(--shadow);
-    }
-
-    .total-summary h4 {
-      margin: 0 0 15px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 15px;
-    }
-
-    .summary-card {
-      background: var(--secondary-bg);
-      padding: 15px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-
-    .summary-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-dark);
-    }
-
-    .summary-card h4 {
-      margin: 0 0 10px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-      text-align: center;
-      border-bottom: 1px solid var(--accent-gold);
-      padding-bottom: 8px;
-    }
-
-    .member-summary {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .currency-group {
-      background: var(--content-bg);
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid var(--border-color);
-    }
-
-    .currency-group h5 {
-      margin: 0 0 8px 0;
-      color: var(--primary-dark);
-      font-size: 0.9rem;
-      font-weight: bold;
-      font-family: var(--font-title);
-    }
-
-    .summary-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 2px 5px;
-      font-size: 0.85rem;
-      font-family: var(--font-ui);
-    }
-
-    .filters-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin-bottom: 20px;
-      padding: 15px;
-      background: var(--secondary-bg);
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-    }
-
-    .filter-group, .search-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .filter-group label, .search-group label {
-      font-weight: bold;
-      margin-bottom: 5px;
-      color: var(--primary-dark);
-      font-family: var(--font-title);
-    }
-
-    .categories-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 20px;
-    }
-
-    .category-section {
-      background: var(--content-bg);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow);
-    }
-
-    .category-section h3 {
-      margin: 0 0 15px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-      text-align: center;
-      border-bottom: 2px solid var(--accent-gold);
-      padding-bottom: 10px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-
-    .info-card {
-      background: linear-gradient(135deg, var(--content-bg) 0%, var(--secondary-bg) 100%);
-      padding: 20px;
-      border-radius: var(--border-radius);
-      border: 2px solid var(--border-color);
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-    }
-
-    .info-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-dark);
-      border-color: var(--accent-gold);
-    }
-
-    .info-card h3 {
-      margin: 0 0 15px 0;
-      color: var(--primary-bg);
-      font-family: var(--font-title);
-      text-align: center;
-      border-bottom: 1px solid var(--accent-gold);
-      padding-bottom: 8px;
-    }
-
-    .info-card p {
-      margin: 8px 0;
-      font-family: var(--font-ui);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .info-card span {
-      font-weight: bold;
-      color: var(--accent-gold);
-    }
-
-    .member-contribution {
-      background: var(--content-bg);
-      padding: 15px;
-      border-radius: var(--border-radius);
-      border: 1px solid var(--border-color);
-      margin-bottom: 10px;
-      box-shadow: var(--shadow);
-    }
-
-    .member-info {
-      display: grid;
-      grid-template-columns: 2fr 1fr auto;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .member-info input,
-    .member-info select {
-      padding: 8px;
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      font-family: var(--font-ui);
-      font-size: 0.9rem;
-    }
-
-    .modal-actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 15px;
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .no-results {
-      text-align: center;
-      color: var(--primary-dark);
-      font-style: italic;
-      padding: 20px;
-      background: rgba(139, 69, 19, 0.1);
-      border-radius: var(--border-radius);
-      border: 1px dashed var(--border-color);
-    }
-
-    /* Animations */
-    @keyframes slideInGuild {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideOutGuild {
-      from { transform: translateX(0); opacity: 1; }
-      to { transform: translateX(100%); opacity: 0; }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .config-form {
-        grid-template-columns: 1fr;
-      }
-      
-      .currency-distribution-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .member-info {
-        grid-template-columns: 1fr;
-        gap: 8px;
-      }
-      
-      .currency-card {
-        min-width: unset;
-      }
-
-      .filters-row {
-        grid-template-columns: 1fr;
-      }
-
-      .categories-container {
-        grid-template-columns: 1fr;
-      }
-
-      .info-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-actions {
-        flex-direction: column;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .tab-header {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
-      }
-
-      .tab-actions {
-        justify-content: center;
-      }
-
-      .total-display {
-        padding: 10px 15px;
-      }
-
-      .total-value {
-        font-size: 1.5rem;
-      }
-    }
-  </style>
 </body>
 </html>

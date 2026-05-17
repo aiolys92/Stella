@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inventaire Chariot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ══ SIDEBAR ══ -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">⚜ INVENTAIRES<span>Gestionnaire d'équipement</span></div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span> Accueil</a>
+      <a href="perso.html"><span class="nav-icon">👤</span> Perso · Dorusis</a>
+      <a href="chariot.html" class="active"><span class="nav-icon">🛒</span> Chariot</a>
+      <a href="guilde.html"><span class="nav-icon">⚔️</span> Guilde</a>
+    </div>
+    <div class="sidebar-footer">Toutes vos données restent<br>stockées localement.</div>
+  </nav>
+
+  <!-- ══ MOBILE NAV ══ -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <a href="index.html"><span class="mn-icon">🏠</span> Accueil</a>
+      <a href="perso.html"><span class="mn-icon">👤</span> Perso</a>
+      <a href="chariot.html" class="active"><span class="mn-icon">🛒</span> Chariot</a>
+      <a href="guilde.html"><span class="mn-icon">⚔️</span> Guilde</a>
+    </div>
+  </nav>
+
+  <!-- ══ CONTENU PRINCIPAL ══ -->
+  <main class="main-wrap fade-up">
+
+    <!-- En-tête -->
+    <header class="page-header">
+      <h1>🛒 INVENTAIRE · CHARIOT</h1>
+      <p class="page-header-sub">Contenu du chariot de transport</p>
+      <span class="page-header-ornament">🛒</span>
+    </header>
+
+    <!-- Stat cards -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <span class="stat-icon">📦</span>
+        <div>
+          <div class="stat-label">Objets</div>
+          <div class="stat-value" id="statItems">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">⚖️</span>
+        <div>
+          <div class="stat-label">Poids total</div>
+          <div class="stat-value" id="statWeight">0.00 kg</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💰</span>
+        <div>
+          <div class="stat-label">Valeur totale</div>
+          <div class="stat-value" id="statValue">0.00 pm</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barre de contrôles -->
+    <div class="controls-bar">
+      <button class="btn btn-primary" onclick="inv.openModal()">✨ Ajouter un objet</button>
+
+      <div class="search-wrap">
+        <input type="search" id="searchInput" placeholder="Rechercher un objet…">
+      </div>
+
+      <select class="filter-select" id="typeFilter">
+        <option value="">Tous les types</option>
+        <option value="arme">⚔️ Armes</option>
+        <option value="armure">🛡️ Armures</option>
+        <option value="autre">📦 Autres</option>
+      </select>
+
+      <div class="spacer"></div>
+
+      <label class="btn btn-ghost" style="cursor:pointer" title="Importer un fichier JSON">
+        📂 Importer
+        <input type="file" id="importFile" accept=".json" style="display:none">
+      </label>
+      <button class="btn btn-ghost" onclick="inv.exportJSON()" title="Exporter en JSON">💾 Exporter</button>
+    </div>
+
+    <!-- Tableau -->
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th data-sort="type" class="sortable">Type <span class="sort-arrow"></span></th>
+              <th data-sort="nom"  class="sortable sort-asc">Nom <span class="sort-arrow"></span></th>
+              <th data-sort="categorie" class="sortable hide-sm">Catégorie <span class="sort-arrow"></span></th>
+              <th data-sort="quantite"  class="sortable" style="text-align:center">Qté <span class="sort-arrow"></span></th>
+              <th data-sort="poids" class="sortable hide-sm" style="text-align:right">Poids/u <span class="sort-arrow"></span></th>
+              <th style="text-align:right">Total poids</th>
+              <th data-sort="prix" class="sortable hide-sm" style="text-align:right">Prix/u <span class="sort-arrow"></span></th>
+              <th class="hide-md-only">Caractéristiques</th>
+              <th style="text-align:center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryBody"></tbody>
+        </table>
+      </div>
+
+      <div class="table-footer">
+        <div class="foot-item">📦 <span class="foot-val" id="footCount">0 objet</span></div>
+        <div class="foot-item">⚖️ <span class="foot-val" id="footWeight">0.00 kg</span></div>
+        <div class="foot-item">💰 <span class="foot-val" id="footValue">0.00 pm</span></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ══ MODAL ══ -->
+  <div id="itemModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+
+      <div class="modal-head">
+        <h3 id="modalTitle">✨ Nouvel objet</h3>
+        <button class="modal-close" onclick="inv.closeModal()" aria-label="Fermer">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="itemForm" novalidate>
+          <div class="form-grid">
+            <div class="field full-width">
+              <label>Nom de l'objet *</label>
+              <input name="nom" type="text" placeholder="Ex : Corde de remorquage" autocomplete="off" required>
+            </div>
+            <div class="field">
+              <label>Catégorie</label>
+              <select name="categorie" id="formCategorie"></select>
+            </div>
+            <div class="field">
+              <label>Type d'objet</label>
+              <select name="type">
+                <option value="arme">⚔️ Arme</option>
+                <option value="armure">🛡️ Armure</option>
+                <option value="autre" selected>📦 Autre</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Quantité</label>
+              <input name="quantite" type="number" value="1" min="0" step="1">
+            </div>
+            <div class="field">
+              <label>Poids (kg / unité)</label>
+              <input name="poids" type="number" value="0" min="0" step="0.1" placeholder="0.0">
+            </div>
+            <div class="field">
+              <label>Prix (pm / unité)</label>
+              <input name="prix" type="number" value="0" min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+
+          <div id="fields-arme" class="type-section" style="display:none">
+            <h4>⚔️ Statistiques d'arme</h4>
+            <div class="form-grid cols-5">
+              <div class="field"><label>Initiative</label><input name="initiative" type="text" placeholder="+1"></div>
+              <div class="field"><label>Attaque</label><input name="attaque" type="text" placeholder="+2"></div>
+              <div class="field"><label>Parade</label><input name="parade" type="text" placeholder="+1"></div>
+              <div class="field"><label>Seconde Parade</label><input name="seconde_parade" type="text" placeholder="0"></div>
+              <div class="field"><label>Dommage</label><input name="dommage" type="text" placeholder="1d8+2"></div>
+            </div>
+          </div>
+
+          <div id="fields-armure" class="type-section" style="display:none">
+            <h4>🛡️ Protection</h4>
+            <div class="form-grid cols-3">
+              <div class="field"><label>Encaissement</label><input name="encaissement" type="text" placeholder="3"></div>
+            </div>
+          </div>
+
+          <div id="fields-autre" class="type-section">
+            <h4>📋 Caractéristiques</h4>
+            <div class="field">
+              <label>Description / Propriétés</label>
+              <textarea name="caracteristiques" rows="3" placeholder="Décrivez les propriétés, effets ou notes sur cet objet…"></textarea>
+            </div>
+          </div>
+
+          <div class="cat-add-row">
+            <span style="font-size:.8rem;color:var(--text-muted);white-space:nowrap">➕ Catégorie :</span>
+            <input id="newCatInput" type="text" placeholder="Nom de la nouvelle catégorie…">
+            <button type="button" id="addCatBtn" class="btn-sm">Ajouter</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" onclick="inv.closeModal()">Annuler</button>
+        <button type="submit" form="itemForm" class="btn btn-primary">💾 Sauvegarder</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="inventory.js"></script>
+  <script>
+    window.inv = new Inventory({ key: 'inv_chariot', title: 'Chariot' });
+  </script>
+
+</body>
+</html>

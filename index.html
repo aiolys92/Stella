@@ -3,309 +3,161 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Gestionnaire des Trésors - Inventaire Magique</title>
-  <meta name="description" content="Système de gestion des monnaies, gemmes et équipements pour aventuriers">
+  <title>Inventaires — Stella</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .welcome-header {
+      background: linear-gradient(130deg, var(--brown-dark) 0%, var(--brown-main) 60%, var(--brown-light) 100%);
+      border-radius: var(--radius-lg);
+      padding: 40px 36px;
+      margin-bottom: 28px;
+      border: 2px solid var(--gold-dark);
+      box-shadow: var(--shadow-md);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .welcome-header::before {
+      content: '⚜';
+      position: absolute; left: 28px; top: 50%; transform: translateY(-50%);
+      font-size: 2.8rem; opacity: .25; color: var(--gold-main);
+    }
+    .welcome-header::after {
+      content: '⚜';
+      position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
+      font-size: 2.8rem; opacity: .25; color: var(--gold-main);
+    }
+    .welcome-header h1 { color: var(--parch-light); margin-bottom: 10px; }
+    .welcome-header p {
+      color: var(--gold-light);
+      font-family: 'Crimson Text', serif;
+      font-style: italic;
+      font-size: 1.15rem;
+      opacity: .9;
+    }
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: var(--brown-dark);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--parch-dark);
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .info-card {
+      background: var(--parch-light);
+      border-radius: var(--radius);
+      border: 1px solid var(--parch-dark);
+      padding: 18px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .info-card h3 { font-size: .85rem; color: var(--brown-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .8px; }
+    .info-card p { font-size: .88rem; color: var(--text-muted); font-family: 'Crimson Text', serif; line-height: 1.6; }
+  </style>
 </head>
 <body>
-  <div class="content fade-in">
-    <!-- En-tête principal -->
-    <header class="page-header">
-      <h1>⚜ GESTIONNAIRE DES TRÉSORS ⚜</h1>
-      <p class="page-subtitle">Système de gestion des monnaies et gemmes pour aventuriers</p>
-    </header>
 
-    <!-- Navigation principale -->
-    <section class="section">
-      <h2>🗺️ Navigation Principale</h2>
-      <div class="main-nav-grid">
-        <a href="dorusis.html" class="nav-card primary">
-          <div class="nav-icon">👤</div>
-          <div class="nav-content">
-            <h3>Inventaire Dorusis</h3>
-            <p>Trésor personnel du guerrier</p>
-          </div>
-        </a>
-        
-        <a href="guilde.html" class="nav-card secondary">
-          <div class="nav-icon">⚔️</div>
-          <div class="nav-content">
-            <h3>Inventaire Guilde</h3>
-            <p>Trésor commun de la confrérie</p>
-          </div>
-        </a>
-        
-        <a href="poids.html" class="nav-card tertiary">
-          <div class="nav-icon">🏋️</div>
-          <div class="nav-content">
-            <h3>Gestion des Poids</h3>
-            <p>Administration des poids et bagages</p>
-          </div>
-        </a>
-        
-        <a href="liste.html" class="nav-card quaternary">
-          <div class="nav-icon">📋</div>
-          <div class="nav-content">
-            <h3>Liste Complète</h3>
-            <p>Catalogue de toutes les monnaies et gemmes</p>
-          </div>
-        </a>
-        
-        <a href="convertisseur.html" class="nav-card quinary">
-          <div class="nav-icon">🔄</div>
-          <div class="nav-content">
-            <h3>Convertisseur de Monnaies</h3>
-            <p>Transformation entre différentes monnaies</p>
-          </div>
-        </a>
-        
-        <a href="grimoire.html" class="nav-card senary">
-          <div class="nav-icon">📖</div>
-          <div class="nav-content">
-            <h3>Grimoire Magique</h3>
-            <p>Livre de documentation et règles</p>
-          </div>
-        </a>
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">⚜ INVENTAIRES<span>Gestionnaire d'équipement</span></div>
+    <div class="sidebar-nav">
+      <a href="index.html" class="active"><span class="nav-icon">🏠</span> Accueil</a>
+      <a href="perso.html"><span class="nav-icon">👤</span> Perso · Dorusis</a>
+      <a href="chariot.html"><span class="nav-icon">🛒</span> Chariot</a>
+      <a href="guilde.html"><span class="nav-icon">⚔️</span> Guilde</a>
+    </div>
+    <div class="sidebar-footer">Toutes vos données restent<br>stockées localement.</div>
+  </nav>
+
+  <!-- Mobile nav -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <a href="index.html" class="active"><span class="mn-icon">🏠</span> Accueil</a>
+      <a href="perso.html"><span class="mn-icon">👤</span> Perso</a>
+      <a href="chariot.html"><span class="mn-icon">🛒</span> Chariot</a>
+      <a href="guilde.html"><span class="mn-icon">⚔️</span> Guilde</a>
+    </div>
+  </nav>
+
+  <!-- Contenu principal -->
+  <main class="main-wrap fade-up">
+
+    <div class="welcome-header">
+      <h1>⚜ GESTIONNAIRE D'INVENTAIRES ⚜</h1>
+      <p>Gérez vos équipements, armes et objets — avec poids, prix et statistiques</p>
+    </div>
+
+    <!-- Cartes de navigation -->
+    <h2 class="section-title">🗺️ Inventaires</h2>
+    <div class="nav-cards">
+
+      <a href="perso.html" class="nav-card perso">
+        <span class="nav-card-icon">👤</span>
+        <div class="nav-card-title">Perso · Dorusis</div>
+        <div class="nav-card-sub">Équipement personnel du personnage</div>
+        <div class="nav-card-count" id="count-inv_perso">— objets</div>
+      </a>
+
+      <a href="chariot.html" class="nav-card chariot">
+        <span class="nav-card-icon">🛒</span>
+        <div class="nav-card-title">Chariot</div>
+        <div class="nav-card-sub">Inventaire du chariot de transport</div>
+        <div class="nav-card-count" id="count-inv_chariot">— objets</div>
+      </a>
+
+      <a href="guilde.html" class="nav-card guilde">
+        <span class="nav-card-icon">⚔️</span>
+        <div class="nav-card-title">Guilde</div>
+        <div class="nav-card-sub">Trésor commun de la confrérie</div>
+        <div class="nav-card-count" id="count-inv_guilde">— objets</div>
+      </a>
+
+    </div>
+
+    <!-- Infos -->
+    <h2 class="section-title" style="margin-top:32px">📖 Fonctionnalités</h2>
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>⚔️ Types d'objets</h3>
+        <p><strong>Arme :</strong> initiative, attaque, parade, seconde parade, dommage.<br>
+           <strong>Armure :</strong> encaissement.<br>
+           <strong>Autre :</strong> champ texte libre pour les propriétés.</p>
       </div>
-    </section>
-
-    <!-- Informations sur le système -->
-    <section class="section">
-      <h2>📜 Informations du Système</h2>
-      <div class="info-grid">
-        <div class="info-card">
-          <h3>💰 Monnaies et Gemmes</h3>
-          <ul>
-            <li><strong>Monnaies Métalliques:</strong> Fer, Argent, Or, Électrum, Platine</li>
-            <li><strong>Gemmes Précieuses:</strong> Rubis, Émeraude, Saphir, Diamant</li>
-            <li><strong>Conversion Automatique:</strong> en PM (Pièce Modèle)</li>
-            <li><strong>Valeur Totale:</strong> Calcul instantané</li>
-          </ul>
-        </div>
-        
-        <div class="info-card">
-          <h3>⚖️ Gestion des Poids</h3>
-          <ul>
-            <li><strong>Catégories Organisées:</strong> Armes, Armures, Outils</li>
-            <li><strong>Poids Porté:</strong> Moitié du poids quand porté</li>
-            <li><strong>Calcul Dorusis:</strong> 80kg + équipement automatiquement</li>
-            <li><strong>Inventaires Multiples:</strong> Dorusis, Cheval, Guilde</li>
-          </ul>
-        </div>
-        
-        <div class="info-card">
-          <h3>💾 Sauvegarde des Données</h3>
-          <ul>
-            <li><strong>Export/Import:</strong> Format JSON</li>
-            <li><strong>Sauvegarde Locale:</strong> Dans votre navigateur</li>
-            <li><strong>Sécurité:</strong> Vos données restent privées</li>
-            <li><strong>Backup:</strong> Possibilité de sauvegarder et récupérer</li>
-          </ul>
-        </div>
-        
-        <div class="info-card">
-          <h3>📱 Interface Responsive</h3>
-          <ul>
-            <li><strong>Interface Adaptative:</strong> Mobile et Desktop</li>
-            <li><strong>Navigation Optimisée:</strong> Facile d'utilisation</li>
-            <li><strong>Thème Médiéval:</strong> Esthétique fantastique</li>
-            <li><strong>Performance:</strong> Rapidité et stabilité</li>
-          </ul>
-        </div>
+      <div class="info-card">
+        <h3>⚖️ Poids & Prix</h3>
+        <p>Chaque objet a un poids et un prix à l'unité. Les totaux sont calculés automatiquement selon la quantité.</p>
       </div>
-    </section>
-
-    <!-- Actions rapides -->
-    <section class="section">
-      <h2>⚡ Actions Rapides</h2>
-      <div class="quick-actions">
-        <button onclick="window.location.href='dorusis.html'" class="action-btn primary">
-          📦 Ouvrir Inventaire Dorusis
-        </button>
-        <button onclick="window.location.href='poids.html'" class="action-btn secondary">
-          ⚖️ Gérer les Poids
-        </button>
-        <button onclick="window.location.href='convertisseur.html'" class="action-btn tertiary">
-          🔄 Convertir les Monnaies
-        </button>
-        <button onclick="window.location.href='grimoire.html'" class="action-btn quaternary">
-          📖 Lire le Grimoire
-        </button>
+      <div class="info-card">
+        <h3>💾 Sauvegarde</h3>
+        <p>Les données sont sauvegardées automatiquement dans le navigateur. Exportez en JSON pour sauvegarder ou partager, et réimportez quand vous voulez.</p>
       </div>
-    </section>
-
-    <!-- Exemples d'utilisation -->
-    <section class="section">
-      <h2>🎯 Exemples d'Utilisation</h2>
-      <div class="info-grid">
-        <div class="info-card">
-          <h3>🎮 Pour les Joueurs</h3>
-          <ul>
-            <li><strong>Gestion de Personnage:</strong> Inventaire Dorusis pour votre aventurier</li>
-            <li><strong>Calcul de Poids:</strong> Gestion automatique du poids porté</li>
-            <li><strong>Valeur du Trésor:</strong> Suivi de la valeur de vos richesses</li>
-            <li><strong>Import/Export:</strong> Partage entre les sessions de jeu</li>
-          </ul>
-        </div>
-        
-        <div class="info-card">
-          <h3>🎲 Pour les Maîtres de Jeu</h3>
-          <ul>
-            <li><strong>Inventaire de Guilde:</strong> Trésor commun du groupe</li>
-            <li><strong>Liste des Prix:</strong> Référence pour tous les objets</li>
-            <li><strong>Convertisseur:</strong> Conversion rapide entre monnaies</li>
-            <li><strong>Documentation:</strong> Lecteur PDF pour les règles</li>
-          </ul>
-        </div>
-        
-        <div class="info-card">
-          <h3>📊 Pour les Organisateurs</h3>
-          <ul>
-            <li><strong>Gestion Multiple:</strong> Plusieurs inventaires de personnages</li>
-            <li><strong>Statistiques:</strong> Analyses complètes des données</li>
-            <li><strong>Sauvegarde Sécurisée:</strong> Gestion sûre des données</li>
-            <li><strong>Accessibilité:</strong> Prêt pour mobile et ordinateur</li>
-          </ul>
-        </div>
-        
-        <div class="info-card">
-          <h3>🔧 Pour les Développeurs</h3>
-          <ul>
-            <li><strong>Code Ouvert:</strong> Personnalisable et extensible</li>
-            <li><strong>Format JSON:</strong> Format de données standard</li>
-            <li><strong>API Simple:</strong> Facile à intégrer</li>
-            <li><strong>Documentation:</strong> Documentation complète disponible</li>
-          </ul>
-        </div>
+      <div class="info-card">
+        <h3>🔍 Recherche & Tri</h3>
+        <p>Filtrez par nom, catégorie ou type. Triez par n'importe quelle colonne en cliquant sur l'en-tête. Dupliquez les objets similaires.</p>
       </div>
-    </section>
+    </div>
 
-    <!-- Caractéristiques techniques -->
-    <section class="section">
-      <h2>🔧 Caractéristiques Techniques</h2>
-      <div class="info-grid">
-        <div class="info-card">
-          <h3>⚙️ Technologie</h3>
-          <p><strong>Frontend:</strong> HTML5, CSS3, JavaScript ES6+</p>
-          <p><strong>Stockage:</strong> LocalStorage, Export/Import JSON</p>
-          <p><strong>Design:</strong> Responsive, Mobile-First</p>
-          <p><strong>Compatibilité:</strong> Tous les navigateurs modernes</p>
-        </div>
-        
-        <div class="info-card">
-          <h3>📊 Capacités</h3>
-          <p><strong>Objets:</strong> Inventaires illimités</p>
-          <p><strong>Catégories:</strong> Système de catégories flexible</p>
-          <p><strong>Calculs:</strong> Poids et valeur en temps réel</p>
-          <p><strong>Recherche:</strong> Capacité de recherche textuelle complète</p>
-        </div>
-        
-        <div class="info-card">
-          <h3>🛡️ Sécurité</h3>
-          <p><strong>Confidentialité:</strong> Toutes les données restent locales</p>
-          <p><strong>Sauvegarde:</strong> Export/import manuel</p>
-          <p><strong>Stabilité:</strong> Aucune dépendance serveur</p>
-          <p><strong>Mises à jour:</strong> Amélioration progressive</p>
-        </div>
-        
-        <div class="info-card">
-          <h3>🎨 Design</h3>
-          <p><strong>Thème:</strong> Inspiré du fantastique médiéval</p>
-          <p><strong>Typographie:</strong> Polices Cinzel, Crimson Text</p>
-          <p><strong>Couleurs:</strong> Bruns cuir, accents dorés</p>
-          <p><strong>UX:</strong> Intuitive et cohérente</p>
-        </div>
-      </div>
-    </section>
+  </main>
 
-    <!-- Pied de page -->
-    <footer class="section footer">
-      <div class="footer-content">
-        <h3>⚜ GESTIONNAIRE DES TRÉSORS ⚜</h3>
-        <p><em>Œuvre parfaite pour la gestion des trésors d'aventuriers</em></p>
-        <p class="latin-quote">"L'argent n'a pas d'odeur, mais bien administré il prospère"</p>
-        <div class="footer-links">
-          <span>Version 2.0</span> • 
-          <span>Année 2025</span> • 
-          <span>Fait avec passion</span>
-        </div>
-      </div>
-    </footer>
-  </div>
-
-  <!-- Scripts -->
-  <script src="data.js"></script>
-  <script src="script.js"></script>
+  <script src="inventory.js"></script>
   <script>
-    // Script spécifique à la page d'accueil
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('🏰 Gestionnaire des Trésors - Initialisé');
-      
-      // Animation des cartes de navigation
-      const navCards = document.querySelectorAll('.nav-card');
-      navCards.forEach((card, index) => {
-        card.style.animationDelay = `${index * 0.1}s`;
-        
-        card.addEventListener('mouseenter', function() {
-          this.style.transform = 'translateY(-8px) scale(1.02)';
-        });
-        
-        card.addEventListener('mouseleave', function() {
-          this.style.transform = 'translateY(0) scale(1)';
-        });
-      });
-
-      // Statistiques des objets disponibles
-      if (window.monnaies) {
-        const piecesCount = Object.keys(window.monnaies.pieces).length;
-        const gemmesCount = Object.keys(window.monnaies.gemmes).length;
-        let poidsCount = 0;
-        
-        if (window.monnaies.poids) {
-          Object.values(window.monnaies.poids).forEach(cat => {
-            poidsCount += Object.keys(cat).length;
-          });
-        }
-        
-        console.log(`📊 Statistiques: ${piecesCount} monnaies, ${gemmesCount} gemmes, ${poidsCount} objets`);
-        
-        // Afficher les statistiques dans la console de façon stylée
-        console.log('%c🏰 GESTIONNAIRE DES TRÉSORS INITIALISÉ', 'font-size: 16px; font-weight: bold; color: #8B4513;');
-        console.log('%c⚜ Système complet pour la gestion des trésors ⚜', 'font-style: italic; color: #DAA520;');
-      }
-
-      // Vérifier les fonctionnalités du navigateur
-      checkBrowserFeatures();
+    // Charger les compteurs de chaque inventaire
+    ['inv_perso', 'inv_chariot', 'inv_guilde'].forEach(key => {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        const n = (d.items || []).length;
+        const el = document.getElementById(`count-${key}`);
+        if (el) el.textContent = n + ' objet' + (n !== 1 ? 's' : '');
+      } catch {}
     });
-
-    function checkBrowserFeatures() {
-      const features = {
-        localStorage: typeof(Storage) !== "undefined",
-        fileAPI: window.File && window.FileReader && window.FileList && window.Blob,
-        json: typeof JSON !== "undefined"
-      };
-
-      console.log('🔧 Vérification des Fonctionnalités du Navigateur:');
-      Object.entries(features).forEach(([feature, supported]) => {
-        console.log(`  ${supported ? '✅' : '❌'} ${feature}: ${supported ? 'Supporté' : 'Non supporté'}`);
-      });
-
-      if (!features.localStorage) {
-        console.warn('⚠️ LocalStorage non supporté - fonctionnalité de sauvegarde/chargement limitée');
-      }
-
-      if (!features.fileAPI) {
-        console.warn('⚠️ API File non supportée - fonctionnalité d\'import/export limitée');
-      }
-    }
-
-    // Fonction utilitaire pour naviguer
-    function navigateTo(page) {
-      window.location.href = page;
-    }
-
-    // Exposition pour usage externe
-    window.navigateTo = navigateTo;
   </script>
+
 </body>
 </html>
