@@ -211,7 +211,7 @@ class Inventory {
     }, 0);
   }
   get totalValue()  { return this.items.reduce((s, i) => s + (parseFloat(i.prix)||0)*(parseFloat(i.quantite)||0), 0); }
-  get totalMagic()  { return this.items.filter(i => !!i.magique).length; }
+  get totalMagic()  { return this.items.filter(i => !!i.magique).reduce((s, i) => s + (parseInt(i.quantite) || 0), 0); }
 
   /* ──────── CRUD ──────── */
 
@@ -531,7 +531,244 @@ class Inventory {
     }, `${this.key}-${_today()}.json`);
   }
 
-  /* ──────── Compteurs index ──────── */
+  /* ──────── Impression PDF A4 ──────── */
+
+  printInventory() {
+    const TYPE_ORDER = { arme: 0, armure: 1, autre: 2 };
+    const sorted = [...this.items].sort((a, b) => {
+      const ta = TYPE_ORDER[a.type||'autre'] ?? 2, tb = TYPE_ORDER[b.type||'autre'] ?? 2;
+      if (ta !== tb) return ta - tb;
+      const ca = (a.categorie||'').toLowerCase(), cb = (b.categorie||'').toLowerCase();
+      if (ca !== cb) return ca < cb ? -1 : 1;
+      return (a.nom||'').toLowerCase() < (b.nom||'').toLowerCase() ? -1 : 1;
+    });
+
+    const win = window.open('', '_blank', 'width=860,height=760');
+    if (!win) { alert('Autorisez les popups pour générer le PDF.'); return; }
+    win.document.write(this._buildPrintHTML(sorted));
+    win.document.close();
+  }
+
+  _buildPrintHTML(items) {
+    const now   = new Date();
+    const date  = now.toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+    const totalW = items.reduce((s,i)=>{ const r=(parseFloat(i.poids)||0)*(parseFloat(i.quantite)||0); return s+(i.porte?r/2:r); },0);
+    const totalV = items.reduce((s,i)=>s+(parseFloat(i.prix)||0)*(parseFloat(i.quantite)||0),0);
+    const totalQ = items.reduce((s,i)=>s+(parseInt(i.quantite)||0),0);
+    const nbMagic = items.filter(i=>i.magique).length;
+
+    /* ── Groupes par catégorie ── */
+    const groups = [];
+    let lastCat = null;
+    for (const item of items) {
+      if (item.categorie !== lastCat) {
+        groups.push({ cat: item.categorie, type: item.type||'autre', items: [] });
+        lastCat = item.categorie;
+      }
+      groups[groups.length-1].items.push(item);
+    }
+
+    const TYPE_ICON_PRINT = { arme:'⚔', armure:'🛡', autre:'◆' };
+    const TYPE_LABEL      = { arme:'Arme', armure:'Armure', autre:'Autre' };
+    const esc = s => s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    const rows = groups.map(g => {
+      const groupHdr = `<tr class="group-header">
+        <td colspan="6">${TYPE_ICON_PRINT[g.type]||'◆'} ${esc(g.cat)}</td>
+      </tr>`;
+      const itemRows = g.items.map(item => {
+        const type  = item.type||'autre';
+        const poids = parseFloat(item.poids)||0;
+        const prix  = parseFloat(item.prix) ||0;
+        const qty   = parseInt(item.quantite)||0;
+        const effW  = poids * qty * (item.porte ? .5 : 1);
+
+        /* Flags */
+        const flags = [
+          item.magique ? '✨ Magique'         : '',
+          item.surMoi  ? '👤 Sur moi'          : '',
+          item.porte   ? '⚖ Porté (poids ÷2)' : '',
+        ].filter(Boolean).join(' · ');
+
+        /* Stats */
+        let stats = '';
+        if (type === 'arme') {
+          const chips = [
+            ['Init', item.initiative], ['Atq', item.attaque],
+            ['Par',  item.parade],     ['Par2', item.seconde_parade],
+            ['Dmg',  item.dommage],
+          ].filter(([,v])=>v&&String(v).trim())
+           .map(([k,v])=>`<span class="sc">${k}&nbsp;<b>${esc(v)}</b></span>`).join('');
+          const autres = item.autres?.trim()
+            ? `<div class="ct">${esc(item.autres)}</div>` : '';
+          stats = chips + autres;
+        } else if (type === 'armure') {
+          stats = item.encaissement ? `<span class="sc">Enc&nbsp;<b>${esc(item.encaissement)}</b></span>` : '';
+        } else {
+          stats = item.caracteristiques
+            ? `<div class="ct">${esc(item.caracteristiques)}</div>` : '';
+        }
+
+        return `<tr>
+          <td>
+            <span class="badge badge-${type}">${esc(item.categorie)}</span>
+          </td>
+          <td>
+            <div class="iname">${esc(item.nom)}${item.magique?' <span class="mx">✨</span>':''}</div>
+            ${flags ? `<div class="iflags">${flags}</div>` : ''}
+          </td>
+          <td class="tc">${qty}</td>
+          <td class="tr">${effW.toFixed(2)}&nbsp;kg${item.porte?'<sup>÷2</sup>':''}</td>
+          <td class="tr">${(prix*qty).toFixed(2)}&nbsp;pm</td>
+          <td>${stats}</td>
+        </tr>`;
+      }).join('');
+      return groupHdr + itemRows;
+    }).join('');
+
+    const magicStat = nbMagic > 0
+      ? `<div class="si"><span>✨</span>${nbMagic} magique${nbMagic>1?'s':''}</div>` : '';
+
+    return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Inventaire ${esc(this.title)} — ${date}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+@page { size: A4 portrait; margin: 14mm 12mm 14mm 12mm; }
+*    { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Crimson Text', Georgia, serif; font-size: 10.5pt; color: #1E0F07; background: #fff; line-height: 1.45; }
+
+/* ── Header ── */
+.hdr { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 9px; border-bottom: 2.5pt solid #3D1F0D; margin-bottom: 10px; }
+.hdr-l h1 { font-family: 'Cinzel', serif; font-size: 17pt; color: #3D1F0D; letter-spacing: 2px; font-weight: 700; }
+.hdr-l h1 .orn { color: #B8860B; }
+.hdr-l p   { font-style: italic; color: #7A5C4F; font-size: 9.5pt; margin-top: 3px; }
+.hdr-r     { text-align: right; font-size: 8.5pt; color: #7A5C4F; line-height: 1.7; }
+.hdr-r strong { color: #3D1F0D; font-size: 9pt; }
+
+/* ── Stats bar ── */
+.sbar { display: flex; gap: 0; border: 1pt solid #D6C49A; border-radius: 4px; margin-bottom: 12px; overflow: hidden; }
+.si   { flex: 1; padding: 6px 10px; font-size: 9.5pt; font-weight: 600; color: #3D1F0D; background: #F5EDD8; border-right: 1pt solid #D6C49A; }
+.si:last-child { border-right: none; }
+.si span { color: #B8860B; margin-right: 5px; }
+
+/* ── Table ── */
+table { width: 100%; border-collapse: collapse; font-size: 9pt; }
+thead tr th { background: #3D1F0D; color: #F5EDD8; padding: 5px 7px; font-family: 'Cinzel', serif; font-size: 7pt; font-weight: 600; letter-spacing: 1px; text-align: left; }
+td  { padding: 5px 7px; border-bottom: 0.4pt solid #E8D5B0; vertical-align: top; }
+tr:nth-child(even) td { background: #FEFCF5; }
+tr.group-header td {
+  background: #6B3A2A;
+  color: #F5EDD8;
+  font-family: 'Cinzel', serif;
+  font-size: 7.5pt;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  padding: 4px 7px;
+  border-bottom: none;
+  text-transform: uppercase;
+}
+tr.group-header:not(:first-child) td { border-top: 1pt solid #3D1F0D; margin-top: 4pt; }
+tr { page-break-inside: avoid; }
+
+/* Cols */
+.tc { text-align: center; }
+.tr { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+sup { font-size: 6pt; color: #1565C0; }
+
+/* ── Badges ── */
+.badge { display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 7.5pt; font-weight: 700; white-space: nowrap; }
+.badge-arme   { background: #FFEBEE; color: #7B0000; border: 0.4pt solid #EF9A9A; }
+.badge-armure { background: #E3F2FD; color: #0D3B7A; border: 0.4pt solid #90CAF9; }
+.badge-autre  { background: #EDE7F6; color: #311B92; border: 0.4pt solid #B39DDB; }
+
+/* ── Item name ── */
+.iname  { font-weight: 600; font-size: 10pt; color: #1E0F07; }
+.mx     { font-size: 9pt; }
+.iflags { font-size: 7pt; color: #7A5C4F; margin-top: 2px; font-style: italic; }
+
+/* ── Stats ── */
+.sc { display: inline-block; background: #F5EDD8; border: 0.4pt solid #D6C49A; border-radius: 2px; padding: 0 4px; font-size: 7.5pt; margin: 1px 2px 1px 0; white-space: nowrap; }
+.ct { font-size: 8.5pt; font-style: italic; color: #2F1B14; margin-top: 1px; line-height: 1.4; }
+
+/* ── Totals row ── */
+.totals td { background: #3D1F0D !important; color: #F5EDD8 !important; font-weight: 700; font-family: 'Cinzel', serif; font-size: 8.5pt; border-bottom: none !important; padding: 6px 7px; }
+
+/* ── Footer ── */
+.ftr { margin-top: 12px; padding-top: 7px; border-top: 0.5pt solid #D6C49A; display: flex; justify-content: space-between; font-size: 8pt; color: #7A5C4F; font-style: italic; }
+
+/* Print colours */
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-l">
+    <h1><span class="orn">⚜</span> INVENTAIRE &nbsp;·&nbsp; ${esc(this.title).toUpperCase()}</h1>
+    <p>Liste complète des objets — ${items.length} entr${items.length>1?'ées':'ée'}</p>
+  </div>
+  <div class="hdr-r">
+    <strong>${date}</strong><br>
+    Généré depuis Stella<br>
+    <em>Gestion d'inventaires RPG</em>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="sbar">
+  <div class="si"><span>📦</span>${items.length} objet${items.length>1?'s':''}</div>
+  <div class="si"><span>⚖</span>${totalW.toFixed(2)} kg (effectif)</div>
+  <div class="si"><span>💰</span>${totalV.toFixed(2)} pm</div>
+  ${magicStat}
+</div>
+
+<!-- TABLE -->
+<table>
+  <thead>
+    <tr>
+      <th style="width:13%">Catégorie</th>
+      <th style="width:25%">Nom de l'objet</th>
+      <th style="width:5%;text-align:center">Qté</th>
+      <th style="width:11%;text-align:right">Poids total</th>
+      <th style="width:11%;text-align:right">Prix total</th>
+      <th>Caractéristiques / Statistiques</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+  <tfoot>
+    <tr class="totals">
+      <td colspan="2">⚜ TOTAUX</td>
+      <td class="tc">${totalQ}</td>
+      <td class="tr">${totalW.toFixed(2)} kg</td>
+      <td class="tr">${totalV.toFixed(2)} pm</td>
+      <td style="font-size:7.5pt;font-weight:400;color:#E8D5B0">* poids effectif (÷2 si porté)</td>
+    </tr>
+  </tfoot>
+</table>
+
+<!-- FOOTER -->
+<div class="ftr">
+  <span>⚜ Stella — Gestionnaire d'inventaires RPG</span>
+  <span>Imprimé le ${date}</span>
+</div>
+
+<script>
+  // Police chargée → impression automatique
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function() { setTimeout(function(){ window.print(); }, 400); });
+  } else {
+    setTimeout(function(){ window.print(); }, 800);
+  }
+</script>
+</body>
+</html>`;
+  }
+
+
 
   _updateIndexCounts() {
     const el = document.getElementById(`count-${this.key}`);
