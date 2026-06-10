@@ -1,16 +1,18 @@
 'use strict';
 
 /* ══════════════════════════════════════════════
-   GESTIONNAIRE D'INVENTAIRE — inventory.js  v5
+   LE REGISTRE — inventory.js  v6
    • Export / import global (3 inventaires)
    • Déplacement d'objets entre inventaires
+   • Jauge de charge avec capacité réglable
+   • Ajout rapide, suppression annulable, toasts
    ══════════════════════════════════════════════ */
 
 /* Registre de tous les inventaires connus */
 const ALL_INVENTORIES = [
-  { key: 'inv_perso',   label: '👤 Perso · Dorusis' },
-  { key: 'inv_chariot', label: '🛒 Chariot'           },
-  { key: 'inv_guilde',  label: '⚔️ Guilde'            },
+  { key: 'inv_perso',   label: '👤 Perso · Dorusis', defaultCapacity: 45  },
+  { key: 'inv_chariot', label: '🛒 Chariot',          defaultCapacity: 400 },
+  { key: 'inv_guilde',  label: '⚔️ Guilde',           defaultCapacity: 800 },
 ];
 
 const DEFAULT_CATS = [
@@ -24,10 +26,10 @@ const DEFAULT_CATS = [
   { nom: 'Divers',         type: 'autre'  },
 ];
 
-const TYPE_ICONS  = { arme: '⚔️', armure: '🛡️', autre: '📦' };
+const TYPE_ICONS = { arme: '⚔️', armure: '🛡️', autre: '📦' };
 
 /* ══════════════════════════════════════════════
-   FONCTIONS GLOBALES (accessibles sans instance)
+   FONCTIONS GLOBALES
    ══════════════════════════════════════════════ */
 
 /** Exporte les 3 inventaires en un seul fichier JSON */
@@ -45,6 +47,7 @@ function globalExport() {
         label,
         items:      d.items      || [],
         customCats: d.customCats || [],
+        capacity:   d.capacity,
       };
     } catch {
       payload.inventaires[key] = { label, items: [], customCats: [] };
@@ -55,7 +58,7 @@ function globalExport() {
     .reduce((s, inv) => s + inv.items.length, 0);
 
   _downloadJSON(payload, `stella-global-${_today()}.json`);
-  _showToast(`💾 Export global : ${total} objet(s) sur 3 inventaires`);
+  _showToast(`Export global : ${total} objet(s) sur 3 inventaires`, { type: 'success' });
 }
 
 /**
@@ -75,51 +78,71 @@ function globalImport(file) {
         const total = Object.values(data.inventaires)
           .reduce((s, inv) => s + (inv.items || []).length, 0);
 
-        if (!confirm(
-          `📦 Import global\n\n` +
-          `${total} objet(s) répartis sur les 3 inventaires :\n` +
-          ALL_INVENTORIES.map(({ key, label }) => {
-            const n = (data.inventaires[key]?.items || []).length;
-            return `  ${label} : ${n} objet(s)`;
-          }).join('\n') +
-          `\n\n⚠️ Les 3 inventaires actuels seront remplacés.`
-        )) return;
+        const detail = ALL_INVENTORIES.map(({ key, label }) => {
+          const n = (data.inventaires[key]?.items || []).length;
+          return `${label} — ${n} objet(s)`;
+        }).join('<br>');
 
-        ALL_INVENTORIES.forEach(({ key }) => {
-          const inv = data.inventaires[key];
-          if (!inv) return;
-          localStorage.setItem(key, JSON.stringify({
-            items:      inv.items || [],
-            customCats: _normCats(inv.customCats),
-            v: 5, savedAt: new Date().toISOString()
-          }));
+        _confirmDialog({
+          title:    'Import global',
+          html:     `Ce fichier contient <strong>${total} objet(s)</strong> répartis sur les 3 inventaires :` +
+                    `<div class="cm-list">${detail}</div>` +
+                    `<br>Les 3 inventaires actuels seront <strong>remplacés</strong>.`,
+          okLabel:  'Remplacer tout',
+          danger:   true,
+        }).then(ok => {
+          if (!ok) return;
+          ALL_INVENTORIES.forEach(({ key }) => {
+            const inv = data.inventaires[key];
+            if (!inv) return;
+            localStorage.setItem(key, JSON.stringify({
+              items:      inv.items || [],
+              customCats: _normCats(inv.customCats),
+              capacity:   inv.capacity,
+              v: 6, savedAt: new Date().toISOString()
+            }));
+          });
+          if (window.inv) { window.inv._load(); window.inv.render(); }
+          _refreshIndexCounts();
+          _showToast(`Import global réussi — ${total} objet(s) chargés`, { type: 'success' });
         });
-
-        if (window.inv) { window.inv._load(); window.inv.render(); }
-        _showToast(`✅ Import global réussi — ${total} objet(s) chargés`);
         return;
       }
 
       /* ── Export INDIVIDUEL (ancien format) ── */
       const count = (data.items || []).length;
-      if (!confirm(
-        `📦 Ce fichier contient un export individuel (${count} objet(s)).\n` +
-        `L'importer dans l'inventaire actuel uniquement ?`
-      )) return;
-
-      if (window.inv) {
-        window.inv.items      = data.items      || [];
+      _confirmDialog({
+        title:   'Import individuel',
+        html:    `Ce fichier contient un export individuel (<strong>${count} objet(s)</strong>).<br>` +
+                 `L'importer dans l'inventaire actuel uniquement ?`,
+        okLabel: 'Importer ici',
+      }).then(ok => {
+        if (!ok || !window.inv) return;
+        window.inv.items      = data.items || [];
         window.inv.customCats = _normCats(data.customCats);
         window.inv._save();
         window.inv.render();
-        _showToast(`✅ ${count} objet(s) importés`);
-      }
+        _showToast(`${count} objet(s) importés`, { type: 'success' });
+      });
 
     } catch {
-      alert('❌ Fichier JSON invalide ou corrompu.');
+      _showToast('Fichier JSON invalide ou corrompu.', { type: 'danger' });
     }
   };
   reader.readAsText(file);
+}
+
+/** Met à jour les compteurs de la page d'accueil si présents */
+function _refreshIndexCounts() {
+  ALL_INVENTORIES.forEach(({ key }) => {
+    const el = document.getElementById(`count-${key}`);
+    if (!el) return;
+    try {
+      const raw = localStorage.getItem(key);
+      const n   = raw ? (JSON.parse(raw).items || []).length : 0;
+      el.textContent = n + ' objet' + (n !== 1 ? 's' : '');
+    } catch {}
+  });
 }
 
 /* ══════════════════════════════════════════════
@@ -132,6 +155,7 @@ class Inventory {
     this.title       = cfg.title;
     this.items       = [];
     this.customCats  = [];
+    this.capacity    = ALL_INVENTORIES.find(i => i.key === cfg.key)?.defaultCapacity || 50;
     this.editId      = null;
     this.moveItemId  = null;
     this.filter      = '';
@@ -139,9 +163,11 @@ class Inventory {
     this.magicFilter = false;
     this.sortKey     = 'nom';
     this.sortDir     = 1;
+    this._firstRender = true;
 
     this._load();
     this._bindEvents();
+    this._refreshCatSelect();
     this.render();
     this._updateIndexCounts();
   }
@@ -155,6 +181,7 @@ class Inventory {
       const d = JSON.parse(raw);
       this.items      = Array.isArray(d.items) ? d.items : [];
       this.customCats = _normCats(d.customCats);
+      if (parseFloat(d.capacity) > 0) this.capacity = parseFloat(d.capacity);
     } catch (e) { console.warn('Erreur chargement inventaire:', e); }
   }
 
@@ -162,7 +189,8 @@ class Inventory {
     try {
       localStorage.setItem(this.key, JSON.stringify({
         items: this.items, customCats: this.customCats,
-        v: 5, savedAt: new Date().toISOString()
+        capacity: this.capacity,
+        v: 6, savedAt: new Date().toISOString()
       }));
     } catch (e) { console.warn('Erreur sauvegarde:', e); }
   }
@@ -173,10 +201,15 @@ class Inventory {
 
   addCategory(nom, type = 'autre') {
     nom = (nom || '').trim();
-    if (!nom || this.cats.some(c => c.nom === nom)) return;
+    if (!nom) return;
+    if (this.cats.some(c => c.nom === nom)) {
+      _showToast(`La catégorie « ${nom} » existe déjà.`, { type: 'warn' });
+      return;
+    }
     this.customCats.push({ nom, type });
     this._save();
     this._refreshCatSelect();
+    _showToast(`Catégorie « ${nom} » ajoutée`, { type: 'success' });
   }
 
   /* ──────── Computed ──────── */
@@ -196,9 +229,10 @@ class Inventory {
     if (this.typeFilter) items = items.filter(i => (i.type || 'autre') === this.typeFilter);
     if (this.magicFilter) items = items.filter(i => !!i.magique);
     items.sort((a, b) => {
-      let va = a[this.sortKey] ?? '', vb = b[this.sortKey] ?? '';
-      if (typeof va === 'string') va = va.toLowerCase();
-      if (typeof vb === 'string') vb = vb.toLowerCase();
+      const va = a[this.sortKey] ?? '', vb = b[this.sortKey] ?? '';
+      if (typeof va === 'string' || typeof vb === 'string') {
+        return String(va).localeCompare(String(vb), 'fr', { sensitivity: 'base', numeric: true }) * this.sortDir;
+      }
       return va < vb ? -this.sortDir : va > vb ? this.sortDir : 0;
     });
     return items;
@@ -217,9 +251,32 @@ class Inventory {
 
   _uid() { return `${Date.now()}_${Math.random().toString(36).slice(2,7)}`; }
 
-  addItem(data)     { this.items.push({ ...data, id: this._uid() }); this._save(); this.render(); }
-  deleteItem(id)    { if (!confirm('Supprimer cet objet ?')) return; this.items = this.items.filter(i => i.id !== id); this._save(); this.render(); }
-  dupeItem(id)      { const s = this.items.find(i => i.id === id); if (s) this.addItem({ ...s, nom: s.nom + ' (copie)', porte: false, surMoi: false }); }
+  addItem(data) { this.items.push({ ...data, id: this._uid() }); this._save(); this.render(); }
+
+  /** Suppression immédiate + toast « Annuler » (pas de confirm bloquant) */
+  deleteItem(id) {
+    const idx = this.items.findIndex(i => i.id === id);
+    if (idx < 0) return;
+    const [removed] = this.items.splice(idx, 1);
+    this._save(); this.render();
+    _showToast(`« ${removed.nom} » supprimé`, {
+      type: 'danger',
+      duration: 6500,
+      actionLabel: 'Annuler',
+      onAction: () => {
+        this.items.splice(Math.min(idx, this.items.length), 0, removed);
+        this._save(); this.render();
+        _showToast(`« ${removed.nom} » restauré`, { type: 'success' });
+      }
+    });
+  }
+
+  dupeItem(id) {
+    const s = this.items.find(i => i.id === id);
+    if (!s) return;
+    this.addItem({ ...s, nom: s.nom + ' (copie)', porte: false, surMoi: false });
+    _showToast(`« ${s.nom} » dupliqué`, { type: 'success' });
+  }
 
   updateItem(id, data) {
     const idx = this.items.findIndex(x => x.id === id);
@@ -230,7 +287,78 @@ class Inventory {
     const item = this.items.find(i => i.id === id);
     if (!item) return;
     item[field] = !item[field];
-    this._save(); this._renderTable(); this._renderStats();
+    this._save(); this._renderTable(); this._renderStats(); this._renderGauge();
+  }
+
+  /* ──────── Capacité / Jauge de charge ──────── */
+
+  setCapacity(val) {
+    const v = parseFloat(val);
+    if (!(v > 0)) return;
+    this.capacity = v;
+    this._save();
+    this._renderGauge();
+    _showToast(`Capacité fixée à ${v} kg`, { type: 'success' });
+  }
+
+  editCapacity() {
+    const wrap = document.getElementById('lgCapWrap');
+    if (!wrap || wrap.querySelector('input')) return;
+    const input = document.createElement('input');
+    input.type = 'number'; input.min = '1'; input.step = '1';
+    input.value = this.capacity;
+    input.className = 'lg-cap-input';
+    input.setAttribute('aria-label', 'Capacité de charge en kg');
+    const done = (commit) => {
+      if (commit && input.value) this.setCapacity(input.value);
+      this._renderGauge(); // restaure le bouton
+    };
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter')  { e.preventDefault(); done(true);  }
+      if (e.key === 'Escape') { e.preventDefault(); done(false); }
+    });
+    input.addEventListener('blur', () => done(true));
+    wrap.innerHTML = '';
+    wrap.appendChild(input);
+    input.focus(); input.select();
+  }
+
+  _renderGauge() {
+    const gauge = document.getElementById('loadGauge');
+    if (!gauge) return;
+    const w   = this.totalWeight;
+    const cap = this.capacity || 1;
+    const pct = w / cap;
+
+    const state =
+      pct >= 1   ? 'over'  :
+      pct >= .8  ? 'heavy' :
+      pct >= .5  ? 'warn'  : 'ok';
+    gauge.dataset.state = state;
+
+    const fill = document.getElementById('lgFill');
+    if (fill) fill.style.width = Math.min(pct * 100, 100) + '%';
+
+    const cur = document.getElementById('lgCurrent');
+    if (cur) cur.textContent = w.toFixed(2);
+
+    const capWrap = document.getElementById('lgCapWrap');
+    if (capWrap) {
+      capWrap.innerHTML =
+        `<button class="lg-cap-btn" type="button" onclick="inv.editCapacity()" ` +
+        `title="Modifier la capacité de charge">${this.capacity} kg ✎</button>`;
+    }
+
+    const FLAVOR = {
+      ok:    'Léger comme une plume.',
+      warn:  'Bien chargé, mais le pas reste alerte.',
+      heavy: 'Le dos commence à plier sous le fardeau…',
+      over:  'Surcharge ! Il faut délester avant de reprendre la route.',
+    };
+    const status = document.getElementById('lgStatus');
+    if (status) {
+      status.innerHTML = `${FLAVOR[state]}<span class="lg-pct">${Math.round(pct * 100)} %</span>`;
+    }
   }
 
   /* ──────── Déplacement d'objet ──────── */
@@ -240,11 +368,9 @@ class Inventory {
     if (!item) return;
     this.moveItemId = id;
 
-    // Nom de l'objet
     const nameEl = document.getElementById('moveItemName');
     if (nameEl) nameEl.textContent = item.nom;
 
-    // Options destination (exclure l'inventaire courant)
     const destSel = document.getElementById('moveDest');
     if (destSel) {
       destSel.innerHTML = ALL_INVENTORIES
@@ -253,7 +379,6 @@ class Inventory {
         .join('');
     }
 
-    // Sélecteur de quantité (seulement si > 1)
     const qtyWrap  = document.getElementById('moveQtyWrap');
     const qtyInput = document.getElementById('moveQty');
     const qtyMax   = document.getElementById('moveQtyMax');
@@ -281,8 +406,8 @@ class Inventory {
     const item = this.items.find(i => i.id === this.moveItemId);
     if (!item) return;
 
-    const destKey  = document.getElementById('moveDest')?.value;
-    if (!destKey) { alert('Choisissez une destination.'); return; }
+    const destKey = document.getElementById('moveDest')?.value;
+    if (!destKey) { _showToast('Choisissez une destination.', { type: 'warn' }); return; }
 
     const srcQty   = parseFloat(item.quantite) || 1;
     const qtyInput = document.getElementById('moveQty');
@@ -301,7 +426,7 @@ class Inventory {
     /* Ajouter à la destination (porte/surMoi remis à zéro) */
     destData.items.push({ ...item, id: this._uid(), quantite: moveQty, porte: false, surMoi: false });
     localStorage.setItem(destKey, JSON.stringify({
-      ...destData, v: 5, savedAt: new Date().toISOString()
+      ...destData, v: 6, savedAt: new Date().toISOString()
     }));
 
     /* Mettre à jour la source */
@@ -315,10 +440,10 @@ class Inventory {
     this.closeMoveModal();
 
     const destLabel = ALL_INVENTORIES.find(i => i.key === destKey)?.label || destKey;
-    _showToast(`🔄 ${moveQty}× ${item.nom} → ${destLabel}`);
+    _showToast(`${moveQty}× ${item.nom} → ${destLabel}`, { type: 'success' });
   }
 
-  /* ──────── Modal Édition ──────── */
+  /* ──────── Modale d'édition ──────── */
 
   openModal(id = null) {
     this.editId = id;
@@ -330,10 +455,10 @@ class Inventory {
     if (id) {
       const item = this.items.find(i => i.id === id);
       if (!item) return;
-      title.textContent = '✏️ Modifier l\'objet';
+      title.textContent = 'Modifier l\'objet';
       this._fillForm(form, item);
     } else {
-      title.textContent = '✨ Nouvel objet';
+      title.textContent = 'Nouvel objet';
     }
     document.getElementById('itemModal').classList.add('active');
     setTimeout(() => form.elements['nom']?.focus(), 60);
@@ -376,20 +501,29 @@ class Inventory {
   }
 
   _refreshCatSelect() {
-    const sel = document.getElementById('formCategorie');
-    if (!sel) return;
-    const cur = sel.value;
     const byType = t => this.cats.filter(c => c.type === t);
-    const opts   = cats => cats.map(c =>
-      `<option value="${c.nom}" data-type="${c.type}"${c.nom===cur?' selected':''}>${c.nom}</option>`
-    ).join('');
-    sel.innerHTML =
-      `<optgroup label="⚔️ Armes">${opts(byType('arme'))}</optgroup>` +
-      `<optgroup label="🛡️ Armures">${opts(byType('armure'))}</optgroup>` +
-      `<optgroup label="📦 Autres">${opts(byType('autre'))}</optgroup>`;
+    const build = (cur) => {
+      const opts = cats => cats.map(c =>
+        `<option value="${c.nom}" data-type="${c.type}"${c.nom===cur?' selected':''}>${c.nom}</option>`
+      ).join('');
+      return `<optgroup label="⚔️ Armes">${opts(byType('arme'))}</optgroup>` +
+             `<optgroup label="🛡️ Armures">${opts(byType('armure'))}</optgroup>` +
+             `<optgroup label="📦 Autres">${opts(byType('autre'))}</optgroup>`;
+    };
+    const sel = document.getElementById('formCategorie');
+    if (sel) sel.innerHTML = build(sel.value);
+    const qa = document.getElementById('qaCat');
+    if (qa) {
+      const cur = qa.value || 'Divers';
+      qa.innerHTML = build(cur);
+    }
   }
 
-  submitForm() {
+  /**
+   * Enregistre le formulaire.
+   * @param {boolean} keepOpen — si vrai, garde la modale ouverte pour enchaîner
+   */
+  submitForm(keepOpen = false) {
     const form   = document.getElementById('itemForm');
     const g      = n => { const el = form.elements[n]; if (!el) return ''; return el.type === 'checkbox' ? el.checked : (el.value ?? '').trim(); };
     const catEl  = form.elements['categorie'];
@@ -403,7 +537,14 @@ class Inventory {
       prix:     parseFloat(g('prix'))     || 0,
       magique:  g('magique'),
     };
-    if (!data.nom) { alert('⚠️ Le nom est obligatoire.'); form.elements['nom']?.focus(); return; }
+    if (!data.nom) {
+      _showToast('Le nom de l\'objet est obligatoire.', { type: 'warn' });
+      const nomEl = form.elements['nom'];
+      nomEl?.classList.add('field-error');
+      setTimeout(() => nomEl?.classList.remove('field-error'), 600);
+      nomEl?.focus();
+      return;
+    }
 
     if (type === 'arme') {
       Object.assign(data, {
@@ -417,13 +558,57 @@ class Inventory {
       data.caracteristiques = g('caracteristiques');
     }
 
+    const wasEdit = !!this.editId;
     this.editId ? this.updateItem(this.editId, data) : this.addItem(data);
-    this.closeModal();
+    _showToast(wasEdit ? `« ${data.nom} » modifié` : `« ${data.nom} » ajouté`, { type: 'success' });
+
+    if (keepOpen) {
+      /* Enchaîner : nouveau formulaire vierge, même catégorie */
+      this.editId = null;
+      const keepCat = g('categorie');
+      form.reset();
+      this._refreshCatSelect();
+      if (form.elements['categorie']) form.elements['categorie'].value = keepCat;
+      this._switchTypeFromCatSelect();
+      document.getElementById('modalTitle').textContent = 'Nouvel objet';
+      form.elements['nom']?.focus();
+    } else {
+      this.closeModal();
+    }
+  }
+
+  /* ──────── Ajout rapide ──────── */
+
+  quickAdd(form) {
+    const g = n => form.elements[n]?.value?.trim() ?? '';
+    const nom = g('qa-nom');
+    if (!nom) {
+      form.elements['qa-nom']?.classList.add('field-error');
+      setTimeout(() => form.elements['qa-nom']?.classList.remove('field-error'), 600);
+      return;
+    }
+    const catSel = form.elements['qa-cat'];
+    const selOpt = catSel?.options[catSel?.selectedIndex];
+    this.addItem({
+      nom,
+      categorie: catSel?.value || 'Divers',
+      type:      selOpt?.dataset.type || 'autre',
+      quantite:  parseFloat(g('qa-qte'))   || 1,
+      poids:     parseFloat(g('qa-poids')) || 0,
+      prix:      parseFloat(g('qa-prix'))  || 0,
+      magique:   false,
+    });
+    _showToast(`« ${nom} » ajouté`, { type: 'success' });
+    form.elements['qa-nom'].value   = '';
+    form.elements['qa-qte'].value   = 1;
+    form.elements['qa-poids'].value = '';
+    form.elements['qa-prix'].value  = '';
+    form.elements['qa-nom'].focus();
   }
 
   /* ──────── Rendu ──────── */
 
-  render() { this._renderStats(); this._renderTable(); this._updateIndexCounts(); }
+  render() { this._renderStats(); this._renderGauge(); this._renderTable(); this._updateIndexCounts(); }
 
   _renderStats() {
     const $ = id => document.getElementById(id);
@@ -445,11 +630,18 @@ class Inventory {
     if ($('footValue'))  $('footValue').textContent  = _fmt(fV, 'pm');
     if ($('footCount'))  $('footCount').textContent  = items.length + ' objet' + (items.length > 1 ? 's' : '');
 
+    /* Animation des lignes uniquement au premier rendu */
+    tbody.classList.toggle('rows-animate', this._firstRender);
+    this._firstRender = false;
+
     if (!items.length) {
-      tbody.innerHTML = `<tr><td colspan="9" class="empty-state">
-        <div class="empty-icon">📦</div>
-        <p>Aucun objet trouvé dans cet inventaire</p>
-        <button class="btn btn-primary" onclick="inv.openModal()">✨ Ajouter un objet</button>
+      const isFiltered = this.filter || this.typeFilter || this.magicFilter;
+      tbody.innerHTML = `<tr><td colspan="8" class="empty-state">
+        <div class="empty-icon">${isFiltered ? '🔍' : '📜'}</div>
+        <p>${isFiltered
+          ? 'Aucun objet ne correspond à cette recherche.'
+          : 'Ce registre est encore vierge. Consignez votre premier objet.'}</p>
+        ${isFiltered ? '' : '<button class="btn btn-primary" onclick="inv.openModal()">✦ Ajouter un objet</button>'}
       </td></tr>`;
       return;
     }
@@ -485,10 +677,10 @@ class Inventory {
     const rowClass = [item.surMoi?'row-onme':'', item.magique?'row-magic':''].filter(Boolean).join(' ');
 
     return `<tr data-id="${item.id}" class="${rowClass}">
-      <td><span class="type-badge type-${type}">${TYPE_ICONS[type]||'📦'} ${_esc(item.categorie)}</span>${magicBadge}</td>
-      <td style="font-weight:600">${_esc(item.nom)}</td>
-      <td class="text-c">${item.quantite}</td>
-      <td class="text-c etat-cell">
+      <td class="td-cat"><span class="type-badge type-${type}">${TYPE_ICONS[type]||'📦'} ${_esc(item.categorie)}</span>${magicBadge}</td>
+      <td class="td-name">${_esc(item.nom)}</td>
+      <td class="text-c td-qty" data-label="Quantité">${item.quantite}</td>
+      <td class="text-c etat-cell td-etat" data-label="État">
         <label class="cb-label" title="Poids porté (÷2)">
           <input type="checkbox" class="cb-toggle" ${item.porte?'checked':''} onchange="inv.toggleField('${item.id}','porte')">
           <span class="cb-icon${item.porte?' cb-active':''}">⚖️</span>
@@ -498,14 +690,14 @@ class Inventory {
           <span class="cb-icon${item.surMoi?' cb-active':''}">👤</span>
         </label>
       </td>
-      <td class="text-r">${wLabel}</td>
-      <td class="text-r hide-sm">${prix.toFixed(2)} pm</td>
-      <td class="hide-md-only">${statsHtml}</td>
-      <td class="text-c" style="white-space:nowrap">
-        <button class="icon-btn" onclick="inv.openModal('${item.id}')" title="Modifier">✏️</button>
-        <button class="icon-btn" onclick="inv.openMoveModal('${item.id}')" title="Déplacer vers…">🔄</button>
-        <button class="icon-btn" onclick="inv.dupeItem('${item.id}')" title="Dupliquer">📋</button>
-        <button class="icon-btn del" onclick="inv.deleteItem('${item.id}')" title="Supprimer">🗑️</button>
+      <td class="text-r td-weight" data-label="Poids total">${wLabel}</td>
+      <td class="text-r hide-sm td-price" data-label="Prix / u">${prix.toFixed(2)} pm</td>
+      <td class="hide-md-only td-stats" data-label="Caractéristiques">${statsHtml}</td>
+      <td class="text-c td-actions" style="white-space:nowrap">
+        <button class="icon-btn" onclick="inv.openModal('${item.id}')" title="Modifier" aria-label="Modifier">✏️</button>
+        <button class="icon-btn" onclick="inv.openMoveModal('${item.id}')" title="Déplacer vers…" aria-label="Déplacer">🔄</button>
+        <button class="icon-btn" onclick="inv.dupeItem('${item.id}')" title="Dupliquer" aria-label="Dupliquer">📋</button>
+        <button class="icon-btn del" onclick="inv.deleteItem('${item.id}')" title="Supprimer" aria-label="Supprimer">🗑️</button>
       </td>
     </tr>`;
   }
@@ -544,7 +736,7 @@ class Inventory {
     });
 
     const win = window.open('', '_blank', 'width=860,height=760');
-    if (!win) { alert('Autorisez les popups pour générer le PDF.'); return; }
+    if (!win) { _showToast('Autorisez les popups pour générer le PDF.', { type: 'warn' }); return; }
     win.document.write(this._buildPrintHTML(sorted));
     win.document.close();
   }
@@ -569,7 +761,6 @@ class Inventory {
     }
 
     const TYPE_ICON_PRINT = { arme:'⚔', armure:'🛡', autre:'◆' };
-    const TYPE_LABEL      = { arme:'Arme', armure:'Armure', autre:'Autre' };
     const esc = s => s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
     const rows = groups.map(g => {
@@ -583,14 +774,12 @@ class Inventory {
         const qty   = parseInt(item.quantite)||0;
         const effW  = poids * qty * (item.porte ? .5 : 1);
 
-        /* Flags */
         const flags = [
           item.magique ? '✨ Magique'         : '',
           item.surMoi  ? '👤 Sur moi'          : '',
           item.porte   ? '⚖ Porté (poids ÷2)' : '',
         ].filter(Boolean).join(' · ');
 
-        /* Stats */
         let stats = '';
         if (type === 'arme') {
           const chips = [
@@ -713,8 +902,8 @@ sup { font-size: 6pt; color: #1565C0; }
   </div>
   <div class="hdr-r">
     <strong>${date}</strong><br>
-    Généré depuis Stella<br>
-    <em>Gestion d'inventaires RPG</em>
+    Généré depuis Le Registre<br>
+    <em>Inventaires de Stella</em>
   </div>
 </div>
 
@@ -752,7 +941,7 @@ sup { font-size: 6pt; color: #1565C0; }
 
 <!-- FOOTER -->
 <div class="ftr">
-  <span>⚜ Stella — Gestionnaire d'inventaires RPG</span>
+  <span>⚜ Le Registre — Inventaires de Stella</span>
   <span>Imprimé le ${date}</span>
 </div>
 
@@ -767,8 +956,6 @@ sup { font-size: 6pt; color: #1565C0; }
 </body>
 </html>`;
   }
-
-
 
   _updateIndexCounts() {
     const el = document.getElementById(`count-${this.key}`);
@@ -787,7 +974,20 @@ sup { font-size: 6pt; color: #1565C0; }
     document.getElementById('moveModal')?.addEventListener('click', e => { if (e.target.id==='moveModal') this.closeMoveModal(); });
     document.addEventListener('keydown', e => { if (e.key==='Escape') { this.closeModal(); this.closeMoveModal(); } });
 
-    document.getElementById('itemForm')?.addEventListener('submit', e => { e.preventDefault(); this.submitForm(); });
+    /* Raccourci « / » → focus recherche */
+    document.addEventListener('keydown', e => {
+      if (e.key !== '/' || e.ctrlKey || e.metaKey || e.altKey) return;
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      e.preventDefault();
+      document.getElementById('searchInput')?.focus();
+    });
+
+    document.getElementById('itemForm')?.addEventListener('submit', e => { e.preventDefault(); this.submitForm(false); });
+    document.getElementById('btnSaveNew')?.addEventListener('click', () => this.submitForm(true));
+
+    /* Ajout rapide */
+    document.getElementById('quickAdd')?.addEventListener('submit', e => { e.preventDefault(); this.quickAdd(e.target); });
 
     /* Quantité déplacement : clamper à la volée */
     document.getElementById('moveQty')?.addEventListener('input', e => {
@@ -796,11 +996,10 @@ sup { font-size: 6pt; color: #1565C0; }
       if (parseInt(e.target.value) < 1)   e.target.value = 1;
     });
 
-    /* Import individuel */
+    /* Import individuel/global (auto-détection) */
     document.getElementById('importFile')?.addEventListener('change', e => {
       const f = e.target.files[0];
       if (!f) return;
-      /* Passer par globalImport qui auto-détecte le format */
       globalImport(f);
       e.target.value = '';
     });
@@ -815,7 +1014,6 @@ sup { font-size: 6pt; color: #1565C0; }
     });
 
     document.querySelectorAll('th[data-sort]').forEach(th => {
-      th.style.cursor = 'pointer';
       th.addEventListener('click', () => this.setSort(th.dataset.sort));
     });
   }
@@ -838,11 +1036,92 @@ function _downloadJSON(obj, filename) {
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
-function _showToast(msg) {
-  const t = Object.assign(document.createElement('div'), { className: 'toast', textContent: msg });
-  document.body.appendChild(t);
+/**
+ * Notification empilable.
+ * @param {string} msg
+ * @param {{type?:'info'|'success'|'warn'|'danger', duration?:number, actionLabel?:string, onAction?:Function}} opts
+ */
+function _showToast(msg, opts = {}) {
+  const { type = 'info', duration = 3400, actionLabel, onAction } = opts;
+
+  let zone = document.getElementById('toastZone');
+  if (!zone) {
+    zone = Object.assign(document.createElement('div'), { id: 'toastZone' });
+    zone.setAttribute('aria-live', 'polite');
+    document.body.appendChild(zone);
+  }
+
+  const t = document.createElement('div');
+  t.className = `toast toast-${type}`;
+  t.appendChild(Object.assign(document.createElement('span'), { textContent: msg }));
+
+  let timer;
+  const dismiss = () => {
+    clearTimeout(timer);
+    t.classList.remove('toast-show');
+    setTimeout(() => t.remove(), 320);
+  };
+
+  if (actionLabel && onAction) {
+    const btn = Object.assign(document.createElement('button'), {
+      className: 'toast-action', textContent: actionLabel, type: 'button'
+    });
+    btn.addEventListener('click', () => { onAction(); dismiss(); });
+    t.appendChild(btn);
+  }
+
+  zone.appendChild(t);
   requestAnimationFrame(() => t.classList.add('toast-show'));
-  setTimeout(() => { t.classList.remove('toast-show'); setTimeout(() => t.remove(), 320); }, 3200);
+  timer = setTimeout(dismiss, duration);
+}
+
+/**
+ * Dialogue de confirmation maison (remplace window.confirm).
+ * @returns {Promise<boolean>}
+ */
+function _confirmDialog({ title = 'Confirmer', html = '', okLabel = 'Confirmer', cancelLabel = 'Annuler', danger = false } = {}) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.innerHTML = `
+      <div class="modal-box confirm-box">
+        <div class="modal-head">
+          <h3>${title}</h3>
+          <button class="modal-close" data-act="cancel" aria-label="Fermer">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="confirm-msg">${html}</div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" data-act="cancel">${cancelLabel}</button>
+          <button class="btn ${danger ? 'btn-danger' : 'btn-primary'}" data-act="ok">${okLabel}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+
+    const close = (val) => {
+      overlay.classList.remove('active');
+      document.removeEventListener('keydown', onKey);
+      setTimeout(() => overlay.remove(), 260);
+      resolve(val);
+    };
+    const onKey = e => { if (e.key === 'Escape') close(false); };
+
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) close(false);
+      const act = e.target.closest('[data-act]')?.dataset.act;
+      if (act === 'ok')     close(true);
+      if (act === 'cancel') close(false);
+    });
+    document.addEventListener('keydown', onKey);
+
+    requestAnimationFrame(() => {
+      overlay.classList.add('active');
+      overlay.querySelector('[data-act="ok"]')?.focus();
+    });
+  });
 }
 
 function _esc(str) {

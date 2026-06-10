@@ -3,68 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Inventaires — Stella</title>
+  <meta name="theme-color" content="#14100A">
+  <title>Le Registre — Inventaires de Stella</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    .welcome-header {
-      background: linear-gradient(130deg, var(--brown-dark) 0%, var(--brown-main) 60%, var(--brown-light) 100%);
-      border-radius: var(--radius-lg);
-      padding: 40px 36px;
-      margin-bottom: 28px;
-      border: 2px solid var(--gold-dark);
-      box-shadow: var(--shadow-md);
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .welcome-header::before {
-      content: '⚜';
-      position: absolute; left: 28px; top: 50%; transform: translateY(-50%);
-      font-size: 2.8rem; opacity: .25; color: var(--gold-main);
-    }
-    .welcome-header::after {
-      content: '⚜';
-      position: absolute; right: 28px; top: 50%; transform: translateY(-50%);
-      font-size: 2.8rem; opacity: .25; color: var(--gold-main);
-    }
-    .welcome-header h1 { color: var(--parch-light); margin-bottom: 10px; }
-    .welcome-header p {
-      color: var(--gold-light);
-      font-family: 'Crimson Text', serif;
-      font-style: italic;
-      font-size: 1.15rem;
-      opacity: .9;
-    }
-    .section-title {
-      font-family: 'Cinzel', serif;
-      font-size: 1.1rem;
-      color: var(--brown-dark);
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid var(--parch-dark);
-    }
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
-    }
-    .info-card {
-      background: var(--parch-light);
-      border-radius: var(--radius);
-      border: 1px solid var(--parch-dark);
-      padding: 18px 20px;
-      box-shadow: var(--shadow-sm);
-    }
-    .info-card h3 { font-size: .85rem; color: var(--brown-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .8px; }
-    .info-card p { font-size: .88rem; color: var(--text-muted); font-family: 'Crimson Text', serif; line-height: 1.6; }
-  </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
+  <!-- ══ BARRE LATÉRALE ══ -->
   <nav class="sidebar">
-    <div class="sidebar-logo">⚜ INVENTAIRES<span>Gestionnaire d'équipement</span></div>
+    <div class="sidebar-logo">
+      <span class="logo-mark">✦</span>
+      <span class="logo-title">LE REGISTRE</span>
+      <span class="logo-sub">Inventaires de Stella</span>
+    </div>
     <div class="sidebar-nav">
       <a href="index.html" class="active"><span class="nav-icon">🏠</span> Accueil</a>
       <a href="perso.html"><span class="nav-icon">👤</span> Perso · Dorusis</a>
@@ -72,7 +23,7 @@
       <a href="guilde.html"><span class="nav-icon">⚔️</span> Guilde</a>
     </div>
     <div class="sidebar-global">
-      <div class="sidebar-global-title">🌐 Global · 3 inventaires</div>
+      <div class="sidebar-global-title">Global · 3 inventaires</div>
       <button class="sg-btn" onclick="globalExport()">💾 Exporter tout</button>
       <label class="sg-btn">
         📂 Importer tout
@@ -80,10 +31,10 @@
                onchange="if(this.files[0])globalImport(this.files[0]);this.value=''">
       </label>
     </div>
-    <div class="sidebar-footer">Données stockées localement.</div>
+    <div class="sidebar-footer">Données conservées localement,<br>à la lueur de la chandelle.</div>
   </nav>
 
-  <!-- Mobile nav -->
+  <!-- ══ NAVIGATION MOBILE ══ -->
   <nav class="mobile-nav">
     <div class="mobile-nav-inner">
       <a href="index.html" class="active"><span class="mn-icon">🏠</span> Accueil</a>
@@ -93,61 +44,73 @@
     </div>
   </nav>
 
-  <!-- Contenu principal -->
+  <!-- ══ CONTENU PRINCIPAL ══ -->
   <main class="main-wrap fade-up">
 
-    <div class="welcome-header">
-      <h1>⚜ GESTIONNAIRE D'INVENTAIRES ⚜</h1>
-      <p>Gérez vos équipements, armes et objets — avec poids, prix et statistiques</p>
-    </div>
+    <!-- Héros -->
+    <header class="welcome-hero">
+      <span class="hero-mark">✦</span>
+      <h1>LE REGISTRE</h1>
+      <div class="ornament">✦</div>
+      <p class="hero-sub">Trois inventaires consignés à la plume : ce que porte Dorusis,
+      ce que traîne le chariot, et ce que garde la guilde.</p>
+    </header>
 
-    <!-- Cartes de navigation -->
-    <h2 class="section-title">🗺️ Inventaires</h2>
+    <!-- Les trois registres -->
+    <h2 class="section-title">Les trois registres</h2>
     <div class="nav-cards">
 
       <a href="perso.html" class="nav-card perso">
         <span class="nav-card-icon">👤</span>
         <div class="nav-card-title">Perso · Dorusis</div>
-        <div class="nav-card-sub">Équipement personnel du personnage</div>
+        <div class="nav-card-sub">L'équipement que le héros porte sur lui.</div>
         <div class="nav-card-count" id="count-inv_perso">— objets</div>
       </a>
 
       <a href="chariot.html" class="nav-card chariot">
         <span class="nav-card-icon">🛒</span>
         <div class="nav-card-title">Chariot</div>
-        <div class="nav-card-sub">Inventaire du chariot de transport</div>
+        <div class="nav-card-sub">Tout ce que la carriole emporte en voyage.</div>
         <div class="nav-card-count" id="count-inv_chariot">— objets</div>
       </a>
 
       <a href="guilde.html" class="nav-card guilde">
         <span class="nav-card-icon">⚔️</span>
         <div class="nav-card-title">Guilde</div>
-        <div class="nav-card-sub">Trésor commun de la confrérie</div>
+        <div class="nav-card-sub">Le trésor commun de la confrérie.</div>
         <div class="nav-card-count" id="count-inv_guilde">— objets</div>
       </a>
 
     </div>
 
-    <!-- Infos -->
-    <h2 class="section-title" style="margin-top:32px">📖 Fonctionnalités</h2>
+    <!-- Fonctionnalités -->
+    <h2 class="section-title">Ce que le Registre sait faire</h2>
     <div class="info-grid">
       <div class="info-card">
         <h3>⚔️ Types d'objets</h3>
         <p><strong>Arme :</strong> initiative, attaque, parade, seconde parade, dommage.<br>
            <strong>Armure :</strong> encaissement.<br>
-           <strong>Autre :</strong> champ texte libre pour les propriétés.</p>
+           <strong>Autre :</strong> champ libre pour les propriétés.</p>
       </div>
       <div class="info-card">
-        <h3>⚖️ Poids & Prix</h3>
-        <p>Chaque objet a un poids et un prix à l'unité. Les totaux sont calculés automatiquement selon la quantité.</p>
+        <h3>⚖️ Charge & valeur</h3>
+        <p>Poids et prix calculés selon les quantités. La jauge de charge vous avertit quand le fardeau devient trop lourd — la capacité se règle pour chaque inventaire.</p>
+      </div>
+      <div class="info-card">
+        <h3>✦ Ajout rapide</h3>
+        <p>Consignez un objet en quelques touches avec la barre d'ajout rapide, ou enchaînez les saisies avec « Enregistrer + nouveau ». La touche <strong>/</strong> ouvre la recherche.</p>
+      </div>
+      <div class="info-card">
+        <h3>🔄 Déplacements</h3>
+        <p>Faites passer un objet — ou une partie d'une pile — d'un inventaire à l'autre. Une suppression malheureuse ? Le bouton « Annuler » la répare aussitôt.</p>
       </div>
       <div class="info-card">
         <h3>💾 Sauvegarde</h3>
-        <p>Les données sont sauvegardées automatiquement dans le navigateur. Exportez en JSON pour sauvegarder ou partager, et réimportez quand vous voulez.</p>
+        <p>Tout est enregistré automatiquement dans le navigateur. Exportez les trois inventaires en un seul fichier JSON, et réimportez-le quand vous voulez.</p>
       </div>
       <div class="info-card">
-        <h3>🔍 Recherche & Tri</h3>
-        <p>Filtrez par nom, catégorie ou type. Triez par n'importe quelle colonne en cliquant sur l'en-tête. Dupliquez les objets similaires.</p>
+        <h3>🖨️ Impression</h3>
+        <p>Chaque inventaire se transforme en fiche PDF A4 propre, groupée par catégorie, prête à poser sur la table de jeu.</p>
       </div>
     </div>
 
@@ -155,17 +118,7 @@
 
   <script src="inventory.js"></script>
   <script>
-    // Charger les compteurs de chaque inventaire
-    ['inv_perso', 'inv_chariot', 'inv_guilde'].forEach(key => {
-      try {
-        const raw = localStorage.getItem(key);
-        if (!raw) return;
-        const d = JSON.parse(raw);
-        const n = (d.items || []).length;
-        const el = document.getElementById(`count-${key}`);
-        if (el) el.textContent = n + ' objet' + (n !== 1 ? 's' : '');
-      } catch {}
-    });
+    _refreshIndexCounts();
   </script>
 
 </body>
