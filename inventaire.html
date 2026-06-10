@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#14100A">
+  <title>Le Registre</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+</head>
+<body>
+
+  <!-- ══ BARRE LATÉRALE ══ -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-mark">✦</span>
+      <span class="logo-title">LE REGISTRE</span>
+      <span class="logo-sub">Inventaires de Stella</span>
+    </div>
+    <div class="sidebar-nav">
+      <a href="index.html"><span class="nav-icon">🏠</span> Accueil</a>
+      <div id="sidebarNavInv"></div>
+      <button type="button" class="nav-new-btn" onclick="openInvCreate()">＋ Nouveau registre</button>
+    </div>
+    <div class="sidebar-global">
+      <div class="sidebar-global-title">Global · tous les registres</div>
+      <button class="sg-btn" onclick="globalExport()">💾 Exporter tout</button>
+      <label class="sg-btn">
+        📂 Importer tout
+        <input type="file" accept=".json" style="display:none"
+               onchange="if(this.files[0])globalImport(this.files[0]);this.value=''">
+      </label>
+      <button class="sg-btn" id="installBtn" style="display:none" onclick="promptInstall()">📲 Installer l'application</button>
+    </div>
+    <div class="sidebar-footer">Données conservées localement,<br>à la lueur de la chandelle.</div>
+  </nav>
+
+  <!-- ══ NAVIGATION MOBILE ══ -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <a href="index.html"><span class="mn-icon">🏠</span> Accueil</a>
+      <span id="mobileNavInv" style="display:contents"></span>
+    </div>
+  </nav>
+
+  <!-- ══ CONTENU PRINCIPAL ══ -->
+  <main class="main-wrap fade-up">
+
+    <!-- En-tête -->
+    <header class="page-header">
+      <div class="ph-eyebrow" id="phEyebrow">Registre</div>
+      <h1 id="phTitle"></h1>
+      <p class="page-header-sub" id="phSub"></p>
+      <span class="page-header-ornament" id="phOrnament"></span>
+    </header>
+
+    <!-- Cartes de statistiques -->
+    <div class="stats-bar stats-bar-4">
+      <div class="stat-card">
+        <span class="stat-icon">📦</span>
+        <div>
+          <div class="stat-label">Objets</div>
+          <div class="stat-value" id="statItems">0</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">⚖️</span>
+        <div>
+          <div class="stat-label">Poids effectif</div>
+          <div class="stat-value" id="statWeight">0.00 kg</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">💰</span>
+        <div>
+          <div class="stat-label">Valeur totale</div>
+          <div class="stat-value" id="statValue">0.00 pm</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✨</span>
+        <div>
+          <div class="stat-label">Objets magiques</div>
+          <div class="stat-value" id="statMagic">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jauge de charge -->
+    <div class="load-gauge" id="loadGauge" data-state="ok">
+      <div class="lg-head">
+        <span class="lg-title">Charge</span>
+        <span class="lg-value"><b id="lgCurrent">0.00</b> kg / <span id="lgCapWrap"></span></span>
+      </div>
+      <div class="lg-track"><div class="lg-fill" id="lgFill"></div></div>
+      <div class="lg-status" id="lgStatus"></div>
+    </div>
+
+    <!-- Barre de contrôles -->
+    <div class="controls-bar">
+      <button class="btn btn-primary" onclick="inv.openModal()">✦ Ajouter un objet</button>
+
+      <div class="search-wrap">
+        <input type="search" id="searchInput" placeholder="Rechercher un objet…">
+        <span class="search-key">/</span>
+      </div>
+
+      <select class="filter-select" id="typeFilter" aria-label="Filtrer par type">
+        <option value="">Tous les types</option>
+        <option value="arme">⚔️ Armes</option>
+        <option value="armure">🛡️ Armures</option>
+        <option value="autre">📦 Autres</option>
+      </select>
+
+      <label class="filter-check" id="magicFilterLabel">
+        <input type="checkbox" id="magicFilter" onchange="this.closest('label').classList.toggle('active',this.checked)">
+        ✨ Magiques
+      </label>
+
+      <div class="spacer"></div>
+
+      <label class="btn btn-ghost" style="cursor:pointer" title="Importer un fichier JSON (auto-détecte individuel ou global)">
+        📂 Importer
+        <input type="file" id="importFile" accept=".json" style="display:none">
+      </label>
+      <button class="btn btn-ghost" onclick="globalExport()" title="Exporter tous les registres en JSON">💾 Exporter tout</button>
+      <button class="btn btn-ghost" onclick="openInvSettings(inv.key)" title="Renommer, changer d'icône ou supprimer ce registre">⚙ Registre</button>
+      <button class="btn btn-secondary" onclick="inv.printInventory()" title="Générer un PDF imprimable A4">🖨️ PDF A4</button>
+    </div>
+
+    <!-- Ajout rapide -->
+    <form class="quick-add" id="quickAdd" autocomplete="off">
+      <span class="qa-label">Ajout rapide</span>
+      <input class="qa-nom" name="qa-nom" type="text" placeholder="Nom de l'objet…" aria-label="Nom de l'objet">
+      <select class="qa-cat" name="qa-cat" id="qaCat" aria-label="Catégorie"></select>
+      <input class="qa-num" name="qa-qte" type="number" value="1" min="0" step="1" title="Quantité" aria-label="Quantité">
+      <input class="qa-num" name="qa-poids" type="number" placeholder="kg" min="0" step="0.1" title="Poids par unité (kg)" aria-label="Poids par unité">
+      <input class="qa-num" name="qa-prix" type="number" placeholder="pm" min="0" step="0.01" title="Prix par unité (pm)" aria-label="Prix par unité">
+      <button class="btn btn-primary" type="submit">Ajouter</button>
+      <button type="button" class="qa-more" onclick="inv.openModal()" title="Ouvrir le formulaire complet (stats d'arme, magie…)">Détails…</button>
+    </form>
+
+    <!-- Tableau -->
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th data-sort="categorie" class="sortable">Catégorie / Type <span class="sort-arrow"></span></th>
+              <th data-sort="nom" class="sortable sort-asc">Nom <span class="sort-arrow"></span></th>
+              <th data-sort="quantite" class="sortable" style="text-align:center">Qté <span class="sort-arrow"></span></th>
+              <th style="text-align:center" title="⚖️ Poids porté (÷2) · 👤 Sur moi">État</th>
+              <th style="text-align:right">Poids total</th>
+              <th data-sort="prix" class="sortable hide-sm" style="text-align:right">Prix/u <span class="sort-arrow"></span></th>
+              <th class="hide-md-only">Caractéristiques</th>
+              <th style="text-align:center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Pied de tableau -->
+      <div class="table-footer">
+        <div class="foot-item">📦 <span class="foot-val" id="footCount">0 objet</span></div>
+        <div class="foot-item">⚖️ <span class="foot-val" id="footWeight">0.00 kg</span></div>
+        <div class="foot-item">💰 <span class="foot-val" id="footValue">0.00 pm</span></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ══ MODALE AJOUT / MODIFICATION ══ -->
+  <div id="itemModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+
+      <div class="modal-head">
+        <h3 id="modalTitle">Nouvel objet</h3>
+        <button class="modal-close" onclick="inv.closeModal()" aria-label="Fermer">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <form id="itemForm" novalidate>
+
+          <!-- Informations de base -->
+          <div class="form-grid">
+            <div class="field full-width">
+              <label>Nom de l'objet *</label>
+              <input name="nom" type="text" placeholder="Ex : Épée longue enchantée" autocomplete="off" required>
+            </div>
+            <div class="field full-width">
+              <label>Catégorie <span class="field-hint">(détermine le type de champs)</span></label>
+              <select name="categorie" id="formCategorie"></select>
+            </div>
+            <div class="field">
+              <label>Quantité</label>
+              <input name="quantite" type="number" value="1" min="0" step="1">
+            </div>
+            <div class="field">
+              <label>Poids (kg / unité)</label>
+              <input name="poids" type="number" value="0" min="0" step="0.1" placeholder="0.0">
+            </div>
+            <div class="field">
+              <label>Prix (pm / unité)</label>
+              <input name="prix" type="number" value="0" min="0" step="0.01" placeholder="0.00">
+            </div>
+            <div class="field" style="justify-content:flex-end">
+              <label class="magic-toggle-wrap">
+                <input type="checkbox" name="magique" id="f-magique">
+                ✨ Objet magique
+              </label>
+            </div>
+          </div>
+
+          <!-- ─── Champs ARME ─── -->
+          <div id="fields-arme" class="type-section" style="display:none">
+            <h4>⚔️ Statistiques d'arme</h4>
+            <div class="form-grid cols-5">
+              <div class="field">
+                <label>Initiative</label>
+                <input name="initiative" type="text" placeholder="+1">
+              </div>
+              <div class="field">
+                <label>Attaque</label>
+                <input name="attaque" type="text" placeholder="+2">
+              </div>
+              <div class="field">
+                <label>Parade</label>
+                <input name="parade" type="text" placeholder="+1">
+              </div>
+              <div class="field">
+                <label>Seconde Parade</label>
+                <input name="seconde_parade" type="text" placeholder="0">
+              </div>
+              <div class="field">
+                <label>Dommage</label>
+                <input name="dommage" type="text" placeholder="1d8+2">
+              </div>
+            </div>
+            <div class="field full-width" style="margin-top:10px">
+              <label>Autres propriétés</label>
+              <textarea name="autres" rows="2" placeholder="Notes, effets spéciaux, enchantements…"></textarea>
+            </div>
+          </div>
+
+          <!-- ─── Champs ARMURE ─── -->
+          <div id="fields-armure" class="type-section" style="display:none">
+            <h4>🛡️ Protection</h4>
+            <div class="form-grid cols-3">
+              <div class="field">
+                <label>Encaissement</label>
+                <input name="encaissement" type="text" placeholder="3">
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── Champs AUTRE ─── -->
+          <div id="fields-autre" class="type-section">
+            <h4>📋 Caractéristiques</h4>
+            <div class="field">
+              <label>Description / Propriétés</label>
+              <textarea name="caracteristiques" rows="3" placeholder="Décrivez les propriétés, effets ou notes sur cet objet…"></textarea>
+            </div>
+          </div>
+
+          <!-- Ajouter une catégorie personnalisée -->
+          <div class="cat-add-row">
+            <span class="car-label">＋ Catégorie :</span>
+            <input id="newCatInput" type="text" placeholder="Nom de la nouvelle catégorie…">
+            <select id="newCatType" title="Type de la nouvelle catégorie">
+              <option value="autre">📦 Autre</option>
+              <option value="arme">⚔️ Arme</option>
+              <option value="armure">🛡️ Armure</option>
+            </select>
+            <button type="button" id="addCatBtn" class="btn-sm">Ajouter</button>
+          </div>
+
+        </form>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" onclick="inv.closeModal()">Annuler</button>
+        <button type="button" id="btnSaveNew" class="btn btn-secondary" title="Enregistrer puis saisir l'objet suivant">Enregistrer + nouveau</button>
+        <button type="submit" form="itemForm" class="btn btn-primary">Enregistrer</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ MODALE DÉPLACEMENT ══ -->
+  <div id="moveModal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-box" style="max-width:440px">
+      <div class="modal-head">
+        <h3>Déplacer l'objet</h3>
+        <button class="modal-close" onclick="inv.closeMoveModal()" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="move-item-preview">
+          <span>📦</span>
+          <span id="moveItemName"></span>
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <label>Déplacer vers</label>
+          <select id="moveDest" class="move-dest-select"></select>
+        </div>
+        <div id="moveQtyWrap" class="field" style="display:none">
+          <label>
+            Quantité à déplacer
+            <span id="moveQtyMax" class="field-hint"></span>
+          </label>
+          <input type="number" id="moveQty" class="move-qty-input" min="1" value="1">
+          <p class="move-qty-hint">Le reste demeure dans l'inventaire source.</p>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="inv.closeMoveModal()">Annuler</button>
+        <button class="btn btn-primary" onclick="inv.confirmMove()">Déplacer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="inventory.js"></script>
+  <script>
+    initInventoryPage();
+  </script>
+
+</body>
+</html>

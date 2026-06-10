@@ -1033,9 +1033,9 @@ h3 { font-size: .98rem; font-weight: 600; letter-spacing: .06em; color: var(--iv
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 3px;
 }
-.nav-card.perso::before   { background: linear-gradient(90deg, var(--ember-deep), var(--ember)); }
-.nav-card.chariot::before { background: linear-gradient(90deg, #6B5A9E, var(--arcane)); }
-.nav-card.guilde::before  { background: linear-gradient(90deg, var(--brass), var(--candle)); }
+.nav-card.accent-0::before { background: linear-gradient(90deg, var(--ember-deep), var(--ember)); }
+.nav-card.accent-1::before { background: linear-gradient(90deg, #6B5A9E, var(--arcane)); }
+.nav-card.accent-2::before { background: linear-gradient(90deg, var(--brass), var(--candle)); }
 .nav-card:hover {
   transform: translateY(-5px);
   border-color: rgba(201,151,63,.55);
@@ -1077,6 +1077,117 @@ h3 { font-size: .98rem; font-weight: 600; letter-spacing: .06em; color: var(--iv
 .info-card p { font-size: .88rem; color: var(--ivory-dim); line-height: 1.65; }
 .info-card p strong { color: var(--ivory); }
 
+/* ── Carte « nouveau registre » & gestion ── */
+button.nav-card { font-family: var(--f-ui); cursor: pointer; width: 100%; }
+.nav-card-new {
+  background: transparent;
+  border: 2px dashed rgba(201,151,63,.4);
+  box-shadow: none;
+  color: var(--ivory-faint);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 190px;
+}
+.nav-card-new .nav-card-icon { color: var(--brass); opacity: .8; filter: none; }
+.nav-card-new .nav-card-title { color: var(--ivory-dim); }
+.nav-card-new:hover {
+  border-color: var(--brass);
+  background: rgba(233,185,90,.05);
+  color: var(--candle);
+}
+.nav-card-new:hover .nav-card-title { color: var(--candle); }
+
+.nc-settings {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--ivory-faint);
+  font-size: .9rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: var(--trans);
+  z-index: 2;
+}
+.nav-card:hover .nc-settings, .nc-settings:focus-visible { opacity: 1; }
+.nc-settings:hover { color: var(--candle); border-color: var(--brass); transform: rotate(40deg); }
+@media (hover: none) { .nc-settings { opacity: .85; } }
+
+/* ── Bouton « nouveau registre » dans la barre latérale ── */
+.nav-new-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px 13px;
+  background: transparent;
+  border: 1px dashed rgba(201,151,63,.4);
+  border-radius: var(--radius);
+  color: var(--ivory-faint);
+  font-family: var(--f-ui); font-size: .85rem; font-weight: 700;
+  cursor: pointer; text-align: left;
+  transition: var(--trans);
+}
+.nav-new-btn:hover { border-color: var(--brass); color: var(--candle); background: rgba(233,185,90,.05); }
+
+/* ── Sélecteur d'icône (modale registre) ── */
+.icon-picker {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+}
+.icon-opt {
+  display: grid; place-items: center;
+  aspect-ratio: 1;
+  font-size: 1.1rem;
+  background: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  filter: saturate(.75);
+  transition: var(--trans);
+}
+.icon-opt:hover { border-color: var(--line-bright); filter: none; }
+.icon-opt.selected {
+  border-color: var(--brass);
+  background: var(--candle-dim);
+  filter: none;
+  box-shadow: 0 0 8px rgba(233,185,90,.25);
+}
+@media (max-width: 480px) { .icon-picker { grid-template-columns: repeat(6, 1fr); } }
+
+/* ── Zone dangereuse (suppression de registre) ── */
+.inv-danger {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+  margin-top: 18px;
+  padding: 13px 15px;
+  background: rgba(210,96,58,.06);
+  border: 1px solid rgba(210,96,58,.35);
+  border-radius: var(--radius);
+}
+.inv-danger-text { font-size: .82rem; color: var(--ivory-dim); line-height: 1.5; }
+.inv-danger-text strong { display: block; color: var(--ember); font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; margin-bottom: 3px; }
+.inv-danger .btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+/* ── Bannière de rappel de sauvegarde ── */
+.backup-banner {
+  display: flex; align-items: center; gap: 13px; flex-wrap: wrap;
+  padding: 13px 17px;
+  margin-bottom: 18px;
+  background: linear-gradient(90deg, rgba(233,185,90,.1), rgba(233,185,90,.03)), var(--surface);
+  border: 1px solid rgba(201,151,63,.5);
+  border-left: 3px solid var(--candle);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm), var(--glow-candle);
+  animation: fadeUp .45s ease both;
+}
+.backup-banner .bb-icon { font-size: 1.3rem; }
+.backup-banner .bb-text { flex: 1; min-width: 220px; font-size: .88rem; color: var(--ivory-dim); line-height: 1.5; }
+.backup-banner .bb-text strong { color: var(--candle); }
+.backup-banner .bb-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.backup-banner .btn { padding: 7px 13px; font-size: .82rem; }
+
 /* ========== NAVIGATION MOBILE ========== */
 .mobile-nav {
   display: none;
@@ -1088,7 +1199,14 @@ h3 { font-size: .98rem; font-weight: 600; letter-spacing: .06em; color: var(--iv
   box-shadow: 0 -6px 22px rgba(0,0,0,.5);
   z-index: 200;
 }
-.mobile-nav-inner { display: flex; padding: 7px 4px calc(7px + env(safe-area-inset-bottom)); gap: 2px; }
+.mobile-nav-inner {
+  display: flex;
+  padding: 7px 4px calc(7px + env(safe-area-inset-bottom));
+  gap: 2px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.mobile-nav-inner a { min-width: 64px; flex-shrink: 0; }
 .mobile-nav a {
   flex: 1;
   display: flex; flex-direction: column; align-items: center; gap: 3px;

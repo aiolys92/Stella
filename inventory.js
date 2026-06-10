@@ -8,12 +8,88 @@
    • Ajout rapide, suppression annulable, toasts
    ══════════════════════════════════════════════ */
 
-/* Registre de tous les inventaires connus */
-const ALL_INVENTORIES = [
-  { key: 'inv_perso',   label: '👤 Perso · Dorusis', defaultCapacity: 45  },
-  { key: 'inv_chariot', label: '🛒 Chariot',          defaultCapacity: 400 },
-  { key: 'inv_guilde',  label: '⚔️ Guilde',           defaultCapacity: 800 },
+/* ──────── Registre dynamique des inventaires ────────
+   La liste des inventaires vit dans localStorage ('inv_registry').
+   Au premier lancement, les 3 registres historiques sont créés
+   (en conservant les données existantes inv_perso / inv_chariot / inv_guilde). */
+
+const REGISTRY_KEY = 'inv_registry';
+
+const DEFAULT_REGISTRY = [
+  { key: 'inv_perso',   label: 'Perso · Dorusis', icon: '👤', eyebrow: 'Registre personnel',
+    sub: "L'équipement que le héros porte sur les routes.",      capacity: 45  },
+  { key: 'inv_chariot', label: 'Chariot',          icon: '🛒', eyebrow: 'Registre de transport',
+    sub: 'Tout ce que la carriole emporte de halte en halte.',   capacity: 400 },
+  { key: 'inv_guilde',  label: 'Guilde',           icon: '⚔️', eyebrow: 'Registre de la confrérie',
+    sub: 'Le trésor commun, gardé sous bonne serrure.',          capacity: 800 },
 ];
+
+const INV_ICONS = ['👤','🛒','⚔️','🛡️','🎒','📦','🐎','🏰','🗝️','🧪','📜','💰','⛺','🛶','🔥','🏹'];
+
+function getRegistry() {
+  try {
+    const raw = localStorage.getItem(REGISTRY_KEY);
+    if (raw) {
+      const list = JSON.parse(raw);
+      if (Array.isArray(list) && list.length) return list;
+    }
+  } catch {}
+  /* Migration : première visite avec la nouvelle version */
+  _saveRegistry(DEFAULT_REGISTRY);
+  return [...DEFAULT_REGISTRY];
+}
+
+function _saveRegistry(list) {
+  try { localStorage.setItem(REGISTRY_KEY, JSON.stringify(list)); } catch {}
+}
+
+function invLabel(meta) { return `${meta.icon || '📦'} ${meta.label}`; }
+
+function _slugKey(label) {
+  const slug = (label || 'registre').toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '').slice(0, 24) || 'registre';
+  return `inv_${slug}_${Date.now().toString(36)}`;
+}
+
+function createInventory({ label, icon, sub, capacity }) {
+  label = (label || '').trim();
+  if (!label) return null;
+  const reg  = getRegistry();
+  const meta = {
+    key: _slugKey(label), label,
+    icon: icon || '📦',
+    eyebrow: 'Registre',
+    sub: (sub || '').trim(),
+    capacity: parseFloat(capacity) > 0 ? parseFloat(capacity) : 50,
+  };
+  reg.push(meta);
+  _saveRegistry(reg);
+  try {
+    localStorage.setItem(meta.key, JSON.stringify({
+      items: [], customCats: [], capacity: meta.capacity,
+      v: 6, savedAt: new Date().toISOString()
+    }));
+  } catch {}
+  return meta;
+}
+
+function updateInventory(key, patch) {
+  const reg = getRegistry();
+  const meta = reg.find(m => m.key === key);
+  if (!meta) return null;
+  Object.assign(meta, patch);
+  _saveRegistry(reg);
+  return meta;
+}
+
+function deleteInventory(key) {
+  const reg = getRegistry();
+  if (reg.length <= 1) return false;       /* on garde toujours au moins un registre */
+  _saveRegistry(reg.filter(m => m.key !== key));
+  try { localStorage.removeItem(key); } catch {}
+  return true;
+}
 
 const DEFAULT_CATS = [
   { nom: 'Arme',           type: 'arme'   },
@@ -34,12 +110,16 @@ const TYPE_ICONS = { arme: '⚔️', armure: '🛡️', autre: '📦' };
 
 /** Exporte les 3 inventaires en un seul fichier JSON */
 function globalExport() {
+  const registry = getRegistry();
   const payload = {
     type:        'stella-global',
+    version:     2,
     exportedAt:  new Date().toISOString(),
+    registry,
     inventaires: {}
   };
-  ALL_INVENTORIES.forEach(({ key, label }) => {
+  registry.forEach(meta => {
+    const { key, label } = meta;
     try {
       const raw = localStorage.getItem(key);
       const d   = raw ? JSON.parse(raw) : {};
@@ -58,7 +138,14 @@ function globalExport() {
     .reduce((s, inv) => s + inv.items.length, 0);
 
   _downloadJSON(payload, `stella-global-${_today()}.json`);
-  _showToast(`Export global : ${total} objet(s) sur 3 inventaires`, { type: 'success' });
+  _showToast(`Export global : ${total} objet(s) sur ${registry.length} registre(s)`, { type: 'success' });
+
+  /* Mémoriser pour le rappel de sauvegarde */
+  try {
+    localStorage.setItem('lastExportAt', String(Date.now()));
+    localStorage.removeItem('exportSnoozeUntil');
+  } catch {}
+  document.getElementById('backupBanner')?.remove();
 }
 
 /**
@@ -75,24 +162,40 @@ function globalImport(file) {
 
       /* ── Export GLOBAL ── */
       if (data.type === 'stella-global' && data.inventaires) {
+        /* v2 : le fichier transporte son propre registre.
+           v1 : on retombe sur les 3 registres historiques. */
+        const fileRegistry = Array.isArray(data.registry) && data.registry.length
+          ? data.registry
+          : DEFAULT_REGISTRY.filter(m => data.inventaires[m.key]);
+
         const total = Object.values(data.inventaires)
           .reduce((s, inv) => s + (inv.items || []).length, 0);
 
-        const detail = ALL_INVENTORIES.map(({ key, label }) => {
-          const n = (data.inventaires[key]?.items || []).length;
-          return `${label} — ${n} objet(s)`;
+        const detail = fileRegistry.map(meta => {
+          const n = (data.inventaires[meta.key]?.items || []).length;
+          return `${invLabel(meta)} — ${n} objet(s)`;
         }).join('<br>');
 
         _confirmDialog({
           title:    'Import global',
-          html:     `Ce fichier contient <strong>${total} objet(s)</strong> répartis sur les 3 inventaires :` +
+          html:     `Ce fichier contient <strong>${total} objet(s)</strong> répartis sur ` +
+                    `<strong>${fileRegistry.length} registre(s)</strong> :` +
                     `<div class="cm-list">${detail}</div>` +
-                    `<br>Les 3 inventaires actuels seront <strong>remplacés</strong>.`,
+                    `<br>Les registres actuels seront <strong>remplacés</strong>.`,
           okLabel:  'Remplacer tout',
           danger:   true,
         }).then(ok => {
           if (!ok) return;
-          ALL_INVENTORIES.forEach(({ key }) => {
+
+          /* Purger les anciens registres qui n'existent plus dans le fichier */
+          getRegistry().forEach(m => {
+            if (!fileRegistry.some(f => f.key === m.key)) {
+              try { localStorage.removeItem(m.key); } catch {}
+            }
+          });
+          _saveRegistry(fileRegistry);
+
+          fileRegistry.forEach(({ key }) => {
             const inv = data.inventaires[key];
             if (!inv) return;
             localStorage.setItem(key, JSON.stringify({
@@ -102,9 +205,10 @@ function globalImport(file) {
               v: 6, savedAt: new Date().toISOString()
             }));
           });
-          if (window.inv) { window.inv._load(); window.inv.render(); }
-          _refreshIndexCounts();
+
           _showToast(`Import global réussi — ${total} objet(s) chargés`, { type: 'success' });
+          /* Recharger pour reconstruire navigation et page courante */
+          setTimeout(() => location.reload(), 600);
         });
         return;
       }
@@ -134,7 +238,7 @@ function globalImport(file) {
 
 /** Met à jour les compteurs de la page d'accueil si présents */
 function _refreshIndexCounts() {
-  ALL_INVENTORIES.forEach(({ key }) => {
+  getRegistry().forEach(({ key }) => {
     const el = document.getElementById(`count-${key}`);
     if (!el) return;
     try {
@@ -155,7 +259,7 @@ class Inventory {
     this.title       = cfg.title;
     this.items       = [];
     this.customCats  = [];
-    this.capacity    = ALL_INVENTORIES.find(i => i.key === cfg.key)?.defaultCapacity || 50;
+    this.capacity    = getRegistry().find(i => i.key === cfg.key)?.capacity || 50;
     this.editId      = null;
     this.moveItemId  = null;
     this.filter      = '';
@@ -373,9 +477,9 @@ class Inventory {
 
     const destSel = document.getElementById('moveDest');
     if (destSel) {
-      destSel.innerHTML = ALL_INVENTORIES
+      destSel.innerHTML = getRegistry()
         .filter(inv => inv.key !== this.key)
-        .map(inv => `<option value="${inv.key}">${inv.label}</option>`)
+        .map(inv => `<option value="${inv.key}">${invLabel(inv)}</option>`)
         .join('');
     }
 
@@ -439,7 +543,8 @@ class Inventory {
     this.render();
     this.closeMoveModal();
 
-    const destLabel = ALL_INVENTORIES.find(i => i.key === destKey)?.label || destKey;
+    const destMeta  = getRegistry().find(i => i.key === destKey);
+    const destLabel = destMeta ? invLabel(destMeta) : destKey;
     _showToast(`${moveQty}× ${item.nom} → ${destLabel}`, { type: 'success' });
   }
 
@@ -1017,6 +1122,353 @@ sup { font-size: 6pt; color: #1565C0; }
       th.addEventListener('click', () => this.setSort(th.dataset.sort));
     });
   }
+}
+
+/* ══════════════════════════════════════════════
+   PAGES : NAVIGATION, ACCUEIL & GESTION DES REGISTRES
+   ══════════════════════════════════════════════ */
+
+/** Construit les liens d'inventaires (barre latérale + navigation mobile) */
+function renderNav(activeKey) {
+  const reg = getRegistry();
+  const side = document.getElementById('sidebarNavInv');
+  if (side) {
+    side.innerHTML = reg.map(m =>
+      `<a href="inventaire.html?inv=${encodeURIComponent(m.key)}"${m.key === activeKey ? ' class="active"' : ''}>` +
+      `<span class="nav-icon">${m.icon || '📦'}</span> ${_esc(m.label)}</a>`
+    ).join('');
+  }
+  const mob = document.getElementById('mobileNavInv');
+  if (mob) {
+    mob.innerHTML = reg.map(m => {
+      const short = m.label.split('·')[0].trim();
+      return `<a href="inventaire.html?inv=${encodeURIComponent(m.key)}"${m.key === activeKey ? ' class="active"' : ''}>` +
+             `<span class="mn-icon">${m.icon || '📦'}</span> ${_esc(short)}</a>`;
+    }).join('');
+  }
+}
+
+/** Initialise une page d'inventaire (inventaire.html?inv=clé) */
+function initInventoryPage() {
+  const reg    = getRegistry();
+  const wanted = new URLSearchParams(location.search).get('inv');
+  const meta   = reg.find(m => m.key === wanted) || reg[0];
+
+  document.title = `${meta.label} · Le Registre`;
+  const $ = id => document.getElementById(id);
+  if ($('phEyebrow'))  $('phEyebrow').textContent = meta.eyebrow || 'Registre';
+  if ($('phTitle'))    $('phTitle').textContent   = meta.label.toUpperCase();
+  if ($('phSub'))      $('phSub').textContent     = meta.sub || 'Objets consignés dans ce registre.';
+  if ($('phOrnament')) $('phOrnament').textContent = meta.icon || '📦';
+
+  renderNav(meta.key);
+  window.inv = new Inventory({ key: meta.key, title: meta.label });
+
+  _initPWA();
+  _checkExportReminder();
+  return meta;
+}
+
+/** Initialise la page d'accueil */
+function initHomePage() {
+  renderNav(null);
+  _renderHomeCards();
+  _initPWA();
+  _checkExportReminder();
+}
+
+/** Cartes des registres sur l'accueil (+ carte « nouveau ») */
+function _renderHomeCards() {
+  const wrap = document.getElementById('homeCards');
+  if (!wrap) return;
+  const reg = getRegistry();
+  wrap.innerHTML = reg.map((m, i) => {
+    let n = 0;
+    try { n = (JSON.parse(localStorage.getItem(m.key) || '{}').items || []).length; } catch {}
+    return `<a href="inventaire.html?inv=${encodeURIComponent(m.key)}" class="nav-card accent-${i % 3}">
+      <button type="button" class="nc-settings" title="Gérer ce registre" aria-label="Gérer ${_esc(m.label)}"
+        onclick="event.preventDefault();event.stopPropagation();openInvSettings('${m.key}')">⚙</button>
+      <span class="nav-card-icon">${m.icon || '📦'}</span>
+      <div class="nav-card-title">${_esc(m.label)}</div>
+      <div class="nav-card-sub">${_esc(m.sub || 'Objets consignés dans ce registre.')}</div>
+      <div class="nav-card-count" id="count-${m.key}">${n} objet${n !== 1 ? 's' : ''}</div>
+    </a>`;
+  }).join('') + `<button type="button" class="nav-card nav-card-new" onclick="openInvCreate()">
+      <span class="nav-card-icon">＋</span>
+      <div class="nav-card-title">Nouveau registre</div>
+      <div class="nav-card-sub">Ouvrir une page vierge du grimoire.</div>
+    </button>`;
+}
+
+/* ──────── Modales de gestion des registres ──────── */
+
+function _invFormHTML(meta = {}) {
+  const icons = INV_ICONS.map(ic =>
+    `<button type="button" class="icon-opt${ic === (meta.icon || '📦') ? ' selected' : ''}" data-icon="${ic}">${ic}</button>`
+  ).join('');
+  return `
+    <div class="field" style="margin-bottom:14px">
+      <label>Nom du registre *</label>
+      <input name="reg-label" type="text" maxlength="40" placeholder="Ex : Coffre de banque" value="${_esc(meta.label || '')}">
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Icône</label>
+      <div class="icon-picker">${icons}</div>
+    </div>
+    <div class="field" style="margin-bottom:14px">
+      <label>Sous-titre <span class="field-hint">(facultatif)</span></label>
+      <input name="reg-sub" type="text" maxlength="90" placeholder="Une ligne d'ambiance…" value="${_esc(meta.sub || '')}">
+    </div>
+    <div class="field">
+      <label>Capacité de charge (kg)</label>
+      <input name="reg-cap" type="number" min="1" step="1" value="${meta.capacity || 50}">
+    </div>`;
+}
+
+function _bindIconPicker(overlay) {
+  overlay.querySelectorAll('.icon-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      overlay.querySelectorAll('.icon-opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+}
+
+function _invModal({ title, meta, okLabel, extraFootHTML = '' }) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.innerHTML = `
+      <div class="modal-box" style="max-width:480px">
+        <div class="modal-head">
+          <h3>${title}</h3>
+          <button class="modal-close" data-act="cancel" aria-label="Fermer">✕</button>
+        </div>
+        <div class="modal-body">${_invFormHTML(meta)}${extraFootHTML}</div>
+        <div class="modal-foot">
+          <button class="btn btn-ghost" data-act="cancel">Annuler</button>
+          <button class="btn btn-primary" data-act="ok">${okLabel}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    _bindIconPicker(overlay);
+
+    const close = val => {
+      overlay.classList.remove('active');
+      document.removeEventListener('keydown', onKey);
+      setTimeout(() => overlay.remove(), 260);
+      resolve(val);
+    };
+    const onKey = e => { if (e.key === 'Escape') close(null); };
+    const collect = () => ({
+      label:    overlay.querySelector('[name="reg-label"]')?.value.trim(),
+      sub:      overlay.querySelector('[name="reg-sub"]')?.value.trim(),
+      capacity: overlay.querySelector('[name="reg-cap"]')?.value,
+      icon:     overlay.querySelector('.icon-opt.selected')?.dataset.icon || '📦',
+    });
+
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) return close(null);
+      const act = e.target.closest('[data-act]')?.dataset.act;
+      if (act === 'cancel') close(null);
+      if (act === 'delete') close({ _delete: true });
+      if (act === 'ok') {
+        const v = collect();
+        if (!v.label) {
+          const inp = overlay.querySelector('[name="reg-label"]');
+          inp?.classList.add('field-error');
+          setTimeout(() => inp?.classList.remove('field-error'), 600);
+          inp?.focus();
+          return;
+        }
+        close(v);
+      }
+    });
+    overlay.querySelector('[name="reg-label"]')?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); overlay.querySelector('[data-act="ok"]')?.click(); }
+    });
+    document.addEventListener('keydown', onKey);
+    requestAnimationFrame(() => {
+      overlay.classList.add('active');
+      overlay.querySelector('[name="reg-label"]')?.focus();
+    });
+  });
+}
+
+/** Création d'un registre, puis ouverture de sa page */
+function openInvCreate() {
+  _invModal({ title: 'Nouveau registre', meta: { capacity: 50 }, okLabel: 'Créer le registre' })
+    .then(v => {
+      if (!v || v._delete) return;
+      const meta = createInventory(v);
+      if (!meta) return;
+      _showToast(`Registre « ${meta.label} » créé`, { type: 'success' });
+      setTimeout(() => { location.href = `inventaire.html?inv=${encodeURIComponent(meta.key)}`; }, 450);
+    });
+}
+
+/** Réglages d'un registre : renommage, icône, capacité, suppression */
+function openInvSettings(key) {
+  const reg  = getRegistry();
+  const meta = reg.find(m => m.key === key);
+  if (!meta) return;
+
+  let capacity = meta.capacity;
+  try {
+    const d = JSON.parse(localStorage.getItem(key) || '{}');
+    if (parseFloat(d.capacity) > 0) capacity = parseFloat(d.capacity);
+  } catch {}
+
+  let count = 0;
+  try { count = (JSON.parse(localStorage.getItem(key) || '{}').items || []).length; } catch {}
+
+  const canDelete = reg.length > 1;
+  const extra = `
+    <div class="inv-danger">
+      <div class="inv-danger-text">
+        <strong>Zone dangereuse</strong>
+        Supprimer ce registre efface ses ${count} objet(s).
+        ${canDelete ? '' : '<br><em>Impossible : il faut conserver au moins un registre.</em>'}
+      </div>
+      <button type="button" class="btn btn-danger" data-act="delete" ${canDelete ? '' : 'disabled'}>Supprimer</button>
+    </div>`;
+
+  _invModal({
+    title: 'Gérer le registre',
+    meta: { ...meta, capacity },
+    okLabel: 'Enregistrer',
+    extraFootHTML: extra,
+  }).then(v => {
+    if (!v) return;
+
+    /* Suppression */
+    if (v._delete) {
+      _confirmDialog({
+        title:   'Supprimer le registre',
+        html:    `Supprimer définitivement <strong>${_esc(meta.label)}</strong> et ses <strong>${count} objet(s)</strong> ?<br>` +
+                 `<em>Pensez à exporter avant si nécessaire.</em>`,
+        okLabel: 'Supprimer définitivement',
+        danger:  true,
+      }).then(ok => {
+        if (!ok) return;
+        if (!deleteInventory(key)) return;
+        _showToast(`Registre « ${meta.label} » supprimé`, { type: 'danger' });
+        const onItsPage = window.inv?.key === key;
+        setTimeout(() => {
+          if (onItsPage) location.href = 'index.html';
+          else { renderNav(window.inv?.key || null); _renderHomeCards(); }
+        }, 500);
+      });
+      return;
+    }
+
+    /* Mise à jour */
+    updateInventory(key, { label: v.label, icon: v.icon, sub: v.sub, capacity: parseFloat(v.capacity) || meta.capacity });
+    try {
+      const d = JSON.parse(localStorage.getItem(key) || '{}');
+      d.capacity = parseFloat(v.capacity) || d.capacity;
+      localStorage.setItem(key, JSON.stringify(d));
+    } catch {}
+
+    _showToast(`Registre « ${v.label} » mis à jour`, { type: 'success' });
+    renderNav(window.inv?.key || null);
+    _renderHomeCards();
+
+    /* Rafraîchir la page courante si c'est elle */
+    if (window.inv?.key === key) {
+      window.inv.title = v.label;
+      window.inv._load();
+      window.inv.render();
+      const $ = id => document.getElementById(id);
+      if ($('phTitle'))    $('phTitle').textContent    = v.label.toUpperCase();
+      if ($('phSub'))      $('phSub').textContent      = v.sub || 'Objets consignés dans ce registre.';
+      if ($('phOrnament')) $('phOrnament').textContent = v.icon;
+      document.title = `${v.label} · Le Registre`;
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════
+   RAPPEL DE SAUVEGARDE
+   ══════════════════════════════════════════════ */
+
+const EXPORT_REMIND_DAYS = 14;   /* rappel si pas d'export depuis N jours */
+const EXPORT_SNOOZE_DAYS = 3;    /* « Plus tard » reporte de N jours */
+
+function _checkExportReminder() {
+  /* Rien à rappeler si le grimoire est vide */
+  let total = 0;
+  getRegistry().forEach(({ key }) => {
+    try { total += (JSON.parse(localStorage.getItem(key) || '{}').items || []).length; } catch {}
+  });
+  if (!total) return;
+
+  const now    = Date.now();
+  const last   = parseInt(localStorage.getItem('lastExportAt'))     || 0;
+  const snooze = parseInt(localStorage.getItem('exportSnoozeUntil')) || 0;
+  if (now < snooze) return;
+
+  const days = last ? Math.floor((now - last) / 864e5) : null;
+  if (last && days < EXPORT_REMIND_DAYS) return;
+
+  const main = document.querySelector('.main-wrap');
+  if (!main || document.getElementById('backupBanner')) return;
+
+  const msg = last
+    ? `Dernier export il y a <strong>${days} jour${days > 1 ? 's' : ''}</strong>.`
+    : `<strong>Aucun export</strong> n'a encore été réalisé.`;
+
+  const banner = document.createElement('div');
+  banner.id = 'backupBanner';
+  banner.className = 'backup-banner';
+  banner.setAttribute('role', 'status');
+  banner.innerHTML = `
+    <span class="bb-icon">🕯️</span>
+    <span class="bb-text">${msg} Le navigateur peut effacer les données locales — mettez le grimoire à l'abri.</span>
+    <span class="bb-actions">
+      <button class="btn btn-primary" onclick="globalExport()">Exporter maintenant</button>
+      <button class="btn btn-ghost" onclick="_snoozeExportReminder()">Plus tard</button>
+    </span>`;
+  main.prepend(banner);
+}
+
+function _snoozeExportReminder() {
+  try { localStorage.setItem('exportSnoozeUntil', String(Date.now() + EXPORT_SNOOZE_DAYS * 864e5)); } catch {}
+  document.getElementById('backupBanner')?.remove();
+  _showToast(`Rappel reporté de ${EXPORT_SNOOZE_DAYS} jours`, { type: 'info' });
+}
+
+/* ══════════════════════════════════════════════
+   PWA : SERVICE WORKER & INSTALLATION
+   ══════════════════════════════════════════════ */
+
+function _initPWA() {
+  /* Le service worker requiert http(s) — en ouverture directe de fichier,
+     le site fonctionne normalement, simplement sans mode hors-ligne. */
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    window._installEvt = e;
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = '';
+  });
+  window.addEventListener('appinstalled', () => {
+    const btn = document.getElementById('installBtn');
+    if (btn) btn.style.display = 'none';
+    _showToast('Le Registre est installé sur cet appareil', { type: 'success' });
+  });
+}
+
+function promptInstall() {
+  const evt = window._installEvt;
+  if (!evt) return;
+  evt.prompt();
+  evt.userChoice.finally(() => { window._installEvt = null; });
 }
 
 /* ══════════════════════════════════════════════

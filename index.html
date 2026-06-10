@@ -6,6 +6,9 @@
   <meta name="theme-color" content="#14100A">
   <title>Le Registre — Inventaires de Stella</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
 </head>
 <body>
 
@@ -18,18 +21,18 @@
     </div>
     <div class="sidebar-nav">
       <a href="index.html" class="active"><span class="nav-icon">🏠</span> Accueil</a>
-      <a href="perso.html"><span class="nav-icon">👤</span> Perso · Dorusis</a>
-      <a href="chariot.html"><span class="nav-icon">🛒</span> Chariot</a>
-      <a href="guilde.html"><span class="nav-icon">⚔️</span> Guilde</a>
+      <div id="sidebarNavInv"></div>
+      <button type="button" class="nav-new-btn" onclick="openInvCreate()">＋ Nouveau registre</button>
     </div>
     <div class="sidebar-global">
-      <div class="sidebar-global-title">Global · 3 inventaires</div>
+      <div class="sidebar-global-title">Global · tous les registres</div>
       <button class="sg-btn" onclick="globalExport()">💾 Exporter tout</button>
       <label class="sg-btn">
         📂 Importer tout
         <input type="file" accept=".json" style="display:none"
                onchange="if(this.files[0])globalImport(this.files[0]);this.value=''">
       </label>
+      <button class="sg-btn" id="installBtn" style="display:none" onclick="promptInstall()">📲 Installer l'application</button>
     </div>
     <div class="sidebar-footer">Données conservées localement,<br>à la lueur de la chandelle.</div>
   </nav>
@@ -38,9 +41,7 @@
   <nav class="mobile-nav">
     <div class="mobile-nav-inner">
       <a href="index.html" class="active"><span class="mn-icon">🏠</span> Accueil</a>
-      <a href="perso.html"><span class="mn-icon">👤</span> Perso</a>
-      <a href="chariot.html"><span class="mn-icon">🛒</span> Chariot</a>
-      <a href="guilde.html"><span class="mn-icon">⚔️</span> Guilde</a>
+      <span id="mobileNavInv" style="display:contents"></span>
     </div>
   </nav>
 
@@ -52,36 +53,13 @@
       <span class="hero-mark">✦</span>
       <h1>LE REGISTRE</h1>
       <div class="ornament">✦</div>
-      <p class="hero-sub">Trois inventaires consignés à la plume : ce que porte Dorusis,
-      ce que traîne le chariot, et ce que garde la guilde.</p>
+      <p class="hero-sub">Vos inventaires consignés à la plume, du sac du héros
+      au trésor de la guilde — et autant de registres que la campagne en demandera.</p>
     </header>
 
-    <!-- Les trois registres -->
-    <h2 class="section-title">Les trois registres</h2>
-    <div class="nav-cards">
-
-      <a href="perso.html" class="nav-card perso">
-        <span class="nav-card-icon">👤</span>
-        <div class="nav-card-title">Perso · Dorusis</div>
-        <div class="nav-card-sub">L'équipement que le héros porte sur lui.</div>
-        <div class="nav-card-count" id="count-inv_perso">— objets</div>
-      </a>
-
-      <a href="chariot.html" class="nav-card chariot">
-        <span class="nav-card-icon">🛒</span>
-        <div class="nav-card-title">Chariot</div>
-        <div class="nav-card-sub">Tout ce que la carriole emporte en voyage.</div>
-        <div class="nav-card-count" id="count-inv_chariot">— objets</div>
-      </a>
-
-      <a href="guilde.html" class="nav-card guilde">
-        <span class="nav-card-icon">⚔️</span>
-        <div class="nav-card-title">Guilde</div>
-        <div class="nav-card-sub">Le trésor commun de la confrérie.</div>
-        <div class="nav-card-count" id="count-inv_guilde">— objets</div>
-      </a>
-
-    </div>
+    <!-- Les registres -->
+    <h2 class="section-title">Les registres</h2>
+    <div class="nav-cards" id="homeCards"></div>
 
     <!-- Fonctionnalités -->
     <h2 class="section-title">Ce que le Registre sait faire</h2>
@@ -102,7 +80,15 @@
       </div>
       <div class="info-card">
         <h3>🔄 Déplacements</h3>
-        <p>Faites passer un objet — ou une partie d'une pile — d'un inventaire à l'autre. Une suppression malheureuse ? Le bouton « Annuler » la répare aussitôt.</p>
+        <p>Faites passer un objet — ou une partie d'une pile — d'un registre à l'autre. Une suppression malheureuse ? Le bouton « Annuler » la répare aussitôt.</p>
+      </div>
+      <div class="info-card">
+        <h3>📖 Registres à volonté</h3>
+        <p>Créez, renommez ou supprimez des registres selon la campagne : un coffre de banque, un repaire, le sac d'un second personnage…</p>
+      </div>
+      <div class="info-card">
+        <h3>📲 Application installable</h3>
+        <p>Hébergé en ligne, Le Registre s'installe comme une application et fonctionne entièrement hors-ligne — idéal en pleine séance. Un rappel discret vous invite à exporter régulièrement.</p>
       </div>
       <div class="info-card">
         <h3>💾 Sauvegarde</h3>
@@ -118,7 +104,7 @@
 
   <script src="inventory.js"></script>
   <script>
-    _refreshIndexCounts();
+    initHomePage();
   </script>
 
 </body>
