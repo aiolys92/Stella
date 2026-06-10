@@ -4,7 +4,7 @@
    ══════════════════════════════════════════════ */
 'use strict';
 
-const VERSION    = 'registre-v1';
+const VERSION    = 'registre-v2';
 const CORE_CACHE = `core-${VERSION}`;
 const FONT_CACHE = `fonts-${VERSION}`;
 
@@ -60,16 +60,35 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  /* Coquille applicative (même origine) */
-  if (url.origin === location.origin) {
+  if (url.origin !== location.origin) return;
+
+  /* Pages HTML & scripts : RÉSEAU d'abord (les mises à jour arrivent tout de suite),
+     cache en secours pour le mode hors-ligne. */
+  const isFresh = e.request.mode === 'navigate' ||
+                  url.pathname.endsWith('.html') ||
+                  url.pathname.endsWith('.js')   ||
+                  url.pathname.endsWith('.css');
+  if (isFresh) {
     e.respondWith(
-      caches.match(e.request, { ignoreSearch: true }).then(cached => {
-        const fetched = fetch(e.request).then(res => {
-          if (res.ok) caches.open(CORE_CACHE).then(c => c.put(e.request, res.clone()));
-          return res;
-        }).catch(() => cached);
-        return cached || fetched;
-      })
+      fetch(e.request).then(res => {
+        if (res.ok) caches.open(CORE_CACHE).then(c => c.put(e.request, res.clone()));
+        return res;
+      }).catch(() =>
+        caches.match(e.request, { ignoreSearch: true })
+          .then(c => c || caches.match('index.html'))
+      )
     );
+    return;
   }
+
+  /* Ressources statiques (icônes…) : cache d'abord, mise à jour silencieuse */
+  e.respondWith(
+    caches.match(e.request, { ignoreSearch: true }).then(cached => {
+      const fetched = fetch(e.request).then(res => {
+        if (res.ok) caches.open(CORE_CACHE).then(c => c.put(e.request, res.clone()));
+        return res;
+      }).catch(() => cached);
+      return cached || fetched;
+    })
+  );
 });

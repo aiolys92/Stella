@@ -42,9 +42,6 @@
     <div class="mobile-nav-inner">
       <a href="index.html" class="active"><span class="mn-icon">🏠</span> Accueil</a>
       <span id="mobileNavInv" style="display:contents"></span>
-      <button type="button" class="mn-more" onclick="openGlobalSheet()">
-        <span class="mn-icon">⚙️</span> Global
-      </button>
     </div>
   </nav>
 
@@ -63,6 +60,24 @@
     <!-- Les registres -->
     <h2 class="section-title">Les registres</h2>
     <div class="nav-cards" id="homeCards"></div>
+
+    <!-- Actions globales (affichées quand la barre latérale est masquée) -->
+    <section class="home-global mobile-only">
+      <h2 class="section-title">Global · tous les registres</h2>
+      <div class="home-global-actions">
+        <button class="sheet-btn" onclick="globalExport()">
+          💾 Exporter tout <span class="sheet-hint">sauvegarde JSON de tous les registres</span>
+        </button>
+        <label class="sheet-btn">
+          📂 Importer tout <span class="sheet-hint">depuis un fichier JSON</span>
+          <input type="file" accept=".json" style="display:none"
+                 onchange="if(this.files[0])globalImport(this.files[0]);this.value=''">
+        </label>
+        <button class="sheet-btn" id="installBtnHome" style="display:none" onclick="promptInstall()">
+          📲 Installer l'application <span class="sheet-hint">accès rapide et mode hors-ligne</span>
+        </button>
+      </div>
+    </section>
 
     <!-- Fonctionnalités -->
     <h2 class="section-title">Ce que le Registre sait faire</h2>
