@@ -1391,6 +1391,65 @@ function openInvSettings(key) {
 }
 
 /* ══════════════════════════════════════════════
+   FEUILLE D'ACTIONS GLOBALES (mobile)
+   ══════════════════════════════════════════════ */
+
+/** Panneau « Global · tous les registres » accessible depuis la nav mobile,
+    où la barre latérale n'est pas affichée. */
+function openGlobalSheet() {
+  const installRow = window._installEvt
+    ? `<button class="sheet-btn" data-act="install">📲 Installer l'application</button>`
+    : '';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay sheet-overlay';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.innerHTML = `
+    <div class="modal-box sheet-box">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="modal-head">
+        <h3>Global · tous les registres</h3>
+        <button class="modal-close" data-act="close" aria-label="Fermer">✕</button>
+      </div>
+      <div class="modal-body sheet-actions">
+        <button class="sheet-btn" data-act="export">💾 Exporter tout <span class="sheet-hint">sauvegarde JSON de tous les registres</span></button>
+        <label class="sheet-btn">📂 Importer tout <span class="sheet-hint">depuis un fichier JSON</span>
+          <input type="file" accept=".json" style="display:none" data-act="import-file">
+        </label>
+        <button class="sheet-btn" data-act="new">＋ Nouveau registre <span class="sheet-hint">ouvrir une page vierge du grimoire</span></button>
+        ${installRow}
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const close = () => {
+    overlay.classList.remove('active');
+    document.removeEventListener('keydown', onKey);
+    setTimeout(() => overlay.remove(), 260);
+  };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+
+  overlay.querySelector('[data-act="import-file"]')?.addEventListener('change', e => {
+    const f = e.target.files[0];
+    close();
+    if (f) globalImport(f);
+  });
+
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) return close();
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if (!act || act === 'import-file') return;
+    if (act === 'close')   close();
+    if (act === 'export')  { close(); globalExport(); }
+    if (act === 'new')     { close(); setTimeout(openInvCreate, 280); }
+    if (act === 'install') { close(); promptInstall(); }
+  });
+  document.addEventListener('keydown', onKey);
+  requestAnimationFrame(() => overlay.classList.add('active'));
+}
+
+/* ══════════════════════════════════════════════
    RAPPEL DE SAUVEGARDE
    ══════════════════════════════════════════════ */
 
