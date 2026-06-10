@@ -672,6 +672,13 @@ h3 { font-size: .98rem; font-weight: 600; letter-spacing: .06em; color: var(--iv
 .cb-label:hover .cb-icon { opacity: .75; }
 .cb-toggle:focus-visible + .cb-icon { outline: 2px solid var(--candle); }
 
+.cb-txt {
+  display: none;
+  font-size: .76rem; font-weight: 700;
+  color: var(--ivory-dim);
+  letter-spacing: .02em;
+}
+
 .halved-badge {
   display: inline-block;
   background: rgba(143,167,194,.14);
@@ -1294,62 +1301,122 @@ button.nav-card { font-family: var(--f-ui); cursor: pointer; width: 100%; }
   .table-wrap { background: transparent; border: none; box-shadow: none; }
 
   .inv-table tbody tr {
-    display: flex; flex-wrap: wrap;
+    display: flex; flex-wrap: wrap; align-items: center;
     margin-bottom: 11px;
-    padding: 6px 4px 8px;
+    padding: 12px 14px 8px;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
   }
-  .inv-table tbody tr:nth-child(even) td { background: transparent; }
+  /* Césures : forcent le passage à la ligne après le nom (ordre 2)
+     et après la ligne méta (ordre 6) */
+  .inv-table tbody tr::before,
+  .inv-table tbody tr::after {
+    content: '';
+    display: block;
+    width: 100%; height: 0;
+  }
+  .inv-table tbody tr::before { order: 2; }
+  .inv-table tbody tr::after  { order: 6; }
+  .inv-table tbody tr:nth-child(even) td,
   .inv-table tbody tr:hover td { background: transparent; }
+  .inv-table td { display: flex; align-items: center; border: none; padding: 0; min-width: 0; }
+  .inv-table td[data-label]::before { content: none; }
+  .inv-table td.hide-sm, .inv-table td.hide-md-only { display: flex; }
 
-  .inv-table td {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    border: none;
-    padding: 6px 13px;
-  }
-  .inv-table td[data-label]::before {
-    content: attr(data-label);
-    font-size: .64rem; font-weight: 800;
-    letter-spacing: .14em; text-transform: uppercase;
-    color: var(--ivory-faint);
-  }
-
-  /* Nom en tête de carte */
-  .td-name {
-    width: 100%; order: -2;
+  /* ── Ligne 1 : badge de catégorie + nom ── */
+  .inv-table td.td-cat { order: 0; width: auto; max-width: 46%; padding-right: 9px; flex-shrink: 0; }
+  .inv-table td.td-name {
+    order: 1; flex: 1 1 auto; min-width: 0;
     justify-content: flex-start;
-    font-size: 1.02rem;
-    padding-top: 9px;
-    border-bottom: 1px solid var(--line-soft) !important;
-    padding-bottom: 8px;
+    font-size: 1.02rem; line-height: 1.3;
   }
-  .td-cat { width: 100%; order: -1; justify-content: flex-start; padding-top: 8px; }
 
-  .td-qty, .td-weight, .td-price { width: 50%; }
-  .inv-table td.hide-sm { display: flex; }        /* on ré-affiche le prix en mode carte */
-  .inv-table td.hide-md-only { display: flex; width: 100%; }
-  .td-stats { flex-wrap: wrap; justify-content: flex-start; }
-  .td-stats::before { width: 100%; }
+  /* ── Ligne 2 : méta  ×qté · poids · prix/u ── */
+  .inv-table td.td-qty, .inv-table td.td-weight, .inv-table td.td-price {
+    width: auto;
+    padding: 6px 0 0;
+    font-size: .86rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ivory-dim);
+    white-space: nowrap;
+  }
+  .inv-table td.td-qty { order: 3; }
+  .inv-table td.td-qty::before { content: '×'; color: var(--ivory-faint); }
+  .inv-table td.td-weight { order: 4; color: var(--ivory); }
+  .inv-table td.td-weight::before,
+  .inv-table td.td-price::before { content: '·'; color: var(--ivory-faint); margin: 0 7px; }
+  .inv-table td.td-price { order: 5; margin-right: auto; }
+  .inv-table td.td-price::after {
+    content: '/ u';
+    font-size: .7rem;
+    color: var(--ivory-faint);
+    margin-left: 3px;
+  }
 
-  .inv-table td.td-etat { width: 100%; justify-content: flex-start; gap: 18px; }
-  .inv-table td.td-actions {
+  /* ── Ligne 3 : puces de caractéristiques (masquée si vide) ── */
+  .inv-table td.td-stats {
+    order: 7; width: 100%;
+    padding: 7px 0 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .inv-table td.td-stats.is-empty { display: none; }
+
+  /* ── Ligne 4 : pastilles d'état + actions ── */
+  .inv-table td.td-etat {
+    order: 8;
     width: 100%;
-    justify-content: space-around;
+    margin-top: 10px;
+    padding: 10px 0 2px;
     border-top: 1px solid var(--line-soft);
-    margin-top: 4px; padding-top: 8px;
+    gap: 8px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+  .inv-table td.td-actions {
+    order: 9;
+    width: 100%;
+    padding: 7px 0 2px;
+    gap: 4px;
+    justify-content: flex-end;
   }
 
-  /* Teinte « sur moi » sur la carte entière, pas cellule par cellule */
+  .td-etat .cb-label {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin: 0;
+    padding: 5px 12px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    transition: var(--trans);
+  }
+  .td-etat .cb-label.on {
+    background: var(--candle-dim);
+    border-color: rgba(201,151,63,.55);
+  }
+  .td-etat .cb-icon {
+    padding: 0; border: none;
+    background: none !important;
+    box-shadow: none !important;
+    font-size: .95rem;
+    opacity: .55;
+  }
+  .td-etat .cb-label.on .cb-icon { opacity: 1; }
+  .td-etat .cb-txt { display: inline; }
+  .td-etat .cb-label.on .cb-txt { color: var(--candle); }
+
+  .td-actions .icon-btn { padding: 8px 11px; font-size: 1.05rem; }
+
+  /* ── Teintes « sur moi » & magie ── */
   .inv-table tbody tr.row-onme { background: rgba(138,174,143,.07); border-color: rgba(138,174,143,.3); }
   .inv-table tbody tr.row-onme td { background: transparent !important; }
   .inv-table tbody tr.row-magic { border-left: 3px solid rgba(233,185,90,.55); }
   .row-magic td:first-child { box-shadow: none; }
-  .td-actions .icon-btn { padding: 8px 12px; font-size: 1.05rem; }
+  .row-onme .td-name::after { display: none; } /* redondant avec la pastille « sur moi » */
 
-  .empty-state { display: block !important; width: 100%; }
+  .empty-state { display: block !important; width: 100%; padding: 44px 16px !important; }
   .empty-state::before { display: none; }
   .table-footer {
     background: var(--surface);

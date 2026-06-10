@@ -763,19 +763,21 @@ class Inventory {
     const magicBadge = item.magique ? ' <span class="magic-star" title="Objet magique">✨</span>' : '';
     const wLabel = effW.toFixed(2) + ' kg' + (item.porte ? ' <span class="halved-badge">÷2</span>' : '');
 
+    let hasStats = false;
     let statsHtml = '<span class="stat-chips">';
     if (type === 'arme') {
       [['Init',item.initiative],['Atq',item.attaque],['Par',item.parade],['Par2',item.seconde_parade],['Dmg',item.dommage]]
         .filter(([,v])=>v&&String(v).trim())
-        .forEach(([k,v])=>{ statsHtml+=`<span class="stat-chip">${k} <strong>${_esc(v)}</strong></span>`; });
+        .forEach(([k,v])=>{ hasStats=true; statsHtml+=`<span class="stat-chip">${k} <strong>${_esc(v)}</strong></span>`; });
       if (item.autres?.trim()) {
         const t = item.autres.trim();
+        hasStats = true;
         statsHtml += `<span class="stat-text" title="${_esc(t)}">${_esc(t.length>35?t.slice(0,33)+'…':t)}</span>`;
       }
     } else if (type === 'armure') {
-      if (item.encaissement) statsHtml += `<span class="stat-chip">Enc <strong>${_esc(item.encaissement)}</strong></span>`;
+      if (item.encaissement) { hasStats=true; statsHtml += `<span class="stat-chip">Enc <strong>${_esc(item.encaissement)}</strong></span>`; }
     } else {
-      if (item.caracteristiques) { const t=item.caracteristiques; statsHtml+=`<span class="stat-text" title="${_esc(t)}">${_esc(t.length>45?t.slice(0,43)+'…':t)}</span>`; }
+      if (item.caracteristiques) { const t=item.caracteristiques; hasStats=true; statsHtml+=`<span class="stat-text" title="${_esc(t)}">${_esc(t.length>45?t.slice(0,43)+'…':t)}</span>`; }
     }
     statsHtml += '</span>';
 
@@ -786,18 +788,18 @@ class Inventory {
       <td class="td-name">${_esc(item.nom)}</td>
       <td class="text-c td-qty" data-label="Quantité">${item.quantite}</td>
       <td class="text-c etat-cell td-etat" data-label="État">
-        <label class="cb-label" title="Poids porté (÷2)">
+        <label class="cb-label${item.porte?' on':''}" title="Poids porté (÷2)">
           <input type="checkbox" class="cb-toggle" ${item.porte?'checked':''} onchange="inv.toggleField('${item.id}','porte')">
-          <span class="cb-icon${item.porte?' cb-active':''}">⚖️</span>
+          <span class="cb-icon${item.porte?' cb-active':''}">⚖️</span><span class="cb-txt">porté</span>
         </label>
-        <label class="cb-label" title="Sur moi">
+        <label class="cb-label${item.surMoi?' on':''}" title="Sur moi">
           <input type="checkbox" class="cb-toggle" ${item.surMoi?'checked':''} onchange="inv.toggleField('${item.id}','surMoi')">
-          <span class="cb-icon${item.surMoi?' cb-active':''}">👤</span>
+          <span class="cb-icon${item.surMoi?' cb-active':''}">👤</span><span class="cb-txt">sur moi</span>
         </label>
       </td>
       <td class="text-r td-weight" data-label="Poids total">${wLabel}</td>
       <td class="text-r hide-sm td-price" data-label="Prix / u">${prix.toFixed(2)} pm</td>
-      <td class="hide-md-only td-stats" data-label="Caractéristiques">${statsHtml}</td>
+      <td class="hide-md-only td-stats${hasStats?'':' is-empty'}" data-label="Caractéristiques">${statsHtml}</td>
       <td class="text-c td-actions" style="white-space:nowrap">
         <button class="icon-btn" onclick="inv.openModal('${item.id}')" title="Modifier" aria-label="Modifier">✏️</button>
         <button class="icon-btn" onclick="inv.openMoveModal('${item.id}')" title="Déplacer vers…" aria-label="Déplacer">🔄</button>
